@@ -53,15 +53,34 @@
 * **Context Mode**: `Coding`
 * **Rule**: 禁止在一个 Task 中修改 Plan 未定义的范围。
 
-### State D: 三级验证 (Tiered Verification)
+### State D: 三级验证 (Tiered Verification) [v1.4.0增强]
 
-* **Goal**: 数学与行为验证
-* **Flow**:
-* Tier 1: 结构验证 (`tree` check vs `systemPatterns`)
-* Tier 2: 签名验证 (Interface check vs `techContext`)
-* Tier 3: 行为验证 (Test check vs `behaviorContext`)
-
+* **Goal**: 数学与行为验证，确保代码实现符合T1公理约束
 * **Context Mode**: `Verifying`
+
+* **Flow**:
+1. **Tier 1: 结构验证 (Structure Verification)**
+   - **检查点**: 代码目录结构 vs `systemPatterns.md` 定义
+   - **验证**: $S_{fs} \cong S_{doc}$ (文件系统 ≅ 文档定义)
+   - **工具**: `tree` 命令对比 ASCII 目录树
+   - **失败处理**: 回退 State C 修复架构偏离
+
+2. **Tier 2: 签名验证 (Signature Verification)**
+   - **检查点**: 接口实现 vs `techContext.md` 定义
+   - **验证**: $I_{code} \supseteq I_{doc}$ (代码接口 ⊇ 文档接口)
+   - **工具**: 函数签名、API端点、类型签名对比
+   - **失败处理**: 回退 State C 补充接口实现
+
+3. **Tier 3: 行为验证 (Behavior Verification)**
+   - **检查点**: 测试用例 vs `behaviorContext.md` 断言
+   - **验证**: $B_{code} \equiv B_{spec}$ (代码行为 ≡ 规范行为)
+   - **工具**: 单元测试/集成测试覆盖断言
+   - **失败处理**: 回退 State C 修复行为偏离
+
+* **Exit Criteria**:
+- [ ] Tier 1: 目录结构 100% 匹配
+- [ ] Tier 2: 所有定义的接口已实现
+- [ ] Tier 3: 关键行为测试通过率 ≥ 90%
 
 ### State E: 收敛与审计 (Convergence & Audit)
 
