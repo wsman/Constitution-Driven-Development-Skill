@@ -1,180 +1,48 @@
-# CDD (Constitution-Driven Development) 配置文件
-# 文件路径: memory_bank/cdd_config.yaml
-# 版本: v1.3.0
+# CDD Configuration v1.3.0
 
-# ============================================
-# 外部审计者配置 (External Auditor) v1.3.0增强
-# ============================================
-external_auditor:
-  # 是否启用外部审计者
-  enabled: true
-  
-  # 模型配置
-  model: "deepseek-reasoner"  # 深度推理模型
-  max_tokens: 8192  # v1.3.0: 完整审计需要8192 tokens
-  
-  # API 配置
-  api:
-    base_url: "https://api.deepseek.com"
-    api_key: "${DEEPSEEK_API_KEY}"
-    timeout: 300  # 超时时间(秒)
-  
-  # 审计策略
-  strategy:
-    # 审计范围
-    scope:
-      - "t0_documents"      # T0级别文档
-      - "t1_documents"      # T1级别文档 (v1.3.0新增)
-      - "spec_plan_consistency"  # Spec/Plan一致性 (v1.3.0新增)
-    
-    # 触发时机
-    trigger_on:
-      - "t0_document_change"    # T0文档变更
-      - "release_candidate"     # 发布候选版本
-      - "manual_trigger"        # 手动触发
-    
-    # 审计深度
-    depth: "comprehensive"  # shallow/comprehensive/deep
-  
-  # 审计报告配置
-  report:
+# Audit & Governance Settings
+
+project:
+  name: "{{PROJECT_NAME}}"
+  version: "0.1.0"
+  entropy_threshold: 0.3  # H_sys target
+
+# 外部审计配置
+
+audit:
+  provider: "deepseek-reasoner"
+  api_config:
+    base_url: "https://api.deepseek.com/chat/completions"
+    timeout: 120
+  trigger_policy:
+    on_state_change: ["State E"]  # State E 结束时自动触发
+    on_file_change: ["memory_bank/01_active_state/*.md"]
+  reporting:
     format: "markdown"
-    include_api_data: true   # v1.3.0: 包含真实API数据
-    include_scores: true     # v1.3.0: 包含三维度评分
-    output_dir: "research_report/"
-    filename_pattern: "cdd_skill_audit_{timestamp}.md"
-  
-  # Discord通知配置
-  discord:
-    enabled: true
-    channel_id: "${DISCORD_CHANNEL_ID}"  # Discord频道ID
-    webhook_url: "${DISCORD_WEBHOOK_URL}"  # Webhook URL
+    output_dir: "reports/audits"
+    notify_channels: ["console"]
 
-# ============================================
-# 主模型配置 (Primary Model)
-# ============================================
-primary_model:
-  model: "minimax/MiniMax-M2.1"
-  api:
-    base_url: "https://api.minimax.io/anthropic"
-    api_key: "${MINIMAX_API_KEY}"
+# 上下文管理配置 (DS-007 实现)
 
-# ============================================
-# 熵值计算配置 (v1.3.0新增)
-# ============================================
-entropy_calculation:
-  # 启用自动计算
-  auto_calculate: true
-  
-  # 计算时机
-  calculate_on:
-    - "state_e_entry"    # 进入State E时
-    - "document_change"  # 文档变更时
-  
-  # 权重配置
-  weights:
-    c_dir: 0.4    # 目录结构合规率
-    c_sig: 0.3    # 接口签名覆盖率
-    c_test: 0.3   # 测试通过率
-  
-  # 阈值配置
-  thresholds:
-    excellent: 0.3   # <= 0.3
-    good: 0.5        # <= 0.5
-    warning: 0.7     # <= 0.7
-    danger: 1.0      # > 0.7
-  
-  # 脚本路径
-  script_path: "scripts/measure_entropy.py"
-
-# ============================================
-# 验证配置
-# ============================================
-verification:
-  tiers:
-    tier1:
-      enabled: true
-      description: "物理结构验证 (filesystem vs ASCII tree)"
-      command: "tree src/ > actual.txt"
-    tier2:
-      enabled: true
-      description: "签名验证 (code vs interface definition)"
-    tier3:
-      enabled: true
-      description: "行为验证 (runtime vs behavior assertion)"
-
-# ============================================
-# Spec-Kit 集成配置 (v1.3.0新增)
-# ============================================
-spec_kit:
-  # Clarify 工作流
-  clarify:
-    enabled: true
-    auto_trigger: true  # 自动触发Clarify
-    
-  # DS-050/051/052 模板路径
-  templates:
-    spec: "templates/standards/DS-050_FEATURE_SPECIFICATION.md"
-    plan: "templates/standards/DS-051_IMPLEMENTATION_PLAN.md"
-    tasks: "templates/standards/DS-052_ATOMIC_TASKS.md"
-  
-  # 输出路径
-  output:
-    specs_dir: "specs/"
-    plans_dir: "plans/"
-    tasks_dir: "tasks/"
-
-# ============================================
-# 上下文管理配置 (v1.3.0新增)
-# ============================================
-context_management:
-  # 上下文模式
+context_strategy:
+  max_tokens: 8000
+  safety_margin: 0.1 # 保留 10% 缓冲
   modes:
     planning:
-      load: ["t0", "t1", "ds050", "ds051"]
-      unload: []
-      max_tokens: 8000
+      include: ["systemPatterns.md", "techContext.md"]
+      budget_ratio: 0.5
     coding:
-      load: ["ds050_summary", "ds051_step", "ds052_task", "current_file"]
-      unload: ["t0_full", "t1_full"]
-      max_tokens: 4000
+      include: ["DS-050", "DS-051", "DS-052"]
+      exclude: ["README.md", "history_logs"]
+      budget_ratio: 0.7
     verifying:
-      load: ["ds050", "test_results"]
-      unload: []
-      max_tokens: 4000
-    calibrating:
-      load: ["active_context", "verification_results"]
-      unload: []
-      max_tokens: 2000
+      include: ["behaviorContext.md"]
+      budget_ratio: 0.6
 
-# ============================================
-# 审计策略配置
-# ============================================
-audit_policies:
-  security:
-    enabled: true
-    check_for:
-      - "sql_injection"
-      - "xss_vulnerabilities"
-      - "auth_bypass"
-  
-  quality:
-    enabled: true
-    check_for:
-      - "code_smells"
-      - "complexity"
-  
-  compliance:
-    enabled: true
-    constitution_refs:
-      - "§152"  # 单一真理源
-      - "§381"  # 安全公理
-      - "§114"  # 双存储同构
+# 路径配置
 
-# ============================================
-# 报告配置
-# ============================================
-reports:
-  output_dir: "research_report/"
-  retention_days: 30
-  auto_archive: true
+paths:
+  memory_bank: "memory_bank"
+  templates: "templates"
+  specs: "specs"
+  src: "src"
