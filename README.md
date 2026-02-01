@@ -105,7 +105,7 @@ cp cdd/templates/*_index.md memory_bank/00_indices/
 cp cdd/templates/activeContext.md memory_bank/01_active_state/
 cp cdd/templates/KNOWLEDGE_GRAPH.md memory_bank/02_systemaxioms/
 
-# Copy T1 templates (NEW v1.2.0)
+# Copy T1 templates (NEW v1.3.2)
 cp cdd/templates/systemPatterns.md memory_bank/02_systemaxioms/
 cp cdd/templates/techContext.md memory_bank/02_systemaxioms/
 cp cdd/templates/behaviorContext.md memory_bank/02_systemaxioms/
@@ -118,14 +118,14 @@ cp cdd/templates/readme_template.md README.md
 
 ```
 cdd/
-├── SKILL.md                         # Main skill file (v1.2.0, with Appendix A)
-├── README.md                        # This file (v1.2.0)
+├── SKILL.md                         # Main skill file (v1.3.2, with Appendix A)
+├── README.md                        # This file (v1.3.2)
 ├── templates/                       # T0/T1 document templates
 │   ├── 01_basic_law_index.md        # Basic Law Index
 │   ├── 02_procedural_law_index.md   # Procedural Law Index
 │   ├── 03_technical_law_index.md    # Technical Law Index
-│   ├── activeContext.md             # Active Context (v1.2.0)
-│   ├── KNOWLEDGE_GRAPH.md           # Knowledge Graph (v1.2.0, Mermaid)
+│   ├── activeContext.md             # Active Context (v1.3.2)
+│   ├── KNOWLEDGE_GRAPH.md           # Knowledge Graph (v1.3.2, Mermaid)
 │   ├── systemPatterns.md            # T1: Architecture patterns (NEW)
 │   ├── techContext.md               # T1: Interface signatures (NEW)
 │   ├── behaviorContext.md           # T1: Behavior assertions (NEW)
@@ -136,7 +136,7 @@ cdd/
     └── calculate_entropy.py         # Entropy calculation script (NEW)
 ```
 
-## Core Mathematics (v1.2.0)
+## Core Mathematics (v1.3.2)
 
 **System Entropy** (Updated with H_align):
 $$
@@ -148,7 +148,7 @@ Where:
 - **H_struct** (Structural Entropy): $1 - N_{linked}/N_{total}$
 - **H_align** (Alignment Deviation): $N_{violation} / N_{constraints}$ (NEW)
 
-**Calibration Standard** (v1.2.0):
+**Calibration Standard** (v1.3.2):
 - 🟢 **Excellent**: $0.0 - 0.3$ (Calibration Target)
 - 🟡 **Good**: $0.3 - 0.5$ (Normal Development)
 - 🟠 **Warning**: $0.5 - 0.7$ (Start Repairs)
@@ -179,7 +179,7 @@ Use with OpenClaw + MiniMax M2.1 for development, DeepSeek-Reasoner for auditing
    - **Tier 3**: Behavior ($B_{code} \equiv B_{spec}$) vs `behaviorContext.md`
 5. **State E (Converge)**: Calibrate $H_{sys} \leq 0.3$, complete
 
-## External Auditor (v1.2.0)
+## External Auditor (v1.3.2)
 
 CDD includes an **External Auditor** for third-party AI review:
 
@@ -189,7 +189,7 @@ CDD includes an **External Auditor** for third-party AI review:
 - **Scope**: T0 documents only
 - **Output**: Markdown report with real API data → Discord notification
 
-**API Data Requirement** (v1.2.0):
+**API Data Requirement** (v1.3.2):
 - Request ID, timestamps, latency (ms), token counts (exact, no estimates)
 
 ## Closed-Loop Verification Checklist

@@ -1,6 +1,6 @@
-# CDD 模板使用指南 [v1.1.0]
+# CDD 模板使用指南 [v1.3.2]
 
-## 模型配置 [v1.1.0新增]
+## 模型配置 [v1.3.2新增]
 
 CDD框架使用双模型架构：
 
@@ -126,9 +126,9 @@ external_auditor:
 - `cdd_config.yaml` 中的审计策略
 - 添加自定义的 DS-xxx 和 WF-xxx 文件
 
-## 开发流程 [v1.1.0更新]
+## 开发流程 [v1.3.2更新]
 
-### 启动开发 (Bootloader Sequence) [v1.1.0更新]
+### 启动开发 (Bootloader Sequence) [v1.3.2更新]
 
 1. **Phase 1: 引导输入** - 加载 `README.md`，提取项目背景注入 `activeContext.md`
 2. **Phase 2: 内核加载** - 加载 5 个 T0 核心文档
