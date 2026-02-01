@@ -1,7 +1,7 @@
 # Constitution-Driven Development Skill (CDD)
 
-**Version**: 1.2.0  
-**Codename**: Engineering Hardened  
+**Version**: 1.3.0  
+**Codename**: Governance Automation  
 **License**: Apache-2.0  
 **Author**: wsman
 
