@@ -1,15 +1,15 @@
 ---
 name: cdd
-description: 宪法驱动开发 (Constitution-Driven Development) v1.3.2 Final Polish。使用MiniMax M2.1模型进行AI辅助开发，基于合规度熵值模型、Spec-Kit工作流和三级验证。架构优化完成，snake_case命名规范，目录结构清晰。
+description: 宪法驱动开发 (Constitution-Driven Development) v1.4.0 Quality & Governance Integration。使用MiniMax M2.1模型进行AI辅助开发，基于合规度熵值模型、Spec-Kit工作流、三级验证和质量门禁。集成WF-ANALYZE规划校验、DS-053质量检查单、DS-054环境硬化。
 model: minimax/MiniMax-M2.1
-version: v1.3.2
+version: v1.4.0
 ---
 
-# 宪法驱动开发 (CDD) v1.3.2
+# 宪法驱动开发 (CDD) v1.4.0
 
 使用 MiniMax M2.1 模型进行 AI 辅助软件开发，遵循逆熵实验室三级法律体系约束。
 
-**版本**: v1.3.2 (Final Polish)
+**版本**: v1.4.0 (Quality & Governance Integration)
 
 **状态**: 🟢 Production Ready
 

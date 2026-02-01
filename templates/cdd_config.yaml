@@ -1,5 +1,5 @@
-# CDD Configuration v1.3.2
-# Final Polish
+# CDD Configuration v1.4.0
+# Quality & Governance Integration
 
 project:
   name: "{{PROJECT_NAME}}"
@@ -21,15 +21,38 @@ external_auditor:
     format: "markdown"
     output_dir: "research_report"
 
-# Spec-Kit 集成配置 (v1.3.2 Updated)
+# Spec-Kit 集成配置 (v1.4.0 Updated)
 spec_kit:
   templates:
     spec: "templates/standards/DS-050_feature_specification.md"
     plan: "templates/standards/DS-051_implementation_plan.md"
     tasks: "templates/standards/DS-052_atomic_tasks.md"
+    quality_checklist: "templates/standards/DS-053_quality_checklist.md"
+    environment_hardening: "templates/standards/DS-054_environment_hardening.md"
   output:
     specs_dir: "specs"
     plans_dir: "plans"
+    checklists_dir: "memory_bank/checklists"
+
+# 质量门禁配置 (v1.4.0新增)
+quality_gates:
+  analyze:
+    enabled: true
+    mandatory: true
+    trigger: "after DS-052 generation"
+    output: "memory_bank/protocols/analysis_report.md"
+  checklist:
+    enabled: true
+    mandatory: false
+    trigger: "after Analyze pass"
+    output_dir: "memory_bank/checklists"
+  environment_hardening:
+    enabled: true
+    mandatory: true
+    trigger: "before State C execution"
+    skip_patterns:
+      - "*.docs"
+      - "*.refactor"
 
 # 上下文管理 (DS-007)
 context_strategy:
@@ -46,7 +69,7 @@ context_strategy:
       include: ["templates/axioms/behavior_context.md"]
       budget_ratio: 0.6
 
-# 路径配置 (v1.3.2 Final Polish)
+# 路径配置 (v1.4.0)
 paths:
   templates:
     core: "templates/core"

@@ -1,7 +1,7 @@
 # Constitution-Driven Development Skill (CDD)
 
-**Version**: 1.3.2  
-**Codename**: Final Polish  
+**Version**: 1.4.0  
+**Codename**: Quality & Governance Integration  
 **License**: Apache-2.0  
 **Author**: wsman
 
