@@ -1,6 +1,6 @@
 # WF-ANALYZE: 规划一致性校验工作流
 
-**版本**: v1.3.2  
+**版本**: v1.4.0  
 **协议类型**: T2-工作流协议  
 **触发时机**: State B (DS-052 Tasks生成后) → State C (执行前)  
 **执行模式**: 只读分析 (Read-Only Analysis)
