@@ -1,26 +1,26 @@
 # Constitution-Driven Development Skill (CDD)
 
-**Version**: 1.4.0  
-**Codename**: Quality & Governance Integration  
+**Version**: 1.5.0  
+**Codename**: Ecosystem & Automation  
 **License**: Apache-2.0  
 **Author**: wsman
 
-A comprehensive skill for OpenClaw that implements Constitution-Driven Development (CDD) methodology using MiniMax M2.1 model. External auditing with DeepSeek-Reasoner.
+A comprehensive skill for OpenClaw that implements Constitution-Driven Development (CDD) methodology using MiniMax M2.1 model. Features ecosystem automation, GitHub integration, and governance protocols.
 
 ## Overview
 
-CDD is a systematic approach to AI-assisted software development that enforces strict documentation-driven workflows, three-tier verification, and system entropy monitoring. It features a closed-loop architecture with external auditing capabilities.
+CDD is a systematic approach to AI-assisted software development that enforces strict documentation-driven workflows, three-tier verification, and system entropy monitoring. v1.5.0 introduces ecosystem automation with GitHub sync, feature scaffolding, and constitution amendment protocols.
 
 ## Features
 
-- 📜 **T0/T1 Document System**: Core consciousness (T0) + System axioms (T1)
+- 📜 **T0/T1/T2 Document System**: Core consciousness → System axioms → Executable standards
 - 🔄 **Five-State Workflow**: A→B→C→D→E (Ingest → Plan → Execute → Verify → Converge)
 - ✅ **Three-Tier Verification**: Structure → Signatures → Behavior
-- 📊 **Entropy Monitoring**: Real-time $H_{sys}$ metrics with H_alignment
-- 🎯 **System Entropy Calculation**: Python scripts for H_cog, H_struct, H_align
+- 📊 **Entropy Monitoring**: Real-time $H_{sys}$ metrics with compliance-based scoring
 - 🤖 **External Auditor**: Third-party AI review with deepseek-reasoner
+- 🚀 **Ecosystem Automation**: GitHub Issues sync, feature scaffolding scripts
+- ⚖️ **Governance Protocols**: Constitution amendment workflows (SemVer-based)
 - 📋 **Knowledge Graph**: Mermaid visualization support
-- 📐 **T1 Templates**: systemPatterns, techContext, behaviorContext
 
 ## Document Hierarchy
 
@@ -226,6 +226,48 @@ Before completing any task, verify:
 - See `templates/system_patterns.md` for Tier 1 verification template
 - See `templates/tech_context.md` for Tier 2 verification template
 - See `templates/behavior_context.md` for Tier 3 verification template
+
+## 🚀 CDD v1.5.0 (Ecosystem & Automation) - Gold Release
+
+**Status**: 🟢 Production Ready | **Score**: 9.0/10 | **Audit**: deepseek-reasoner
+
+### v1.5.0 New Features
+
+| Component | Function |
+|-----------|----------|
+| `scripts/cdd-feature.py` | Feature scaffolding: auto-numbering, Git branch creation, template instantiation |
+| `templates/protocols/WF-sync-issues.md` | GitHub Issues sync protocol (DS-052 → Issues) |
+| `templates/protocols/WF-amend.md` | Constitution amendment protocol (SemVer-based) |
+| `templates/cdd_config.yaml` | github_integration + governance configuration |
+| `MIGRATION_GUIDE.md` | v1.4.0 → v1.5.0 upgrade guide |
+
+### Quick Start (v1.5.0)
+
+```bash
+# Clone
+git clone https://github.com/wsman/Constitution-Driven-Development-Skill.git
+cd Constitution-Driven-Development-Skill
+
+# Create new feature
+python scripts/cdd-feature.py "Add User Login"
+
+# Dry run (no changes)
+python scripts/cdd-feature.py "Add User Login" --dry-run
+```
+
+### Version Milestones
+
+| Version | Focus |
+|---------|-------|
+| v1.0-v1.2 | T0/T1/T2 document system + five-state workflow |
+| v1.3 | Entropy metrics + external auditing |
+| v1.4 | Quality gates integration |
+| v1.5 | Ecosystem automation (current) |
+
+### Documentation
+
+- [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) - Upgrade from v1.4.0
+- [SKILL.md](SKILL.md) - Complete skill documentation
 
 ## License
 
