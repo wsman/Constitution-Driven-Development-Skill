@@ -867,7 +867,7 @@ T0文档变更检测
     {"role": "user", "content": "..."}
   ],
   "temperature": 0.2,
-  "max_tokens": 4096
+  "max_tokens": 8192
 }
 ```
 
@@ -944,7 +944,7 @@ T0文档变更检测
     {"role": "user", "content": "..."}
   ],
   "temperature": 0.2,
-  "max_tokens": 4096
+  "max_tokens": 8192
 }
 ```
 
@@ -1050,7 +1050,7 @@ class ExternalAuditor:
                     {"role": "user", "content": context}
                 ],
                 "temperature": 0.2,
-                "max_tokens": 4096
+                "max_tokens": 8192
             },
             headers={"Authorization": f"Bearer {self.api_key}"},
             timeout=180
