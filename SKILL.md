@@ -756,14 +756,19 @@ T0文档变更检测
 └─────────┬─────────┘
           ↓
 ┌───────────────────┐
-│  T0文档审查        │
-│  - 基本法检查      │
+│  构建审计请求      │ ← 记录API调用信息
+└─────────┬─────────┘
+          ↓
+┌───────────────────┐
+│  T0文档审查        │ ← deepseek-reasoner API调用
+│  - 基本法检查      │   记录: 端点/模型/请求ID/耗时/Token
 │  - 程序法检查      │
 │  - 技术法检查      │
 └─────────┬─────────┘
           ↓
 ┌───────────────────┐
-│  生成审计报告      │
+│  生成审计报告      │ ← 包含完整API调用信息
+│  - API调用详情     │
 │  - 审查结果       │
 │  - 风险评估       │
 │  - 修复建议       │
@@ -772,7 +777,42 @@ T0文档变更检测
 ┌───────────────────┐
 │  抄送用户          │ ⭐
 │  (Discord消息)    │
+│  - 包含API摘要    │
 └───────────────────┘
+```
+
+### ⭐ 外部审计API调用信息记录标准 (v2.0)
+
+**从2026-02-01起，所有审计报告必须包含完整的API调用信息**：
+
+```markdown
+## API调用详情
+
+### 调用 #1: 审计请求
+| 字段 | 值 |
+|------|-----|
+| **端点** | `https://api.deepseek.com/chat/completions` |
+| **模型** | `deepseek-reasoner` |
+| **请求ID** | `{REQUEST_ID}` |
+| **发送时间** | `{SEND_TIMESTAMP}` |
+| **收到时间** | `{RECV_TIMESTAMP}` |
+| **耗时** | `{LATENCY}ms` |
+| **Token使用** | 输入: {IN_TOKENS} / 输出: {OUT_TOKENS} / 总计: {TOTAL_TOKENS} |
+
+**请求参数**:
+```json
+{
+  "model": "deepseek-reasoner",
+  "messages": [
+    {"role": "system", "content": "..."},
+    {"role": "user", "content": "..."}
+  ],
+  "temperature": 0.2,
+  "max_tokens": 4096
+}
+```
+
+**响应状态**: {STATUS_CODE} OK
 ```
 
 ### 外部审计者系统提示
@@ -808,61 +848,87 @@ T0文档变更检测
 | **时效性** | 版本是否最新 | §102.3 版本同步 |
 | **熵值** | $H_{sys}$ 是否在合理范围 | §141 熵减验证 |
 
-### 审计报告模板
+### 审计报告模板 (v2.0 - 含API调用信息)
 
 **报告文件名格式**: `report_by_deepseek-reasoner_YYYY-MM-DD_HH-MM-SS.md`
 
-**报告保存路径**: `memory_bank/audit_reports/` 或 `research_report/`
+**报告保存路径**: `research_report/`
 
 ```markdown
 # T0文档审计报告 (T0 Document Audit Report)
 
 ## 审计元数据
 - **审计时间**: {timestamp}
-- **触发原因**: T0文档变更
+- **触发原因**: {trigger}
 - **审查范围**: {scope}
-- **变更文件**: {changed_files}
 - **审计模型**: deepseek-reasoner
 
-## 变更摘要
-### 新增文件
-- {new_files}
+## API调用详情
 
-### 修改文件
-- {modified_files}
+### 调用 #1: 审计请求
+| 字段 | 值 |
+|------|-----|
+| **端点** | `https://api.deepseek.com/chat/completions` |
+| **模型** | `deepseek-reasoner` |
+| **请求ID** | `{REQUEST_ID}` |
+| **发送时间** | `{SEND_TIME}` |
+| **收到时间** | `{RECV_TIME}` |
+| **耗时** | `{LATENCY}ms` |
+| **Token使用** | 输入: {IN_TOKENS} / 输出: {OUT_TOKENS} / 总计: {TOTAL_TOKENS} |
 
-### 删除文件
-- {deleted_files}
+**请求参数**:
+```json
+{
+  "model": "deepseek-reasoner",
+  "messages": [
+    {"role": "system", "content": "..."},
+    {"role": "user", "content": "..."}
+  ],
+  "temperature": 0.2,
+  "max_tokens": 4096
+}
+```
 
-## 审查结果
+**响应状态**: {STATUS_CODE} OK
 
-### ✅ 通过项
-- {passing_checks}
+---
 
-### ⚠️ 警告项
-- {warnings}
+## 审查摘要
 
-### ❌ 问题项
-- {issues}
+{summary}
 
-## 详细审查内容
+## 通过项列表
 
-### 基本法索引审查
-- {basic_law_review}
+- ✅ {pass_1}
+- ✅ {pass_2}
+- ✅ ...
 
-### 程序法索引审查
-- {procedural_law_review}
+## 警告项列表
 
-### 技术法索引审查
-- {technical_law_review}
+- ⚠️ {warning_1}
+- ⚠️ {warning_2}
+- ⚠️ ...
 
-### 活跃上下文审查
-- {active_context_review}
+## 问题项列表
 
-### 知识图谱审查
-- {knowledge_graph_review}
+- ❌ {issue_1}
+- ❌ {issue_2}
+- ❌ ...
+
+## 风险评估
+
+| 维度 | 风险等级 |
+|------|----------|
+| 完整性风险 | {risk_completeness} |
+| 一致性风险 | {risk_consistency} |
+| 合规性风险 | {risk_compliance} |
+| 时效性风险 | {risk_timeliness} |
+| 熵值风险 | {risk_entropy} |
+
+**整体风险评估**: {overall_risk}
 
 ## 合规性检查
+
 | 检查项 | 状态 | 宪法依据 |
 |--------|------|----------|
 | 完整性检查 | ✅/⚠️/❌ | §152 单一真理源 |
@@ -871,53 +937,141 @@ T0文档变更检测
 | 时效性检查 | ✅/⚠️/❌ | §102.3 版本同步 |
 | 熵值检查 | ✅/⚠️/❌ | §141 熵减验证 |
 
-## 风险评估
-- **整体风险**: 🟢 低 / 🟡 中 / 🟠 高 / 🔴 严重
-- **需关注项**: {concerns}
+## 改进建议
 
-## 建议
-{recommendations}
+1. {suggestion_1}
+2. {suggestion_2}
+3. {suggestion_3}
 
 ## 下一步行动
-- [ ] 确认审计结果
-- [ ] 修正问题项（如有）
-- [ ] 更新相关文档
+
+- [ ] {next_action_1}
+- [ ] {next_action_2}
+- [ ] {next_action_3}
 
 ---
+
 **审计者**: External Auditor (deepseek-reasoner)
 **生成时间**: {timestamp}
 ```
 
-### 外部审计者API调用示例
+### 外部审计者API调用示例 (v2.0 - 含完整记录)
 
 ```python
-from openai import OpenAI
-import hashlib
+import requests
+import time
+from datetime import datetime
+import json
 
 class ExternalAuditor:
-    """外部审计者 - T0文档审计"""
+    """外部审计者 - T0文档审计 (v2.0)"""
     
-    def __init__(self, config: dict):
-        self.client = OpenAI(
-            api_key=config['api']['api_key'],
-            base_url=config['api']['base_url']
-        )
-        self.model = config['model']
-        self.cc_to_user = config['notifications']['cc_to_user']
+    def __init__(self, api_key: str, model: str = "deepseek-reasoner"):
+        self.api_url = "https://api.deepseek.com/chat/completions"
+        self.api_key = api_key
+        self.model = model
     
     def audit_t0_documents(self, changed_files: list, all_t0_docs: dict) -> dict:
-        """审计T0级别文档"""
+        """审计T0级别文档 - 记录完整API调用信息"""
         
         # 构建审查上下文
         context = self._build_context(changed_files, all_t0_docs)
         
+        # 记录API调用前的状态
+        send_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+08:00")
+        start_time = time.time()
+        
         # 调用深度推理模型
-        response = self.client.chat.completions.create(
-            model=self.model,  # deepseek-reasoner
-            messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": f"""
-审计以下T0级别文档变更：
+        response = requests.post(
+            self.api_url,
+            json={
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": self.system_prompt},
+                    {"role": "user", "content": context}
+                ],
+                "temperature": 0.2,
+                "max_tokens": 4096
+            },
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            timeout=180
+        )
+        
+        # 记录API响应信息
+        recv_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+08:00")
+        latency_ms = int((time.time() - start_time) * 1000)
+        
+        result = response.json()
+        request_id = result.get("id", "N/A")
+        usage = result.get("usage", {})
+        input_tokens = usage.get("prompt_tokens", 0)
+        output_tokens = usage.get("completion_tokens", 0)
+        
+        # 提取审计内容
+        audit_content = result["choices"][0]["message"]["content"]
+        
+        # 构建API调用信息
+        api_info = {
+            "endpoint": self.api_url,
+            "model": self.model,
+            "request_id": request_id,
+            "send_time": send_time,
+            "recv_time": recv_time,
+            "latency_ms": latency_ms,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "status_code": response.status_code
+        }
+        
+        # 生成审计报告
+        report = self._generate_report(api_info, audit_content)
+        
+        return {
+            "report": report,
+            "api_info": api_info
+        }
+    
+    def _build_context(self, changed_files: list, all_t0_docs: dict) -> str:
+        """构建审查上下文"""
+        # ... (同前)
+        pass
+    
+    def _generate_report(self, api_info: dict, audit_content: str) -> str:
+        """生成审计报告 (v2.0)"""
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        
+        report = f"""# T0文档审计报告
+
+## 审计元数据
+- **审计时间**: {timestamp}
+- **审查范围**: T0文档体系
+- **审计模型**: {api_info['model']}
+
+## API调用详情
+
+### 调用 #1: 审计请求
+| 字段 | 值 |
+|------|-----|
+| **端点** | `{api_info['endpoint']}` |
+| **模型** | `{api_info['model']}` |
+| **请求ID** | `{api_info['request_id']}` |
+| **发送时间** | `{api_info['send_time']}` |
+| **收到时间** | `{api_info['recv_time']}` |
+| **耗时** | `{api_info['latency_ms']}ms` |
+| **Token使用** | 输入: {api_info['input_tokens']} / 输出: {api_info['output_tokens']} |
+
+**响应状态**: {api_info['status_code']} OK
+
+---
+
+{audit_content}
+
+---
+**审计者**: External Auditor ({api_info['model']})
+**生成时间**: {api_info['send_time']}
+"""
+        return report
+```审计以下T0级别文档变更：
 
 变更文件: {changed_files}
 
