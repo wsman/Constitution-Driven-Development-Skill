@@ -66,6 +66,15 @@ github_integration:
   behavior: "create_and_link"  # create | link_only
   task_prefix: "T"            # 任务ID前缀
 
+# 治理配置 (v1.5.0新增)
+governance:
+  amendment_protocol: "templates/protocols/WF-amend.md"
+  versioning_scheme: "semver"
+  protected_paths:
+    - "templates/core/*"
+    - "templates/axioms/*"
+  require_impact_report: true
+
 # 上下文管理 (DS-007)
 context_strategy:
   max_tokens: 8000
