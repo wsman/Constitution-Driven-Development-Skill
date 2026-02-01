@@ -11,7 +11,6 @@ version: v1.3.2
 
 **版本**: v1.3.2 (Final Polish)
 
-**版本**: v1.2.0 (Engineering Hardened)
 **状态**: 🟢 Production Ready
 
 ## 🎯 模型配置 [v1.1.0新增]

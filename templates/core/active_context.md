@@ -1,8 +1,9 @@
 # Active Context (活动上下文)
 
-**版本**: v1.2.0
+**版本**: v1.3.2
 **最后更新**: {{TIMESTAMP}}
 **维护者**: {{PROJECT_NAME}}
+**宪法模式**: Bootloader v1.3.2
 **宪法模式**: Bootloader v1.2.0
 
 ---
