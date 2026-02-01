@@ -52,14 +52,17 @@ model: minimax/MiniMax-M2.1
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## 🔄 核心流程 (闭环)
+## 🔄 核心流程 (闭环) [v1.1.0修复]
 
 ```
 【启动】 OpenClaw + MiniMax M2.1 启动
     ↓
-【1】加载 README.md (项目背景文档，来自 readme_template.md)
+【1】引导加载 (Bootloader Sequence) ⭐
+    ├─ 加载 README.md (作为 Bootloader Input)
+    ├─ 提取关键背景 (Project Context) 注入 activeContext
+    └─ 卸载 README.md (释放上下文，保持 T0 纯净)
     ↓
-【2】加载全部 T0 文档 (5个)
+【2】加载 T0 核心意识层 (5个常驻文档)
     ↓
 【3】执行 CDD 五状态工作流
     ├─ State A: 加载 T1 文档，基准摄入
@@ -86,6 +89,13 @@ model: minimax/MiniMax-M2.1
     └─ $H_{sys} ≤ 0.3$
     ↓
 【8】结束 → 返回 State A (或退出)
+```
+
+### 关于 README.md 的定位澄清 [v1.1.0新增]
+
+* **角色**: 引导加载器输入 (Bootloader Input)
+* **生命周期**: 仅在会话初始化 (Init) 阶段存在于上下文窗口
+* **作用**: 为 `activeContext.md` 提供初始的"世界观" (项目是什么)，防止冷启动时的幻觉。一旦信息被 T0 层吸收，原文件即退出上下文
 
 ### Memory Bank 结构
 在使用 CDD skill 之前，**必须在项目文件夹下创建 `memory_bank` 目录**：
@@ -201,7 +211,7 @@ memory_bank/
 #### 1. 创建阶段（项目初始化）
 - ✅ **第一时间创建**: 项目开始时必须创建全部5个T0文档
 - ✅ **初始加载**: OpenClaw + MiniMax 启动后立即加载全部T0文档到上下文
-- ✅ **版本标记**: 标记为 v1.0.0，版本同步
+- ✅ **版本标记**: 标记为 v1.1.0，版本同步
 
 #### 2. 计划阶段（修改前）
 - ✅ **先文档后代码**: 任何项目修改前，必须先在T0文档中制定计划
@@ -466,7 +476,7 @@ cp -r skills/cdd/templates/* memory_bank/
 ### 📚 参考文档库
 
 **完整文档体系说明**: `skills/cdd/reference/document_classification_guide.md`
-- 版本: v1.0.0
+- 版本: v1.1.0
 - 宪法依据: §10.6
 - 内容: 完整的T0-T3分级体系定义、检索策略算法、性能指标
 
@@ -478,28 +488,31 @@ cp -r skills/cdd/templates/* memory_bank/
 
 为了量化系统的有序度，每次加载上下文时必须计算并展示 **归一化系统熵 ($H_{sys}$)**。
 
-### 指标定义
+### 系统总熵公式 [v1.1.0重构]
 
-$$H_{sys} = \alpha \cdot \underbrace{\left(\frac{T_{load}}{T_{limit}}\right)}_{\text{认知负载熵}} + \beta \cdot \underbrace{\left(1 - \frac{N_{linked}}{N_{total}}\right)}_{\text{结构离散熵}} + \gamma \cdot \underbrace{\left(\frac{F_{drift}}{F_{total}}\right)}_{\text{版本漂移熵}}$$
+$$
+H_{sys} = w_c \cdot H_{cog} + w_s \cdot H_{struct} + w_a \cdot H_{align}
+$$
 
-### 参数定义
+**分量定义**:
 
-| 参数 | 定义 | 默认值 |
-|------|------|--------|
-| $T_{load}$ | 当前 Bootloader 上下文 Token 占用 | - |
-| $T_{limit}$ | 上下文硬性阈值 | 8000 Tokens |
-| $N_{linked}$ | 图谱中拥有有效入度/出度的节点数 | - |
-| $N_{total}$ | 总文件节点数 | - |
-| $F_{drift}$ | 版本号滞后或被标记为 Deprecated 的文件数 | - |
-| $F_{total}$ | 总文件数 | - |
+1.  **认知负载熵 ($H_{cog}$)**: 衡量上下文窗口的拥挤程度。
+    $$H_{cog} = \frac{T_{load}}{T_{limit}} \quad (T_{limit}=8000)$$
 
-### 权重配置
+2.  **结构离散熵 ($H_{struct}$)**: 衡量知识图谱的连通性。
+    $$H_{struct} = 1 - \frac{N_{linked}}{N_{total}}$$
+    *注: 孤立节点越多，系统越无序。*
 
-| 权重 | 值 | 优先级 |
-|------|-----|--------|
-| $\alpha$ (认知负载) | 0.4 | 性能优先 |
-| $\beta$ (结构离散) | 0.3 | 关联优先 |
-| $\gamma$ (版本漂移) | 0.3 | 合规优先 |
+3.  **同构偏离熵 ($H_{align}$)**: **[v1.1.0新增]** 衡量代码实现与T1架构约束的偏离度。
+    $$H_{align} = \frac{N_{violation}}{N_{constraints}}$$
+    * $N_{violation}$: 静态分析发现的架构违规数 (Tier 1/2 失败项)
+    * $N_{constraints}$: `systemPatterns` 与 `techContext` 定义的约束总数
+
+### 权重配置 [v1.1.0更新]
+
+$$w_c=0.4, \quad w_s=0.3, \quad w_a=0.3$$
+
+**目标**: $H_{sys} \leq 0.3$ (低熵有序状态)
 
 ### 解读标准
 
@@ -607,14 +620,21 @@ $$H_{sys} = \alpha \cdot \underbrace{\left(\frac{T_{load}}{T_{limit}}\right)}_{\
 - 使用参数化查询（防注入）
 - 原子化写入操作
 
-### State D: 三级验证闭环 (Verification Loop)
+### State D: 三级验证闭环 (Verification Loop) [v1.1.0增强]
 **[验证即循环 §136]**
 
-| Tier | 验证内容 | 数学公理 |
-|------|----------|----------|
-| **Tier 1** | 物理文件系统 vs ASCII树 | $S_{fs} \cong S_{doc}$ |
-| **Tier 2** | 代码AST签名 vs 接口定义 | $I_{code} \supseteq I_{doc}$ |
-| **Tier 3** | 运行时行为 vs 行为断言 | $B_{code} \equiv B_{spec}$ |
+验证不仅仅是测试，而是**数学证明**。必须按顺序通过以下三级验证：
+
+| 等级 | 名称 | 范畴 | 定义 | 验证工具/方法 | 数学公理 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Tier 1** | **结构验证** | 静态 | **物理空间 $\cong$ 逻辑空间**<br>检查文件结构是否符合 `systemPatterns.md` 定义的 ASCII 树。 | `tree` 命令比对,<br>`DS-007` 脚本 | $S_{fs} \cong S_{doc}$ |
+| **Tier 2** | **签名验证** | 静态 | **实现集合 $\supseteq$ 定义集合**<br>检查代码中的函数/类签名是否覆盖 `techContext.md` 中的接口定义。 | AST 解析,<br>TypeScript 检查 | $I_{code} \supseteq I_{doc}$ |
+| **Tier 3** | **行为验证** | 动态 | **运行时 $\equiv$ 预期**<br>运行测试用例，验证行为是否符合 `behaviorContext.md` 断言。 | `pytest`, `npm test`,<br>断言检查 | $B_{code} \equiv B_{spec}$ |
+
+**执行规则**:
+1. 任何一级失败，立即回退至 State C (执行) 或 State B (规划)。
+2. 严禁跳过 Tier 1/2 直接进行 Tier 3 测试。
+3. 验证结果必须记录在 `activeContext.md` 中。
 
 ### State E: 收敛与纠错 (Convergence)
 - 任何验证失败 → 修正代码或文档
