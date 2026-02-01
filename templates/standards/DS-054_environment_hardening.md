@@ -377,3 +377,39 @@ environment_hardening:
 **标准版本**: v1.3.2  
 **最后更新**: {{TIMESTAMP}}  
 **来源**: spec-kit implement.md §4
+
+---
+
+### Step 5: 自定义跳过机制 (v1.4.0增强)
+
+对于边缘技术栈或高度定制化环境，提供声明式跳过配置：
+
+#### 5.1 跳过语法
+
+在项目根目录创建 `.cddignore` 文件：
+
+```yaml
+# CDD Environment Hardening Skip Config
+version: "1.0"
+
+skip:
+  checks:
+    - ".dockerignore"
+    - ".eslintignore"
+  all: false
+  
+reason: "Legacy project with custom build system"
+```
+
+#### 5.2 跳过优先级
+
+| 场景 | 处理逻辑 |
+|------|----------|
+| `.cddignore` + `all: true` | 跳过整个DS-054阶段 |
+| `.cddignore` + `checks` | 跳过指定检查项 |
+| 无 `.cddignore` | 执行完整环境硬化 |
+
+#### 5.3 安全红线 (不可跳过)
+
+- `.gitignore` 基础模式
+- 敏感文件 (`.env*`, `*.key`, `*.pem`)
