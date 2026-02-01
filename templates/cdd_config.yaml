@@ -1,5 +1,5 @@
-# CDD Configuration v1.4.0
-# Quality & Governance Integration
+# CDD Configuration v1.5.0
+# Ecosystem & Automation
 
 project:
   name: "{{PROJECT_NAME}}"
@@ -21,7 +21,7 @@ external_auditor:
     format: "markdown"
     output_dir: "research_report"
 
-# Spec-Kit 集成配置 (v1.4.0 Updated)
+# Spec-Kit 集成配置 (v1.5.0 Updated)
 spec_kit:
   templates:
     spec: "templates/standards/DS-050_feature_specification.md"
@@ -54,6 +54,18 @@ quality_gates:
       - "*.docs"
       - "*.refactor"
 
+# GitHub 生态集成 (v1.5.0新增)
+github_integration:
+  enabled: true
+  protocol: "templates/protocols/WF-sync-issues.md"
+  sync_on_state_b: true        # State B完成后自动同步
+  sync_on_demand: true         # 支持手动触发
+  default_labels:
+    - "cdd-task"
+    - "automated"
+  behavior: "create_and_link"  # create | link_only
+  task_prefix: "T"            # 任务ID前缀
+
 # 上下文管理 (DS-007)
 context_strategy:
   max_tokens: 8000
@@ -69,7 +81,7 @@ context_strategy:
       include: ["templates/axioms/behavior_context.md"]
       budget_ratio: 0.6
 
-# 路径配置 (v1.4.0)
+# 路径配置 (v1.5.0)
 paths:
   templates:
     core: "templates/core"
