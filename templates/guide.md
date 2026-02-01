@@ -107,21 +107,26 @@ external_auditor:
 - `cdd_config.yaml` 中的审计策略
 - 添加自定义的 DS-xxx 和 WF-xxx 文件
 
-## 开发流程
+## 开发流程 [v1.1.0更新]
 
-### 启动开发
+### 启动开发 (Bootloader Sequence) [v1.1.0更新]
 
-1. **加载索引内核** - 读取三个索引文件
-2. **加载活动上下文** - 读取 `activeContext.md`
-3. **计算系统熵值** - 输出 $H_{sys}$ 仪表盘
+1. **Phase 1: 引导输入** - 加载 `README.md`，提取项目背景注入 `activeContext.md`
+2. **Phase 2: 内核加载** - 加载 5 个 T0 核心文档
+3. **Phase 3: 熵值校准** - 计算 $H_{sys}$ (含 $H_{align}$ 检查)
+
+**关于 README.md 的定位**:
+- 角色: 引导加载器输入 (Bootloader Input)
+- 生命周期: 仅在会话初始化阶段存在
+- 作用: 为 `activeContext.md` 提供初始"世界观"，防止冷启动幻觉
 
 ### 执行 CDD
 
 1. **State A (基准摄入)** - 读取 systemPatterns/techContext/behaviorContext
 2. **State B (文档规划)** - 先修改文档，等待用户批准
 3. **State C (受控执行)** - 按文档执行代码修改
-4. **State D (三级验证)** - 执行 Tier 1/2/3 验证
-5. **State E (收敛纠错)** - 修正问题或完成任务
+4. **State D (三级验证)** - Tier 1(结构) -> Tier 2(签名) -> Tier 3(行为)
+5. **State E (收敛纠错)** - 确保 $H_{sys} \leq 0.3$
 
 ### T0文档变更与外部审计 ⭐
 
