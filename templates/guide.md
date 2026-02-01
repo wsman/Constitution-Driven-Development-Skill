@@ -147,6 +147,102 @@ external_auditor:
 4. **State D (三级验证)** - Tier 1(结构) -> Tier 2(签名) -> Tier 3(行为)
 5. **State E (收敛纠错)** - 确保 $H_{sys} \leq 0.3$
 
+### State B: Spec-Driven Planning 指令示例 [v1.3.0新增]
+
+使用 DS-050 和 DS-051 模板进行规范驱动的规划：
+
+#### 1. 生成特性规范 (DS-050)
+
+```bash
+# 输入示例
+/cdd spec "实现用户登录功能，包括邮箱密码登录和第三方OAuth登录"
+
+# 系统将生成:
+# specs/[###-user-login]/spec.md
+# 基于 DS-050_FEATURE_SPECIFICATION.md 模板
+```
+
+**DS-050 标准结构**:
+```
+1. 宪法合规性检查 (引用 systemPatterns/techContext)
+2. 用户场景与测试 (P1/P2/P3 用户故事)
+3. 功能/非功能需求
+4. 数据模型变更
+5. 接口定义
+6. 验证计划 (Tier 1/2/3)
+```
+
+#### 2. 生成实施计划 (DS-051)
+
+```bash
+# 输入示例 (在规范批准后)
+/cdd plan "用户登录" --spec="specs/[###-user-login]/spec.md"
+
+# 系统将生成:
+# specs/[###-user-login]/plan.md
+# 基于 DS-051_IMPLEMENTATION_PLAN.md 模板
+```
+
+**DS-051 标准结构**:
+```
+1. 实施摘要与核心技术决策
+2. 技术上下文 (语言/依赖/存储/测试)
+3. 三级验证准备
+4. 实施步骤 (Step 1/2/3...)
+5. 回滚计划
+6. 验收标准
+7. 里程碑
+```
+
+#### 3. 审批流程
+
+```bash
+# 用户审批
+/cdd approve "规范和计划已审查，同意实施"
+
+// 或拒绝并要求修改
+/cdd reject "需要补充OAuth流程的异常处理"
+```
+
+#### 4. 完整流程示例
+
+```bash
+# 1. 启动 State A
+/cdd start "实现支付模块"
+
+// 2. State B - 规范规划
+/cdd analyze "支付模块需要支持支付宝和微信支付"
+/cdd spec "支付模块"  # 生成 DS-050
+/cdd plan "支付模块"  # 生成 DS-051
+
+// 3. 用户审批
+/cdd approve "通过"
+
+// 4. State C - 执行
+/cdd execute step-1  # 实现支付接口
+/cdd execute step-2  # 实现支付宝适配器
+/cdd execute step-3  # 实现微信支付适配器
+
+// 5. State D - 验证
+/cdd verify tier1  # 结构验证
+/cdd verify tier2  # 签名验证
+/cdd verify tier3  # 行为验证
+
+// 6. State E - 收敛
+/cdd calibrate
+```
+
+### T1/T2 标准快速参考 [v1.3.0新增]
+
+| 标准ID | 名称 | 用途 | 使用场景 |
+|--------|------|------|----------|
+| systemPatterns.md | T1-架构约束 | Tier 1 验证依据 | 检查文件结构 |
+| techContext.md | T1-接口约束 | Tier 2 验证依据 | 检查接口签名 |
+| behaviorContext.md | T1-行为约束 | Tier 3 验证依据 | 检查业务逻辑 |
+| DS-050 | 特性规范 | State B 输出 | 生成功能Spec |
+| DS-051 | 实施计划 | State B 输出 | 生成实施Plan |
+| DS-001 ~ DS-049 | 技术标准 | 编码规范 | 代码检查 |
+
 ### T0文档变更与外部审计 ⭐
 
 **当T0级别文档发生变更时：**
