@@ -1,48 +1,55 @@
-# CDD Configuration v1.3.0
-
-# Audit & Governance Settings
+# CDD Configuration v1.3.1
+# Architecture Optimized
 
 project:
   name: "{{PROJECT_NAME}}"
   version: "0.1.0"
-  entropy_threshold: 0.3  # H_sys target
+  entropy_threshold: 0.3
 
 # 外部审计配置
-
-audit:
-  provider: "deepseek-reasoner"
-  api_config:
-    base_url: "https://api.deepseek.com/chat/completions"
-    timeout: 120
+external_auditor:
+  enabled: true
+  model: "deepseek-reasoner"
+  max_tokens: 8192
+  api:
+    base_url: "https://api.deepseek.com"
+    api_key: "${DEEPSEEK_API_KEY}"
   trigger_policy:
-    on_state_change: ["State E"]  # State E 结束时自动触发
+    on_state_change: ["State E"]
     on_file_change: ["memory_bank/01_active_state/*.md"]
   reporting:
     format: "markdown"
-    output_dir: "reports/audits"
-    notify_channels: ["console"]
+    output_dir: "research_report"
 
-# 上下文管理配置 (DS-007 实现)
+# Spec-Kit 集成配置 (路径更新)
+spec_kit:
+  templates:
+    spec: "templates/_standards/DS-050_FEATURE_SPECIFICATION.md"
+    plan: "templates/_standards/DS-051_IMPLEMENTATION_PLAN.md"
+    tasks: "templates/_standards/DS-052_ATOMIC_TASKS.md"
+  output:
+    specs_dir: "specs"
+    plans_dir: "plans"
 
+# 上下文管理 (DS-007)
 context_strategy:
   max_tokens: 8000
-  safety_margin: 0.1 # 保留 10% 缓冲
+  safety_margin: 0.1
   modes:
     planning:
-      include: ["systemPatterns.md", "techContext.md"]
+      include: ["templates/_axioms/system_patterns.md", "templates/_axioms/tech_context.md"]
       budget_ratio: 0.5
     coding:
-      include: ["DS-050", "DS-051", "DS-052"]
-      exclude: ["README.md", "history_logs"]
+      include: ["templates/_standards/DS-050", "templates/_standards/DS-051", "templates/_standards/DS-052"]
       budget_ratio: 0.7
     verifying:
-      include: ["behaviorContext.md"]
+      include: ["templates/_axioms/behavior_context.md"]
       budget_ratio: 0.6
 
-# 路径配置
-
+# 路径配置 (v1.3.1 新增)
 paths:
-  memory_bank: "memory_bank"
-  templates: "templates"
-  specs: "specs"
-  src: "src"
+  templates:
+    core: "templates/_core"        # T0 核心模板
+    axioms: "templates/_axioms"     # T1 公理模板
+    standards: "templates/_standards"  # T2 DS 标准模板
+    protocols: "templates/_protocols"  # T2 WF 工作流模板
