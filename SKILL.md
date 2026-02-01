@@ -8,7 +8,84 @@ model: minimax/MiniMax-M2.1
 
 使用 MiniMax M2.1 模型进行 AI 辅助软件开发，遵循逆熵实验室三级法律体系约束。
 
-## ⚠️ 前置要求
+## 📐 架构概览
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         CDD 架构全景                                      │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                      外部审计层 (External Auditor)              │   │
+│  │  deepseek-reasoner → 审计T0文档 → 报告 → Discord抄送            │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                    ↓                                     │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                    T0 核心意识层 (始终加载)                      │   │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐  │   │
+│  │  │README   │ │Active   │ │Knowledge│ │ Basic   │ │Procedural│  │   │
+│  │  │.md      │ │Context  │ │Graph    │ │Law      │ │Law      │  │   │
+│  │  │(项目背景)│ │(当前焦点)│ │(导航图) │ │(核心公理)│ │(工作流) │  │   │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘  │   │
+│  │       ↓            ↓           ↓           ↓           ↓       │   │
+│  │       └────────────┴───────────┴───────────┴───────────┘       │   │
+│  │                         ↓ 强制加载                               │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                    ↓                                     │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                    T1 系统公理层 (按需加载)                      │   │
+│  │     systemPatterns.md (架构约束) → techContext.md (接口)        │   │
+│  │                        → behaviorContext.md (行为断言)          │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                    ↓                                     │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                    T2 执行标准层 (懒加载)                        │   │
+│  │     workflows/ (WF-xxx) → standards/ (DS-xxx) → 执行 → 释放     │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                    CDD 五状态工作流                              │   │
+│  │    State A → State B → State C → State D → State E              │   │
+│  │    (基准摄入) (策略规划) (受控执行) (三级验证) (收敛纠错)         │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+## 🔄 核心流程 (闭环)
+
+```
+【启动】 OpenClaw + MiniMax M2.1 启动
+    ↓
+【1】加载 README.md (项目背景文档，来自 readme_template.md)
+    ↓
+【2】加载全部 T0 文档 (5个)
+    ↓
+【3】执行 CDD 五状态工作流
+    ├─ State A: 加载 T1 文档，基准摄入
+    ├─ State B: 文档规划，用户批准
+    ├─ State C: 按文档执行代码修改
+    ├─ State D: 三级验证 (Tier 1/2/3)
+    └─ State E: 收敛纠错，校准确认
+    ↓
+【4】T0 文档变更检测
+    ├─ 无变更 → 继续开发
+    └─ 有变更 → 触发外部审计
+    ↓
+【5】外部审计 (deepseek-reasoner)
+    ├─ 审查 T0 文档
+    ├─ 生成审计报告
+    └─ 发送到 Discord
+    ↓
+【6】用户确认 / 修正
+    ↓
+【7】校准检查 (闭环验证)
+    ├─ 代码 ↔ systemPatterns.md 同构
+    ├─ 接口 ↔ techContext.md 匹配
+    ├─ 行为 ↔ behaviorContext.md 一致
+    └─ $H_{sys} ≤ 0.3$
+    ↓
+【8】结束 → 返回 State A (或退出)
 
 ### Memory Bank 结构
 在使用 CDD skill 之前，**必须在项目文件夹下创建 `memory_bank` 目录**：
@@ -27,9 +104,37 @@ memory_bank/
 │   ├── systemPatterns.md          # T1-ASCII目录树约束
 │   ├── techContext.md             # T1-接口签名约束
 │   └── behaviorContext.md         # T1-行为断言
-└── 03_protocols/                  # T2-协议与标准
-    ├── workflows/                 # T2-标准工作流 (WF-xxx)
-    └── standards/                 # T2-DS-xxx实现标准
+├── 03_protocols/                  # T2-协议与标准
+│   ├── workflows/                 # T2-标准工作流 (WF-xxx)
+│   └── standards/                 # T2-DS-xxx实现标准
+└── cdd_config.yaml                # CDD配置 (外部审计者/API配置)
+
+### ⭐ 项目README.md (项目背景文档)
+
+**定义**: 描述项目背景、技术栈、核心功能的概览文档，**不属于T0级别**。
+**模板来源**: `templates/readme_template.md` (复制到项目根目录后重命名为 `README.md`)
+
+**位置**: 项目根目录 (与 `memory_bank/` 同级)
+
+**内容**:
+- 项目名称和描述
+- 技术栈概览
+- 核心功能列表
+- 外部依赖 (API、数据源)
+- 项目定位 (如: 量化分析系统)
+
+**与T0的区别**:
+| 特性 | T0文档 | README.md (项目背景) |
+|------|--------|---------------------|
+| 加载时机 | 始终加载 | 仅首次或需要时 |
+| 约束作用 | 强制约束 | 仅供参考 |
+| 大小目标 | <800 tokens | 无限制 |
+| 属于Memory Bank | 是 | 否 |
+
+**使用时机**:
+1. 项目初始化时创建 (复制 `readme_template.md`)
+2. 外部审计前提供背景信息
+3. 新成员加入时了解项目
 ```
 
 **T0层级导航：**
@@ -360,7 +465,7 @@ cp -r skills/cdd/templates/* memory_bank/
 
 ### 📚 参考文档库
 
-**完整文档体系说明**: `skills/cdd/reference/文档分级体系说明书.md`
+**完整文档体系说明**: `skills/cdd/reference/document_classification_guide.md`
 - 版本: v1.0.0
 - 宪法依据: §10.6
 - 内容: 完整的T0-T3分级体系定义、检索策略算法、性能指标
@@ -540,6 +645,462 @@ $$H_{sys} = \alpha \cdot \underbrace{\left(\frac{T_{load}}{T_{limit}}\right)}_{\
 - **DS-024**: 自动化架构同步 [§320]
 - **DS-039**: 工具调用桥接器 [§438-§440]
 
+## 🤖 外部审计者 (External Auditor)
+
+CDD 引入 **外部审计者 (External Auditor)** 角色，作为独立的AI审计实体，使用深度推理模型进行**T0级别文档审查**。
+
+### ⭐ 核心理念：第三方视角评估
+
+**外部审计的核心价值**：
+
+> "通过第三方视角评估本项目的文档逻辑是否清晰，结构是否明确。"
+
+CDD文档体系虽然由项目团队内部编写，但可能存在以下盲点：
+- **逻辑自洽性**: 团队可能默认假设某些逻辑关系，实际可能存在跳跃或矛盾
+- **结构清晰度**: 对团队而言 очевидно (显而易见) 的结构，对新成员或外部审计者可能不清晰
+- **术语一致性**: 同一术语在不同文档中可能有不同解释
+- **完整性检查**: 团队可能遗漏某些必要的文档或条款
+
+**外部审计者**作为独立的AI实体，不带项目先入为主的假设，能够：
+1. **客观评估文档结构** - 以"新人"视角审视文档组织
+2. **验证逻辑完整性** - 检查论证链条是否完整
+3. **发现隐含假设** - 识别团队未明确说明的假设
+4. **提供改进建议** - 基于最佳实践给出优化方向
+
+**审计原则**：
+- ✅ 第三方视角，无利益关联
+- ✅ 评估文档逻辑和结构，不评估代码实现
+- ✅ 识别盲点和遗漏
+- ✅ 提供建设性改进建议
+- ⚠️ 不替代团队决策，仅提供参考意见
+
+### 核心职责定位
+
+**🎯 专注范围**: 仅审查 T0 级别文档，不审查代码
+
+**📋 T0 级别文档清单**:
+| 文件 | 路径 | 说明 |
+|------|------|------|
+| `01_basic_law_index.md` | `00_indices/` | 基本法核心公理 |
+| `02_procedural_law_index.md` | `00_indices/` | 程序法工作流索引 |
+| `03_technical_law_index.md` | `00_indices/` | 技术法标准索引 |
+| `activeContext.md` | `01_active_state/` | 活跃上下文 |
+| `KNOWLEDGE_GRAPH.md` | `02_systemaxioms/` | 知识图谱 |
+
+### 外部审计者配置
+
+**配置文件**: `memory_bank/cdd_config.yaml`
+
+```yaml
+# CDD 外部审计者配置
+external_auditor:
+  # 是否启用
+  enabled: true
+  
+  # 模型配置
+  model: "deepseek-reasoner"  # 深度推理模型
+  
+  # API 配置
+  api:
+    base_url: "https://api.deepseek.com"  # API基础地址
+    api_key: "${DEEPSEEK_API_KEY}"        # API密钥 (支持环境变量)
+  
+  # 审计策略
+  audit:
+    # 审计范围: 仅T0级别文档
+    scope:
+      - "t0_documents"  # T0级别文档审查
+    
+    # 触发时机: T0文档变更时
+    trigger_on:
+      - "t0_document_change"  # T0文档变更时触发 ⭐
+      
+    # 审计深度
+    depth: "comprehensive"  # shallow/comprehensive/deep
+      
+    # 审计报告格式
+    report_format: "markdown"
+    
+    # 通知设置
+    notifications:
+      # 抄送用户
+      cc_to_user: true  # ⭐ 审计报告同步抄送给用户
+      
+      # 通知方式 (Discord/Slack等)
+      channels:
+        - "discord"  # 通过Discord发送审计报告
+```
+
+### 外部审计者职责
+
+| 职责 | 触发时机 | 输出 |
+|------|----------|------|
+| **T0文档合规性审查** | T0文档变更时 | 合规性审计报告 |
+| **宪法约束验证** | 修改后立即触发 | 条款引用检查 |
+| **文档一致性检查** | 变更时 | 一致性验证报告 |
+| **架构完整性评估** | 重大变更后 | 完整性评估报告 |
+
+### 外部审计者工作流
+
+```
+T0文档变更检测
+        │
+        ↓
+┌───────────────────┐
+│  变更类型判断      │
+│  (新增/修改/删除)  │
+└─────────┬─────────┘
+          ↓
+┌───────────────────┐
+│  外部审计者触发    │ ← deepseek-reasoner
+└─────────┬─────────┘
+          ↓
+┌───────────────────┐
+│  T0文档审查        │
+│  - 基本法检查      │
+│  - 程序法检查      │
+│  - 技术法检查      │
+└─────────┬─────────┘
+          ↓
+┌───────────────────┐
+│  生成审计报告      │
+│  - 审查结果       │
+│  - 风险评估       │
+│  - 修复建议       │
+└─────────┬─────────┘
+          ↓
+┌───────────────────┐
+│  抄送用户          │ ⭐
+│  (Discord消息)    │
+└───────────────────┘
+```
+
+### 外部审计者系统提示
+
+```
+你是一位资深CDD合规性审计专家，专注于T0级别文档的宪法合规审查。
+
+⚠️ **重要：项目背景说明**
+在审查前，必须首先确认并理解被审计项目的定位和领域。不同的项目类型（量化分析、Web3、传统软件等）有不同的合规要求和审计重点。
+
+**审计职责：**
+1. 审查T0级别文档的完整性和一致性
+2. 验证文档是否符合宪法约束（§102.3, §114, §141, §152等）
+3. 检查文档间的引用关系是否正确
+4. 识别潜在的逻辑矛盾或遗漏
+5. 生成详细的审计报告
+
+**审计原则：**
+- ⭐ **先确认项目背景**：审查开始前，必须明确项目的领域定位和技术栈
+- 仅审查T0级别文档，不审查代码
+- 引用具体条款（§xxx）说明问题
+- 量化风险等级（低/中/高/严重）
+- 提供具体的修复建议
+```
+
+### T0文档审查清单
+
+| 审查维度 | 检查内容 | 宪法依据 |
+|----------|----------|----------|
+| **完整性** | 5个T0文档是否齐全 | §152 单一真理源 |
+| **一致性** | 文档间引用是否一致 | §114 双存储同构 |
+| **合规性** | 是否符合宪法条款 | §102.3 宪法同步 |
+| **时效性** | 版本是否最新 | §102.3 版本同步 |
+| **熵值** | $H_{sys}$ 是否在合理范围 | §141 熵减验证 |
+
+### 审计报告模板
+
+**报告文件名格式**: `report_by_deepseek-reasoner_YYYY-MM-DD_HH-MM-SS.md`
+
+**报告保存路径**: `memory_bank/audit_reports/` 或 `research_report/`
+
+```markdown
+# T0文档审计报告 (T0 Document Audit Report)
+
+## 审计元数据
+- **审计时间**: {timestamp}
+- **触发原因**: T0文档变更
+- **审查范围**: {scope}
+- **变更文件**: {changed_files}
+- **审计模型**: deepseek-reasoner
+
+## 变更摘要
+### 新增文件
+- {new_files}
+
+### 修改文件
+- {modified_files}
+
+### 删除文件
+- {deleted_files}
+
+## 审查结果
+
+### ✅ 通过项
+- {passing_checks}
+
+### ⚠️ 警告项
+- {warnings}
+
+### ❌ 问题项
+- {issues}
+
+## 详细审查内容
+
+### 基本法索引审查
+- {basic_law_review}
+
+### 程序法索引审查
+- {procedural_law_review}
+
+### 技术法索引审查
+- {technical_law_review}
+
+### 活跃上下文审查
+- {active_context_review}
+
+### 知识图谱审查
+- {knowledge_graph_review}
+
+## 合规性检查
+| 检查项 | 状态 | 宪法依据 |
+|--------|------|----------|
+| 完整性检查 | ✅/⚠️/❌ | §152 单一真理源 |
+| 一致性检查 | ✅/⚠️/❌ | §114 双存储同构 |
+| 合规性检查 | ✅/⚠️/❌ | §102.3 宪法同步 |
+| 时效性检查 | ✅/⚠️/❌ | §102.3 版本同步 |
+| 熵值检查 | ✅/⚠️/❌ | §141 熵减验证 |
+
+## 风险评估
+- **整体风险**: 🟢 低 / 🟡 中 / 🟠 高 / 🔴 严重
+- **需关注项**: {concerns}
+
+## 建议
+{recommendations}
+
+## 下一步行动
+- [ ] 确认审计结果
+- [ ] 修正问题项（如有）
+- [ ] 更新相关文档
+
+---
+**审计者**: External Auditor (deepseek-reasoner)
+**生成时间**: {timestamp}
+```
+
+### 外部审计者API调用示例
+
+```python
+from openai import OpenAI
+import hashlib
+
+class ExternalAuditor:
+    """外部审计者 - T0文档审计"""
+    
+    def __init__(self, config: dict):
+        self.client = OpenAI(
+            api_key=config['api']['api_key'],
+            base_url=config['api']['base_url']
+        )
+        self.model = config['model']
+        self.cc_to_user = config['notifications']['cc_to_user']
+    
+    def audit_t0_documents(self, changed_files: list, all_t0_docs: dict) -> dict:
+        """审计T0级别文档"""
+        
+        # 构建审查上下文
+        context = self._build_context(changed_files, all_t0_docs)
+        
+        # 调用深度推理模型
+        response = self.client.chat.completions.create(
+            model=self.model,  # deepseek-reasoner
+            messages=[
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": f"""
+审计以下T0级别文档变更：
+
+变更文件: {changed_files}
+
+完整T0文档内容:
+{for path, content in all_t0_docs.items()}
+---{path}---
+{content}
+---
+
+请执行完整的合规性审查。
+"""}
+            ],
+            temperature=0.2,
+        )
+        
+        audit_report = response.choices[0].message.content
+        
+        # 保存审计报告 ⭐
+        report_path = self._save_audit_report(audit_report, changed_files)
+        
+        return {
+            "audit_report": audit_report,
+            "report_path": report_path,  # ⭐ 报告保存路径
+            "changed_files": changed_files,
+            "cc_to_user": self.cc_to_user,  # ⭐ 标记需要抄送
+            "conclusion": "通过" if "通过" in audit_report else "需修正"
+        }
+    
+    def _save_audit_report(self, content: str, changed_files: list) -> str:
+        """保存审计报告为MD文件"""
+        from datetime import datetime
+        import os
+        
+        # 报告保存目录
+        report_dir = "research_report"
+        os.makedirs(report_dir, exist_ok=True)
+        
+        # 生成报告文件名: report_by_deepseek-reasoner_YYYY-MM-DD_HH-MM-SS.md
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"report_by_deepseek-reasoner_{timestamp}.md"
+        report_path = os.path.join(report_dir, filename)
+        
+        # 报告内容
+        report_content = f"# T0文档审计报告\n\n## 审计元数据\n- **审计时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n- **变更文件**: {', '.join(changed_files)}\n- **审计模型**: deepseek-reasoner\n\n---\n\n{content}\n\n---\n**审计者**: External Auditor"
+        
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write(report_content)
+        
+        return report_path
+    
+    def _build_context(self, changed_files: list, all_t0_docs: dict) -> str:
+        """构建审查上下文"""
+        return f"""
+审查以下T0文档变更：
+变更文件: {', '.join(changed_files)}
+
+请检查：
+1. 变更是否符合宪法条款
+2. 文档间引用是否一致
+3. 熵值是否在合理范围
+4. 版本是否同步
+"""
+```
+
+### 外部审计者集成
+
+在 T0 文档变更时触发：
+
+```python
+# 检测到T0文档变更
+def on_t0_document_change(changed_files: list):
+    # 1. 加载所有T0文档
+    all_t0_docs = load_all_t0_documents()
+    
+    # 2. 触发外部审计
+    auditor = ExternalAuditor(config['external_auditor'])
+    result = auditor.audit_t0_documents(changed_files, all_t0_docs)
+    
+    # 3. 获取审计结果
+    audit_report = result['audit_report']
+    report_path = result['report_path']  # ⭐ 报告文件路径
+    
+    # 4. 发送附件到 Discord ⭐
+    if result['cc_to_user']:
+        send_attachment_to_channel(
+            channel="discord",
+            file_path=report_path,  # ⭐ 附件: 审计报告MD文件
+            caption=f"📋 **T0文档审计报告**\n\n"
+                   f"**审计结论**: {result['conclusion']}\n"
+                   f"**变更文件**: {', '.join(changed_files)}"
+        )
+    
+    # 返回审计结果
+    return result
+
+### 标准流程: T0文档变更与外部审计 ⭐
+
+**当T0级别文档发生变更时：**
+
+```
+T0文档变更
+    ↓
+外部审计者触发 (deepseek-reasoner)
+    ↓
+T0文档合规性审查
+    ↓
+生成审计报告
+    ├─ 保存到: research_report/report_by_deepseek-reasoner_YYYY-MM-DD_HH-MM-SS.md
+    ↓
+⭐ 发送附件到 Discord/其他频道
+    ├─ 附件: 审计报告MD文件
+    ├─ 消息: 审计摘要 + 报告路径
+    ↓
+确认/修正
+```
+
+**完整工作流代码：**
+
+```python
+from datetime import datetime
+import os
+
+def on_t0_document_change(changed_files: list):
+    """T0文档变更处理完整流程"""
+    
+    # 1. 加载所有T0文档
+    all_t0_docs = load_all_t0_documents()
+    
+    # 2. 触发外部审计
+    auditor = ExternalAuditor(config['external_auditor'])
+    result = auditor.audit_t0_documents(changed_files, all_t0_docs)
+    
+    # 3. 获取审计报告和路径
+    audit_report = result['audit_report']
+    report_path = result['report_path']  # research_report/report_by_xxx.md
+    
+    # 4. 发送附件到 Discord ⭐
+    if result['cc_to_user']:
+        send_attachment_to_channel(
+            channel="discord",
+            file_path=report_path,  # ⭐ 附件路径
+            caption=f"📋 **T0文档审计报告**\n\n"
+                   f"**审计结论**: {result['conclusion']}\n"
+                   f"**变更文件**: {', '.join(changed_files)}"
+        )
+    
+    return result
+```
+
+**Discord附件发送示例：**
+
+```python
+def send_attachment_to_channel(channel: str, file_path: str, caption: str = ""):
+    """
+    发送文件附件到指定频道
+    
+    Args:
+        channel: 频道标识 (discord/slack等)
+        file_path: 附件文件路径
+        caption: 附件说明文字
+    """
+    # 读取文件内容
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # 发送消息 (带附件)
+    send_message(
+        channel=channel,
+        message=caption,
+        attachment={
+            "filename": os.path.basename(file_path),
+            "content": content
+        }
+    )
+```
+
+**流程说明：**
+1. **变更检测** - 系统检测T0文档变更
+2. **审计触发** - 调用 deepseek-reasoner 审查
+3. **报告生成** - 保存为 `report_by_deepseek-reasoner_时间戳.md`
+4. **附件发送** - 将报告作为附件发送到 Discord
+5. **用户确认** - 用户查看报告并确认/修正
+
 ## 性能指标
 
 - **上下文占用**: <8K tokens (T0文档 + 按需加载)
@@ -551,7 +1112,9 @@ $$H_{sys} = \alpha \cdot \underbrace{\left(\frac{T_{load}}{T_{limit}}\right)}_{\
 
 ## 使用方式
 
-1. **项目初始化**: 创建5个T0文档到 `memory_bank/`
+1. **项目初始化**: 
+   - 创建5个T0文档到 `memory_bank/`
+   - ⭐ **创建项目README.md** (项目背景文档，非T0级别)
 2. **启动开发**: 加载T0文档，计算 $H_{sys}$
 3. **制定计划**: 在T0文档中定义变更
 4. **执行开发**: 按计划修改代码
@@ -563,6 +1126,7 @@ $$H_{sys} = \alpha \cdot \underbrace{\left(\frac{T_{load}}{T_{limit}}\right)}_{\
 
 ### 前置条件
 - ✅ 必须在项目根目录创建 `memory_bank/` 文件夹
+- ⭐ **必须创建项目README.md** (项目背景文档，来自 templates/readme_template.md)
 - ✅ 必须创建5个T0文档（第一时间）
 - ✅ 必须保持T0文档在上下文中（全程）
 - ✅ 必须先文档后代码（计划阶段）
@@ -604,4 +1168,59 @@ $$H_{sys} = \alpha \cdot \underbrace{\left(\frac{T_{load}}{T_{limit}}\right)}_{\
 - ✅ **版本更新后**: 扫描所有文件，更新 $F_{drift}$ 统计
 - ✅ **结项前**: 确认 $H_{sys}$ 符合预期（或改善）
 
+## 🚀 快速开始
+
+### 步骤1: 项目初始化
+```bash
+# 创建 Memory Bank
+mkdir -p memory_bank/00_indices
+mkdir -p memory_bank/01_active_state
+mkdir -p memory_bank/02_systemaxioms
+mkdir -p memory_bank/03_protocols/workflows
+mkdir -p memory_bank/03_protocols/standards
+
+# 复制模板
+cp templates/*_index.md memory_bank/00_indices/
+cp templates/activeContext.md memory_bank/01_active_state/
+cp templates/KNOWLEDGE_GRAPH.md memory_bank/02_systemaxioms/
+
+# 创建项目 README.md
+cp templates/readme_template.md README.md
+```
+
+### 步骤2: 启动 CDD
+1. 加载 README.md (项目背景)
+2. 加载全部 5 个 T0 文档
+3. 进入 State A (基准摄入)
+
+### 步骤3: 开发循环
+```
+State A → State B → State C → State D → State E
+   ↑__________________________________|
+            (继续开发)
+```
+
+### 步骤4: 外部审计 (T0变更时)
+```
+T0 文档变更 → 触发审计 → deepseek-reasoner → 报告 → Discord → 用户确认
+```
+
+## ✅ 闭环验证清单
+
+每次开发任务结束时，必须确认以下全部通过：
+
+| 检查项 | 验证标准 | 状态 |
+|--------|----------|------|
+| **代码 ↔ 架构同构** | `代码结构` ≅ `systemPatterns.md` | ☐ |
+| **接口 ↔ 签名匹配** | `接口定义` ⊇ `techContext.md` | ☐ |
+| **行为 ↔ 断言一致** | `实际行为` ≡ `behaviorContext.md` | ☐ |
+| **T0 文档同步** | 全部 5 个 T0 文档已更新 | ☐ |
+| **熵值达标** | $H_{sys} \leq 0.3$ | ☐ |
+| **无悬空引用** | 所有 DS/WF 标准已释放 | ☐ |
+| **外部审计通过** | (如有T0变更) 审计报告结论为"通过" | ☐ |
+
+**全部打勾后方可结项。**
+
 ---
+
+*CDD v1.0 - 逻辑清晰，架构闭环。*

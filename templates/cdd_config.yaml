@@ -1,0 +1,142 @@
+# CDD (Constitution-Driven Development) 配置文件
+# 文件路径: memory_bank/cdd_config.yaml
+
+# ============================================
+# 外部审计者配置 (External Auditor)
+# ============================================
+external_auditor:
+  # 是否启用外部审计者
+  enabled: true
+  
+  # 模型配置
+  model: "deepseek-reasoner"  # 深度推理模型
+  
+  # API 配置
+  api:
+    # API基础地址
+    base_url: "https://api.deepseek.com"
+    
+    # API密钥 (支持环境变量格式: ${ENV_VAR})
+    # 推荐使用环境变量: export DEEPSEEK_API_KEY="your-api-key"
+    api_key: "${DEEPSEEK_API_KEY}"
+  
+  # 审计策略
+  audit:
+    # 审计范围: 仅T0级别文档 ⭐
+    scope:
+      - "t0_documents"  # 专注审查T0级别文档
+    
+    # 触发时机: T0文档变更时 ⭐
+    trigger_on:
+      - "t0_document_change"  # T0文档变更时触发
+    
+    # 审计深度: shallow(浅层)/comprehensive(全面)/deep(深度)
+    depth: "comprehensive"
+    
+    # 审计报告格式
+    report_format: "markdown"
+  
+  # 通知设置
+  notifications:
+    # 抄送用户 ⭐
+    cc_to_user: true  # 审计报告同步抄送给用户
+    
+    # 通知渠道
+    channels:
+      - "discord"  # 通过Discord发送审计报告
+
+# ============================================
+# 主模型配置 (Primary Model)
+# ============================================
+primary_model:
+  # 模型名称
+  model: "minimax/MiniMax-M2.1"
+  
+  # API 配置
+  api:
+    base_url: "https://api.minimax.io/anthropic"
+    api_key: "${MINIMAX_API_KEY}"
+
+# ============================================
+# 验证配置
+# ============================================
+verification:
+  # 三级验证设置
+  tiers:
+    tier1:
+      enabled: true
+      description: "物理结构验证 (文件系统 vs ASCII树)"
+    tier2:
+      enabled: true
+      description: "签名验证 (代码 vs 接口定义)"
+    tier3:
+      enabled: true
+      description: "行为验证 (运行时 vs 行为断言)"
+  
+  # 熵值阈值
+  entropy:
+    warning_threshold: 0.5    # 警告阈值
+    critical_threshold: 0.7   # 危险阈值
+
+# ============================================
+# 审计策略配置
+# ============================================
+audit_policies:
+  # 安全审计
+  security:
+    enabled: true
+    scan_for:
+      - "sql_injection"      # SQL注入
+      - "xss_vulnerabilities" # XSS漏洞
+      - "auth_bypass"        # 认证绕过
+      - "path_traversal"     # 路径遍历
+  
+  # 代码质量审计
+  quality:
+    enabled: true
+    check_for:
+      - "code_smells"        # 代码异味
+      - "complexity"         # 复杂度
+      - "duplication"        # 重复代码
+  
+  # 合规性审计
+  compliance:
+    enabled: true
+    constitution_refs:
+      - "§152"  # 单一真理源公理
+      - "§381"  # 安全公理
+      - "§114"  # 双存储同构公理
+
+# ============================================
+# 报告配置
+# ============================================
+reports:
+  # 审计报告输出目录
+  output_dir: "research_report/"  # ⭐ 报告保存目录
+  
+  # 报告文件名格式 ⭐
+  filename_pattern: "report_by_deepseek-reasoner_{timestamp}.md"
+  # timestamp格式: YYYY-MM-DD_HH-MM-SS
+  
+  # 报告保留天数
+  retention_days: 30
+  
+  # 是否自动归档
+  auto_archive: true
+  
+  # 附件发送设置 ⭐
+  attachments:
+    # 是否作为附件发送
+    send_as_attachment: true
+    
+    # 发送渠道
+    channels:
+      - "discord"  # 发送到Discord
+      # - "slack"   # 可选: 发送到Slack
+      # - "email"   # 可选: 发送到邮件
+    
+    # 消息格式
+    message_format:
+      include_summary: true   # 包含审计摘要
+      include_path: true      # 包含报告路径
+      include_conclusion: true # 包含审计结论
