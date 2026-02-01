@@ -1,6 +1,6 @@
 # CDD v1.5.0 (Ecosystem & Automation) 开发计划
 
-**状态**: 🚀 Phase 1 In Progress  
+**状态**: 🚀 Phase 2 Complete  
 **版本**: v1.5.0  
 **代号**: Ecosystem & Automation  
 **目标**: 将"单机版文档治理"升级为"与外部生态(GitHub/Git)联动的自动化治理"
@@ -16,12 +16,13 @@
 | 配置github-mcp集成 | `cdd_config.yaml` (v1.5.0) | ✅ 已完成 |
 | 更新规划文档 | `PLANNING_v1.5.0_ECOSYSTEM_INTEGRATION.md` | ✅ 已完成 |
 
-### Phase 2: 特性脚手架 (cdd-feature) ⏳ 待开始
+### Phase 2: 特性脚手架 (cdd-feature) ✅ 完成
 | 任务 | 文件 | 状态 |
 |------|------|------|
-| 创建cdd-feature脚本 | `scripts/cdd-feature.sh` | ⏳ 待开发 |
-| 更新State A流程 | `WF-201_cdd_workflow.md` | ⏳ 待更新 |
-| 测试分支创建 | - | ⏳ 待测试 |
+| 创建cdd-feature.py | `scripts/cdd-feature.py` | ✅ 已完成 |
+| 自动编号逻辑 | `get_next_feature_id()` | ✅ 已完成 |
+| Git分支创建 | `create_branch()` | ✅ 已完成 |
+| 模板实例化 | `instantiate_templates()` | ✅ 已完成 |
 
 ### Phase 3: 宪法修正案 (WF-AMEND) ⏳ 待开始
 | 任务 | 文件 | 状态 |
@@ -32,31 +33,44 @@
 
 ---
 
-## ✅ Phase 1 完成内容
+## ✅ Phase 2 完成内容
 
-### 1. WF-SYNC-ISSUES 协议
-**文件**: `templates/protocols/WF-sync-issues.md`
+### cdd-feature.py 脚本
+**文件**: `scripts/cdd-feature.py`
 
-- 解析DS-052任务 (匹配 `- [ ]` 模式)
-- 调用GitHub MCP Server创建Issue
-- 回写Issue链接到DS-052
-- 异常处理机制
+```bash
+# 使用示例
+python scripts/cdd-feature.py "Add User Login"
+python scripts/cdd-feature.py "Integrate Stripe" --short-name "stripe"
+```
 
-### 2. cdd_config.yaml v1.5.0
-**新增配置**:
+**功能**:
+- 自动编号 (扫描 specs/ 目录)
+- Git 集成 (自动创建分支)
+- 模板实例化 (DS-050/051/052)
 
-```yaml
-# GitHub 生态集成 (v1.5.0新增)
-github_integration:
-  enabled: true
-  protocol: "templates/protocols/WF-sync-issues.md"
-  sync_on_state_b: true        # State B完成后自动同步
-  sync_on_demand: true         # 支持手动触发
-  default_labels:
-    - "cdd-task"
-    - "automated"
-  behavior: "create_and_link"
-  task_prefix: "T"
+### 使用方法
+
+```bash
+# 赋予执行权限
+chmod +x scripts/cdd-feature.py
+
+# 创建新特性
+python scripts/cdd-feature.py "Add User Login"
+
+# 输出
+🚀 CDD Feature Scaffolding v1.5.0
+   Feature: 001-add-user-login
+   Description: Add User Login
+
+🌿 Creating branch: 001-add-user-login
+📄 Generating artifacts in specs/001-add-user-login/...
+   ✅ DS-050_001_spec.md
+   ✅ DS-051_001_plan.md
+   ✅ DS-052_001_tasks.md
+
+✅ Feature scaffolding complete!
+   Directory: specs/001-add-user-login
 ```
 
 ---
@@ -79,5 +93,5 @@ github_integration:
 
 ---
 
-**计划更新**: 2026-02-01 19:50  
-**状态**: Phase 1 Complete, Phase 2 Ready
+**计划更新**: 2026-02-01 19:55  
+**状态**: Phase 2 Complete, Phase 3 Ready
