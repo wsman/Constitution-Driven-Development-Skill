@@ -34,7 +34,7 @@ spec_kit:
     plans_dir: "plans"
     checklists_dir: "memory_bank/checklists"
 
-# 质量门禁配置 (v1.4.0新增)
+# 质量门禁配置 (v1.4.0)
 quality_gates:
   analyze:
     enabled: true
@@ -63,7 +63,7 @@ context_strategy:
       include: ["templates/axioms/system_patterns.md", "templates/axioms/tech_context.md"]
       budget_ratio: 0.5
     coding:
-      include: ["templates/standards/DS-050", "templates/standards/DS-051", "templates/standards/DS-052"]
+      include: ["templates/standards/DS-050_feature_specification.md", "templates/standards/DS-051_implementation_plan.md", "templates/standards/DS-052_atomic_tasks.md"]
       budget_ratio: 0.7
     verifying:
       include: ["templates/axioms/behavior_context.md"]
