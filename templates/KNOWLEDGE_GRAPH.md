@@ -1,6 +1,6 @@
 # 知识图谱 (Knowledge Graph)
 
-**版本**: v1.0.0
+**版本**: v1.2.0
 **状态**: 🟢 活跃
 **说明**: 项目知识图谱入口，提供高维关联导航
 **维护机制**: 每次 CDD 周期结束时更新
@@ -150,11 +150,126 @@
 
 ---
 
-**维护规则**:
-- 每次 CDD 周期结束时更新图谱
-- 新增节点需定义 relationships
-- 保持最大跳数限制
+## 7. 图谱可视化 (Mermaid) [v1.2.0新增]
+
+**使用说明**: 将以下代码块复制到 [Mermaid Live Editor](https://mermaid.live/) 中可查看可视化结构。
+
+```mermaid
+graph TD
+    %% 核心层 T0
+    ActiveContext(activeContext.md) -->|Focus| CurrentTask[当前任务]
+    BasicLaw(基本法索引) -->|Governs| ProceduralLaw(程序法索引)
+    BasicLaw -->|Governs| TechnicalLaw(技术法索引)
+    
+    subgraph T1_System_Axioms [T1 系统公理层]
+        SystemPatterns(systemPatterns.md)
+        TechContext(techContext.md)
+        BehaviorContext(behaviorContext.md)
+    end
+    
+    subgraph Domain_Knowledge [领域知识簇]
+        Security[安全与合规]
+        Architecture[核心架构]
+        IO[输入输出]
+        Cognition[认知范式]
+    end
+    
+    subgraph Standards_Workflows [T2 标准与工作流]
+        DSxxx[DS-xxx 标准]
+        WFxxx[WF-xxx 工作流]
+    end
+    
+    %% 关系定义
+    TechnicalLaw -->|Mandates| SystemPatterns
+    ProceduralLaw -->|Defines| WFxxx
+    SystemPatterns -->|Governs| Architecture
+    TechContext -->|Defines| IO
+    BehaviorContext -->|Validates| Security
+    Architecture -->|Implements| DSxxx
+    WFxxx -->|Governs| BehaviorContext
+    DSxxx -->|References| TechContext
+    
+    %% 外部审计
+    ExternalAudit((外部审计<br/>deepseek-reasoner)) -.->|Reviews| BasicLaw
+    ExternalAudit -.->|Validates| DSxxx
+
+    %% 样式
+    classDef T0 fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef T1 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+    classDef T2 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef Audit fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,stroke-dasharray5 5;
+    
+    class ActiveContext,BasicLaw,ProceduralLaw,TechnicalLaw T: 0
+    class SystemPatterns,TechContext,BehaviorContext T1
+    class DSxxx,WFxxx T2
+    class ExternalAudit Audit
+
+```
 
 ---
 
+## 8. 节点填充指南 [v1.2.0新增]
+
+当新增一个功能模块（如 "支付系统"）时，请按以下格式添加到图谱：
+
+### 8.1 定义节点
+
+在 `Domain_Knowledge` 中新增簇：
+
+```markdown
+### 💳 支付系统 (Payment System)
+
+| 项目 | 内容 |
+|------|------|
+| **中心节点** | 基本法 §100, 程序法 §210 |
+| **核心标准** | DS-030 (支付安全), DS-031 (交易幂等) |
+| **关联工作流** | WF-250 (支付流程), WF-260 (退款流程) |
+| **依赖模块** | 用户服务, 订单服务 |
+```
+
+### 8.2 建立连接
+
+使用以下关系类型建立节点关联：
+
+| 关系类型 | 说明 | 示例 |
+|----------|------|------|
+| `Implements` | 实现了哪个 T1 接口 | 支付系统 → `techContext.md#IPayment` |
+| `Required_by` | 哪个工作流需要它 | ← `WF-Checkout` |
+| `Governs` | 受哪条法律约束 | → `技术法 §302 原子写入` |
+| `Depends_on` | 依赖哪个模块 | → `用户服务` |
+| `Validates` | 验证哪个不变量 | → `behaviorContext.md#余额非负` |
+
+### 8.3 填充模板
+
+```markdown
+## [模块名称]
+
+**类型**: Domain Cluster
+**版本**: v1.0.0
+**最后更新**: {{TIMESTAMP}}
+
+### 节点信息
+- **中心节点**: [法典条款引用]
+- **核心标准**: [DS-xxx 标准列表]
+- **关联工作流**: [WF-xxx 工作流列表]
+
+### 关系图
+```mermaid
+graph LR
+    Module[当前模块] -->|Implements| Interface[T1接口]
+    Module -->|Governs| Law[法律条款]
+    Workflow -->|Requires| Module
+```
+
+---
+
+## 9. 维护规则
+
+1. **更新频率**: 每次 CDD 周期结束时更新图谱
+2. **节点命名**: 使用 `kebab-case` 如 `payment-system`
+3. **关系限制**: 最大跳数 = 3
+4. **版本管理**: 每个节点需标注版本号
+5. **审计同步**: 外部审计后需更新相关节点
+
 *遵循宪法约束: 知识即图谱，导航即推理。*
+
