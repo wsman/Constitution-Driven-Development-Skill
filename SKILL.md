@@ -1,12 +1,51 @@
 ---
 name: cdd
-description: 宪法驱动开发 (Constitution-Driven Development)。使用MiniMax M2.1模型在OpenClaw中进行AI辅助软件开发，遵循三级法律体系（基本法、程序法、技术法）约束，通过五状态工作流(A→E)和三级验证确保代码质量。
+description: 宪法驱动开发 (Constitution-Driven Development)。使用MiniMax M2.1模型进行AI辅助开发，遵循三级法律体系约束，通过五状态工作流和三级验证确保代码质量。外部审计使用DeepSeek-Reasoner模型。
 model: minimax/MiniMax-M2.1
 ---
 
 # 宪法驱动开发 (CDD)
 
 使用 MiniMax M2.1 模型进行 AI 辅助软件开发，遵循逆熵实验室三级法律体系约束。
+
+## 🎯 模型配置 [v1.1.0新增]
+
+CDD框架使用双模型架构，明确区分开发模型和审计模型：
+
+| 用途 | 模型 | 说明 |
+|------|------|------|
+| **开发模型** | `minimax/MiniMax-M2.1` | 主要开发工作流执行模型 |
+| **审计模型** | `deepseek-reasoner` | 外部T0文档审计模型 |
+
+### 开发模型 (Development Model)
+
+- **模型ID**: `minimax/MiniMax-M2.1`
+- **用途**: 执行CDD五状态工作流 (State A-E)
+- **职责**: 代码生成、文档编写、验证执行
+- **上下文管理**: 加载T0/T1/T2文档体系
+
+### 审计模型 (Audit Model)
+
+- **模型ID**: `deepseek-reasoner`
+- **用途**: T0级别文档合规性审计
+- **触发时机**: T0文档变更时自动触发
+- **职责**: 第三方视角评估、风险识别、改进建议
+
+### 工作流示意
+
+```
+开发阶段 (MiniMax-M2.1)
+    ↓ State E 完成
+T0文档变更检测
+    ↓
+审计阶段 (DeepSeek-Reasoner)
+    ↓
+生成审计报告
+    ↓
+用户确认/修正
+    ↓
+返回开发阶段
+```
 
 ## 📐 架构概览
 

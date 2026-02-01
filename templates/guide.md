@@ -1,4 +1,23 @@
-# CDD 模板使用指南
+# CDD 模板使用指南 [v1.1.0]
+
+## 模型配置 [v1.1.0新增]
+
+CDD框架使用双模型架构：
+
+| 用途 | 模型 | 配置文件位置 |
+|------|------|--------------|
+| **开发模型** | MiniMax-M2.1 | OpenClaw默认配置 |
+| **审计模型** | DeepSeek-Reasoner | `cdd_config.yaml` |
+
+### cdd_config.yaml 配置示例
+
+```yaml
+external_auditor:
+  model: "deepseek-reasoner"  # 外部审计模型
+  api:
+    base_url: "https://api.deepseek.com"
+    api_key: "${DEEPSEEK_API_KEY}"
+```
 
 ## 模板结构
 
