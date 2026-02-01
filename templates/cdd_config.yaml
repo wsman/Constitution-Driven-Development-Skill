@@ -1,5 +1,5 @@
-# CDD Configuration v1.3.1
-# Architecture Optimized
+# CDD Configuration v1.3.2
+# Final Polish
 
 project:
   name: "{{PROJECT_NAME}}"
@@ -9,24 +9,24 @@ project:
 # 外部审计配置
 external_auditor:
   enabled: true
-  model: "deepseek-reasoner"
+  provider: "deepseek-reasoner"
   max_tokens: 8192
   api:
     base_url: "https://api.deepseek.com"
     api_key: "${DEEPSEEK_API_KEY}"
   trigger_policy:
     on_state_change: ["State E"]
-    on_file_change: ["memory_bank/01_active_state/*.md"]
+    on_file_change: ["memory_bank/core/active_context.md"]
   reporting:
     format: "markdown"
     output_dir: "research_report"
 
-# Spec-Kit 集成配置 (路径更新)
+# Spec-Kit 集成配置 (v1.3.2 Updated)
 spec_kit:
   templates:
-    spec: "templates/_standards/DS-050_FEATURE_SPECIFICATION.md"
-    plan: "templates/_standards/DS-051_IMPLEMENTATION_PLAN.md"
-    tasks: "templates/_standards/DS-052_ATOMIC_TASKS.md"
+    spec: "templates/standards/DS-050_feature_specification.md"
+    plan: "templates/standards/DS-051_implementation_plan.md"
+    tasks: "templates/standards/DS-052_atomic_tasks.md"
   output:
     specs_dir: "specs"
     plans_dir: "plans"
@@ -37,19 +37,19 @@ context_strategy:
   safety_margin: 0.1
   modes:
     planning:
-      include: ["templates/_axioms/system_patterns.md", "templates/_axioms/tech_context.md"]
+      include: ["templates/axioms/system_patterns.md", "templates/axioms/tech_context.md"]
       budget_ratio: 0.5
     coding:
-      include: ["templates/_standards/DS-050", "templates/_standards/DS-051", "templates/_standards/DS-052"]
+      include: ["templates/standards/DS-050", "templates/standards/DS-051", "templates/standards/DS-052"]
       budget_ratio: 0.7
     verifying:
-      include: ["templates/_axioms/behavior_context.md"]
+      include: ["templates/axioms/behavior_context.md"]
       budget_ratio: 0.6
 
-# 路径配置 (v1.3.1 新增)
+# 路径配置 (v1.3.2 Final Polish)
 paths:
   templates:
-    core: "templates/_core"        # T0 核心模板
-    axioms: "templates/_axioms"     # T1 公理模板
-    standards: "templates/_standards"  # T2 DS 标准模板
-    protocols: "templates/_protocols"  # T2 WF 工作流模板
+    core: "templates/core"
+    axioms: "templates/axioms"
+    standards: "templates/standards"
+    protocols: "templates/protocols"

@@ -1,7 +1,7 @@
 # Constitution-Driven Development Skill (CDD)
 
-**Version**: 1.3.1  
-**Codename**: Architecture Cleanup  
+**Version**: 1.3.2  
+**Codename**: Final Polish  
 **License**: Apache-2.0  
 **Author**: wsman
 
