@@ -1,17 +1,17 @@
 ---
 name: cdd
-description: 宪法驱动开发 (Constitution-Driven Development) v1.4.0 Quality & Governance Integration。使用MiniMax M2.1模型进行AI辅助开发，基于合规度熵值模型、Spec-Kit工作流、三级验证和质量门禁。集成WF-ANALYZE规划校验、DS-053质量检查单、DS-054环境硬化。
+description: 宪法驱动开发 (Constitution-Driven Development) v1.5.0 Ecosystem & Automation。使用MiniMax M2.1模型进行AI辅助开发，基于合规度熵值模型、Spec-Kit工作流、三级验证和质量门禁。集成GitHub Issues同步、特性脚手架脚本、宪法修正案协议。
 model: minimax/MiniMax-M2.1
-version: v1.4.0
+version: v1.5.0
 ---
 
-# 宪法驱动开发 (CDD) v1.4.0
+# 宪法驱动开发 (CDD) v1.5.0
 
 使用 MiniMax M2.1 模型进行 AI 辅助软件开发，遵循逆熵实验室三级法律体系约束。
 
-**版本**: v1.4.0 (Quality & Governance Integration)
+**版本**: v1.5.0 (Ecosystem & Automation)
 
-**状态**: 🟢 Production Ready
+**状态**: 🟢 Release Ready
 
 ## 🎯 模型配置 [v1.1.0新增]
 
@@ -1684,3 +1684,75 @@ python scripts/calculate_entropy.py > entropy_result.json
 # {{Ha_VALUE}} → 0.100
 # {{H_SYS_VALUE}} → 0.297
 ```
+
+## 📦 v1.5.0 新特性：生态与自动化
+
+v1.5.0 (Ecosystem & Automation) 引入了与外部生态系统的自动化集成能力。
+
+### 🎯 Phase 1: GitHub Issues同步 (WF-SYNC-ISSUES)
+
+**协议文件**: `templates/protocols/WF-sync-issues.md`
+
+**功能**: 将 DS-052 原子任务自动同步到 GitHub Issues
+
+**配置**:
+```yaml
+github_integration:
+  enabled: true
+  protocol: "templates/protocols/WF-sync-issues.md"
+  sync_behavior: "create_and_link"
+```
+
+### 🚀 Phase 2: 特性脚手架 (cdd-feature.py)
+
+**脚本**: `scripts/cdd-feature.py`
+
+**功能**: 一键创建特性文档骨架
+
+**使用**:
+```bash
+# 创建新特性
+python scripts/cdd-feature.py "Add User Login"
+
+# 干运行（不实际创建）
+python scripts/cdd-feature.py "Add User Login" --dry-run
+```
+
+**功能**:
+- 自动编号 (扫描 specs/ 目录)
+- Git 分支创建
+- 模板实例化 (DS-050/051/052)
+
+### ⚖️ Phase 3: 宪法修正案 (WF-AMEND)
+
+**协议文件**: `templates/protocols/WF-amend.md`
+
+**功能**: T0/T1 文档变更的安全协议
+
+**流程**:
+1. **起草**: 识别变更目标 (T0/T1)
+2. **版本计算**: SemVer 计算 (Major/Minor/Patch)
+3. **传播检查**: 检查 T2 模板是否需要同步
+4. **影响报告**: 生成变更影响摘要
+
+### 📖 迁移指南
+
+**文档**: `MIGRATION_GUIDE.md`
+
+从 v1.4.0 升级到 v1.5.0 的完整指南，包含：
+- 配置文件更新
+- 脚本部署
+- 协议部署
+- 常见问题 (FAQ)
+
+### 📊 v1.5.0 审计结果
+
+| 维度 | 评分 | 说明 |
+|------|------|------|
+| 架构完整性 | 9/10 | 结构严谨，逻辑闭环 |
+| 功能可用性 | 8/10 | 协议健壮，自动化方向正确 |
+| 实现质量 | 7/10 | 文档极佳，代码待审计 |
+| 兼容性 | 8/10 | 增强为主，平滑升级 |
+| **总体评分** | **8.0/10** | **Release Ready** |
+
+**审计报告**: `research_report/cdd_skill_v1.5.0_comprehensive_audit_*.md`
