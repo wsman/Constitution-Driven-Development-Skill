@@ -9,7 +9,7 @@ A comprehensive skill for OpenClaw that implements Constitution-Driven Developme
 
 ## Overview
 
-CDD is a systematic approach to AI-assisted software development that enforces strict documentation-driven workflows, three-tier verification, and system entropy monitoring. v1.5.0 introduces ecosystem automation with GitHub sync, feature scaffolding, and constitution amendment protocols.
+CDD is a systematic approach to AI-assisted software development that enforces strict documentation-driven workflows, three-tier verification, and system entropy monitoring. v1.6.0 introduces ecosystem automation with GitHub sync, feature scaffolding, and constitution amendment protocols.
 
 ## Features
 
@@ -121,13 +121,13 @@ cp cdd/templates/core/project_readme_template.md README.md
 
 ```
 cdd/
-├── SKILL.md                         # Main skill file (v1.3.2, with Appendix A)
-├── README.md                        # This file (v1.3.2)
+├── SKILL.md                         # Main skill file (v1.6.0, with Appendix A)
+├── README.md                        # This file (v1.6.0)
 ├── templates/                       # T0/T1 document templates
 │   ├── core/                        # T0-核心意识层
-│   │   ├── active_context.md        # Active Context (v1.3.2)
+│   │   ├── active_context.md        # Active Context (v1.6.0)
 │   │   ├── basic_law_index.md       # Basic Law Index
-│   │   ├── knowledge_graph.md       # Knowledge Graph (v1.3.2, Mermaid)
+│   │   ├── knowledge_graph.md       # Knowledge Graph (v1.6.0, Mermaid)
 │   │   ├── procedural_law_index.md  # Procedural Law Index
 │   │   ├── technical_law_index.md   # Technical Law Index
 │   │   ├── guide.md                 # Template Usage Guide
@@ -146,10 +146,10 @@ cdd/
 │   │   └── DS-052_atomic_tasks.md
 │   └── cdd_config.yaml              # CDD Configuration
 └── scripts/
-    └── measure_entropy.py           # Entropy calculation script (v1.3.2)
+    └── measure_entropy.py           # Entropy calculation script (v1.3.1)
 ```
 
-## Core Mathematics (v1.3.2)
+## Core Mathematics (v1.6.0)
 
 **System Entropy** (Updated with H_align):
 $$
@@ -161,7 +161,7 @@ Where:
 - **H_struct** (Structural Entropy): $1 - N_{linked}/N_{total}$
 - **H_align** (Alignment Deviation): $N_{violation} / N_{constraints}$ (NEW)
 
-**Calibration Standard** (v1.3.2):
+**Calibration Standard** (v1.6.0):
 - 🟢 **Excellent**: $0.0 - 0.3$ (Calibration Target)
 - 🟡 **Good**: $0.3 - 0.5$ (Normal Development)
 - 🟠 **Warning**: $0.5 - 0.7$ (Start Repairs)
@@ -220,7 +220,7 @@ make fix-versions
    - **Tier 3**: Behavior ($B_{code} \equiv B_{spec}$) vs `behavior_context.md`
 5. **State E (Converge)**: Calibrate $H_{sys} \leq 0.3$, complete
 
-## External Auditor (v1.3.2)
+## External Auditor (v1.6.0)
 
 CDD includes an **External Auditor** for third-party AI review:
 
@@ -230,7 +230,7 @@ CDD includes an **External Auditor** for third-party AI review:
 - **Scope**: T0 documents only
 - **Output**: Markdown report with real API data → Discord notification
 
-**API Data Requirement** (v1.3.2):
+**API Data Requirement** (v1.6.0):
 - Request ID, timestamps, latency (ms), token counts (exact, no estimates)
 
 ## Closed-Loop Verification Checklist
@@ -259,7 +259,7 @@ Before completing any task, verify:
 
 **Status**: 🟢 Production Ready | **Score**: 9.0/10 | **Audit**: deepseek-reasoner
 
-### v1.5.0 New Features
+### v1.6.0 New Features
 
 | Component | Function |
 |-----------|----------|
@@ -267,9 +267,9 @@ Before completing any task, verify:
 | `templates/protocols/WF-sync-issues.md` | GitHub Issues sync protocol (DS-052 → Issues) |
 | `templates/protocols/WF-amend.md` | Constitution amendment protocol (SemVer-based) |
 | `templates/cdd_config.yaml` | github_integration + governance configuration |
-| `MIGRATION_GUIDE.md` | v1.4.0 → v1.5.0 upgrade guide |
+| `MIGRATION_GUIDE.md` | v1.5.0 → v1.6.0 upgrade guide |
 
-### Quick Start (v1.5.0)
+### Quick Start (v1.6.0)
 
 ```bash
 # Clone
@@ -290,7 +290,8 @@ python scripts/cdd-feature.py "Add User Login" --dry-run
 | v1.0-v1.2 | T0/T1/T2 document system + five-state workflow |
 | v1.3 | Entropy metrics + external auditing |
 | v1.4 | Quality gates integration |
-| v1.5 | Ecosystem automation (current) |
+| v1.5 | Ecosystem automation |
+| v1.6 | AI Adaptation Layer + Enhanced audit with AI hints (current) |
 
 ### Documentation
 

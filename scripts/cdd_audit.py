@@ -183,6 +183,23 @@ class CDDAuditor:
                 "gate_results": self.results,
                 "logs": self.output_buffer
             }
+            
+            # Add AI remediation plan if requested and there are failures
+            if self.args.ai_hint and self.failed:
+                remediation = []
+                for res in self.results:
+                    if not res["passed"]:
+                        gate_id = res["gate"]
+                        if gate_id == 1:  # Version Mismatch
+                            remediation.append("Run `python scripts/cdd_audit.py --fix` to resolve version mismatch (Gate 1).")
+                        elif gate_id == 2:  # Tests Failed
+                            remediation.append("Analyze `pytest` output above. Fix logic errors in code before retrying (Gate 2).")
+                        elif gate_id == 3:  # Entropy High
+                            remediation.append("System entropy too high. Initiate refactoring workflow and analyze `scripts/measure_entropy.py` output (Gate 3).")
+                
+                if remediation:
+                    report["ai_remediation_plan"] = remediation
+            
             print(json.dumps(report, indent=2))
         
         else:
@@ -227,6 +244,7 @@ def main():
     parser.add_argument("--format", choices=['text', 'json'], default='text', help="Output format")
     parser.add_argument("--verbose", action="store_true", help="Show verbose output")
     parser.add_argument("--quiet", action="store_true", help="Suppress non-error output")
+    parser.add_argument("--ai-hint", action="store_true", help="Provide AI-friendly remediation hints in JSON output")
 
     args = parser.parse_args()
     auditor = CDDAuditor(args)
