@@ -89,10 +89,14 @@ class TestEntropyCalculator:
         project_dir = tmp_path / "test_project"
         project_dir.mkdir()
         
-        # 创建必要的文件
+        # 创建必要的目录结构
         (project_dir / "src").mkdir()
-        (project_dir / "systemPatterns.md").write_text("# Test")
-        (project_dir / "techContext.md").write_text("# Test")
+        (project_dir / "templates" / "axioms").mkdir(parents=True)
+        
+        # 创建必要的文件（使用正确的路径）
+        (project_dir / "templates" / "axioms" / "system_patterns.md").write_text("# Test")
+        (project_dir / "templates" / "axioms" / "tech_context.md").write_text("# Test")
+        (project_dir / "templates" / "axioms" / "behavior_context.md").write_text("# Test")
         
         return EntropyCalculator(str(project_dir), verbose=False)
     
@@ -315,11 +319,14 @@ class TestMainFunction:
     @patch('scripts.measure_entropy.EntropyCalculator')
     def test_main_success_json(self, mock_calculator, mock_args):
         """测试主函数成功（JSON输出）"""
-        # 模拟参数
+        # 模拟参数 - 包含所有新的命令行参数
         mock_args.return_value = Mock(
             project=".",
             verbose=False,
-            json=True
+            json=True,
+            clear_cache=False,
+            force_recalculate=False,
+            cache_info=False
         )
         
         # 模拟计算结果
@@ -350,11 +357,14 @@ class TestMainFunction:
     @patch('scripts.measure_entropy.EntropyCalculator')
     def test_main_danger_status(self, mock_calculator, mock_args):
         """测试主函数（危险状态）"""
-        # 模拟参数
+        # 模拟参数 - 包含所有新的命令行参数
         mock_args.return_value = Mock(
             project=".",
             verbose=False,
-            json=False
+            json=False,
+            clear_cache=False,
+            force_recalculate=False,
+            cache_info=False
         )
         
         # 模拟危险状态

@@ -1,4 +1,4 @@
-.PHONY: help audit gate1 gate2 gate3 fix-versions clean
+.PHONY: help audit gate1 gate2 gate3 fix-versions clean clean-cache cache-info
 
 # 默认目标：显示帮助
 help:
@@ -11,6 +11,8 @@ help:
 	@echo "  make gate3         : Measure System Entropy (H_sys)"
 	@echo "  make fix-versions  : Auto-fix version inconsistencies"
 	@echo "  make clean         : Clean up cache and temp files"
+	@echo "  make clean-cache   : Clean entropy cache only"
+	@echo "  make cache-info    : Show entropy cache information"
 
 # 🛡️ 运行完整宪法审计
 audit: gate1 gate2 gate3
@@ -35,8 +37,21 @@ gate3:
 fix-versions:
 	python scripts/verify_versions.py --fix
 
-# 🧹 工具：清理环境
+# 🧹 工具：清理环境（包含缓存）
 clean:
 	rm -rf __pycache__ .pytest_cache
 	rm -rf tests/__pycache__ scripts/__pycache__
-	@echo "🧹 Environment cleaned."
+	rm -f .entropy_cache.json
+	@echo "🧹 Environment cleaned (including cache)."
+
+# 🗑️ 专门清理熵值缓存
+clean-cache:
+	@echo "🗑️  Cleaning entropy cache..."
+	rm -f .entropy_cache.json
+	@echo "✅ Entropy cache cleaned."
+
+# ℹ️ 显示缓存信息
+cache-info:
+	@echo "📊 Entropy Cache Information"
+	@echo "=========================="
+	python scripts/measure_entropy.py --cache-info
