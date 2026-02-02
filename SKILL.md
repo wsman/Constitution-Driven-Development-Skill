@@ -60,7 +60,7 @@ Use these files to deepen your understanding when encountering complex scenarios
 | **技术实现** | `entropy_metrics.md` | `core/active_context.md`, `standards/DS-054_environment_hardening.md` | 系统熵值公式与阈值 |
 | **技术实现** | `entropy_calculation_guide.md` | `axioms/system_patterns.md`, `axioms/tech_context.md`, `axioms/behavior_context.md` | 熵值计算实现细节 |
 | **架构体系** | `architecture_map.md` | `core/active_context.md`, `axioms/system_patterns.md`, `standards/DS-050_feature_specification.md` | 三级递进架构地图与导航 |
-| **版本管理** | `version_features.md` | `core/active_context.md`, `protocols/WF-amend.md` | 版本历史与特性变更 |
+| **版本管理** | `README.md#version-history--features` | `core/active_context.md`, `protocols/WF-amend.md` | 版本历史与特性变更 (已合并到README) |
 ### 🎯 三级导航使用指南
 
 1. **第一级 (SKILL.md)**: 快速了解CDD核心工作流和工具链

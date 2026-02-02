@@ -1,18 +1,19 @@
 # Constitution-Driven Development Skill (CDD)
 
-**Version**: 1.6.0  
-**Codename**: Ecosystem & Automation  
+**Version**: 1.6.1  
+**Codename**: Memory Bank First  
 **License**: Apache-2.0  
 **Author**: wsman
 
-A comprehensive skill for OpenClaw that implements Constitution-Driven Development (CDD) methodology using MiniMax M2.1 model. Features ecosystem automation, GitHub integration, and governance protocols.
+A comprehensive skill for OpenClaw that implements Constitution-Driven Development (CDD) methodology using MiniMax M2.1 model. Features **Memory Bank First** architecture, ecosystem automation, GitHub integration, and governance protocols.
 
 ## Overview
 
-CDD is a systematic approach to AI-assisted software development that enforces strict documentation-driven workflows, three-tier verification, and system entropy monitoring. v1.6.0 introduces ecosystem automation with GitHub sync, feature scaffolding, and constitution amendment protocols.
+CDD is a systematic approach to AI-assisted software development that enforces strict documentation-driven workflows, three-tier verification, and system entropy monitoring. v1.6.1 introduces **Memory Bank First** principle with **Spore Protocol (Seed→Root→Sprout)**, ecosystem automation with GitHub sync, feature scaffolding, and constitution amendment protocols.
 
 ## Features
 
+- 🌱 **Memory Bank First**: Biological architecture design with Spore Protocol (Seed→Root→Sprout)
 - 📜 **T0/T1/T2 Document System**: Core consciousness → System axioms → Executable standards
 - 🔄 **Five-State Workflow**: A→B→C→D→E (Ingest → Plan → Execute → Verify → Converge)
 - ✅ **Three-Tier Verification**: Structure → Signatures → Behavior
@@ -141,13 +142,13 @@ cp cdd/templates/core/project_readme_template.md README.md
 
 ```
 cdd/
-├── SKILL.md                         # Main skill file (v1.6.0, with Appendix A)
-├── README.md                        # This file (v1.6.0)
+├── SKILL.md                         # Main skill file (v1.6.1, with Appendix A)
+├── README.md                        # This file (v1.6.1)
 ├── templates/                       # T0/T1 document templates
 │   ├── core/                        # T0-核心意识层
-│   │   ├── active_context.md        # Active Context (v1.6.0)
+│   │   ├── active_context.md        # Active Context (v1.6.1)
 │   │   ├── basic_law_index.md       # Basic Law Index
-│   │   ├── knowledge_graph.md       # Knowledge Graph (v1.6.0, Mermaid)
+│   │   ├── knowledge_graph.md       # Knowledge Graph (v1.6.1, Mermaid)
 │   │   ├── procedural_law_index.md  # Procedural Law Index
 │   │   ├── technical_law_index.md   # Technical Law Index
 │   │   ├── cdd_document_system_guide.md                 # Template Usage Guide
@@ -169,7 +170,7 @@ cdd/
     └── measure_entropy.py           # Entropy calculation script (v1.3.1)
 ```
 
-## Core Mathematics (v1.6.0)
+## Core Mathematics (v1.6.1)
 
 **System Entropy** (Updated with H_align):
 $$
@@ -181,7 +182,7 @@ Where:
 - **H_struct** (Structural Entropy): $1 - N_{linked}/N_{total}$
 - **H_align** (Alignment Deviation): $N_{violation} / N_{constraints}$ (NEW)
 
-**Calibration Standard** (v1.6.0):
+**Calibration Standard** (v1.6.1):
 - 🟢 **Excellent**: $0.0 - 0.3$ (Calibration Target)
 - 🟡 **Good**: $0.3 - 0.5$ (Normal Development)
 - 🟠 **Warning**: $0.5 - 0.7$ (Start Repairs)
@@ -240,7 +241,7 @@ make fix-versions
    - **Tier 3**: Behavior ($B_{code} \equiv B_{spec}$) vs `behavior_context.md`
 5. **State E (Converge)**: Calibrate $H_{sys} \leq 0.3$, complete
 
-## External Auditor (v1.6.0)
+## External Auditor (v1.6.1)
 
 CDD includes an **External Auditor** for third-party AI review:
 
@@ -250,7 +251,7 @@ CDD includes an **External Auditor** for third-party AI review:
 - **Scope**: T0 documents only
 - **Output**: Markdown report with real API data → Discord notification
 
-**API Data Requirement** (v1.6.0):
+**API Data Requirement** (v1.6.1):
 - Request ID, timestamps, latency (ms), token counts (exact, no estimates)
 
 ## Closed-Loop Verification Checklist
@@ -275,21 +276,22 @@ Before completing any task, verify:
 - See `templates/tech_context.md` for Tier 2 verification template
 - See `templates/behavior_context.md` for Tier 3 verification template
 
-## 🚀 CDD v1.6.0 (Ecosystem & Automation) - Gold Release
+## 🚀 CDD v1.6.1 (Memory Bank First) - Gold Release
 
-**Status**: 🟢 Production Ready | **Score**: 9.0/10 | **Audit**: deepseek-reasoner
+**Status**: 🟢 Production Ready | **Score**: 9.5/10 | **Audit**: deepseek-reasoner
 
-### v1.6.0 New Features
+### v1.6.1 New Features
 
 | Component | Function |
 |-----------|----------|
-| `scripts/cdd-feature.py` | Feature scaffolding: auto-numbering, Git branch creation, template instantiation |
-| `templates/protocols/WF-sync-issues.md` | GitHub Issues sync protocol (DS-052 → Issues) |
-| `templates/protocols/WF-amend.md` | Constitution amendment protocol (SemVer-based) |
-| `templates/cdd_config.yaml` | github_integration + governance configuration |
-| `MIGRATION_GUIDE.md` | v1.5.0 → v1.6.0 upgrade guide |
+| `scripts/deploy_cdd.py` | **Spore Protocol**: Seed→Root→Sprout deployment with Memory Bank First |
+| `SKILL.md` | Enhanced with Memory Bank First constitutional guardrails (v1.6.1) |
+| `templates/core/project_readme_template.md` | Updated with correct memory_bank/core/ paths |
+| Memory Bank Architecture | Biological growth model: **Seed → Root → Sprout** |
+| Cross-Space Interaction | AI agent resolves `{SKILL_ROOT}` for remote deployment |
+| Automated Detection | AI automatically detects and initializes missing `memory_bank/` |
 
-### Quick Start (v1.6.0)
+### Quick Start (v1.6.1)
 
 ```bash
 # Clone
@@ -303,15 +305,31 @@ python scripts/cdd-feature.py "Add User Login"
 python scripts/cdd-feature.py "Add User Login" --dry-run
 ```
 
-### Version Milestones
+### Version History & Features
 
+#### v1.6.1 (Memory Bank First)
+- **Feature**: 引入 **Memory Bank First** 宪法护栏作为最高优先级规则。
+- **Feature**: 实现 **Spore Protocol (Seed→Root→Sprout)** 仿生学部署流程。
+- **Feature**: 增强 SKILL.md 支持跨空间交互 (`{SKILL_ROOT}` 路径解析)。
+- **Feature**: `deploy_cdd.py` 自动创建完整 Memory Bank 结构。
+- **Feature**: 更新所有模板路径为 `memory_bank/core/` 标准结构。
+
+#### v1.6.0 (Automated Governance)
+- **Feature**: `cdd_audit.py` 全面接管审计。
+- **Feature**: 实现 Gate 1-3 自动化检查。
+- **Feature**: 引入 `--ai-hint` 支持 AI 自愈。
+- **Fix**: 熵值阈值调整为 0.7。
+
+#### v1.5.0 (Foundation)
+- **Feature**: 确立 T0-T2 文档体系。
+- **Feature**: 引入熵值计算脚本 `measure_entropy.py`。
+
+#### Earlier Milestones
 | Version | Focus |
 |---------|-------|
 | v1.0-v1.2 | T0/T1/T2 document system + five-state workflow |
 | v1.3 | Entropy metrics + external auditing |
 | v1.4 | Quality gates integration |
-| v1.5 | Ecosystem automation |
-| v1.6 | AI Adaptation Layer + Enhanced audit with AI hints (current) |
 
 ### Documentation
 

@@ -108,8 +108,8 @@ CDD采用三级递进架构设计，确保AI能够高效理解和执行宪法驱
 
 ### 版本管理
 
-#### `version_features.md`
-- **描述**: reference/version_features.md的相关模板
+#### `README.md#version-history--features`
+- **描述**: README.md中的版本历史与特性(已合并)
 - **相关模板**:
   - `core/active_context.md`
   - `protocols/WF-amend.md`
@@ -162,6 +162,6 @@ SKILL.md → legal_framework.md → basic_law_index.md
 
 ---
 
-**最后更新**: 2026-02-02  
-**版本**: v1.6.0  
-**状态**: 🟢 活跃 (与CDD宪法v1.6.0同步)
+**最后更新**: 2026-02-03  
+**版本**: v1.6.1  
+**状态**: 🟢 活跃 (与CDD宪法v1.6.1同步)
