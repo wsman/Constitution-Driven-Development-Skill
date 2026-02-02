@@ -181,6 +181,18 @@ Use with OpenClaw + MiniMax M2.1 for development, DeepSeek-Reasoner for auditing
 /cdd "Your development task description"
 ```
 
+## 🛡️ 宪法门禁 (Constitutional Guardrails)
+
+本项目实施了严格的 CDD 自动化审计（GitHub Actions）。任何 PR 必须通过以下三道门禁才能合并：
+
+| 门禁 (Gate) | 检查项 | 失败原因 | 修复方法 |
+|-------------|--------|----------|----------|
+| **Gate 1** | **版本一致性** | 文档版本号不统一 (违反 §102.3) | 运行 `python scripts/verify_versions.py --fix` |
+| **Gate 2** | **行为验证** | 单元测试失败 (功能倒退) | 运行 `pytest` 并修复代码逻辑 |
+| **Gate 3** | **熵值监控** | 系统熵值 $H_{sys} > 0.5$ | 运行 `python scripts/measure_entropy.py` 查看详情，进行重构或文档对齐 |
+
+> **提示**: 在提交代码前，建议在本地运行所有检查以避免流水线失败。
+
 ## CDD Workflow
 
 1. **State A (Context Ingestion)**: Load T0 + T1 documents
