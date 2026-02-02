@@ -79,6 +79,79 @@ $$H_{sys} = 0.4 \cdot H_{cog} + 0.3 \cdot H_{struct} + 0.3 \cdot H_{align}$$
 
 ---
 
+## 📊 模板系统状态监控 [v1.6.0新增]
+
+### 核心索引模板状态
+| 模板 | 文件路径 | 版本 | 状态 | 上次验证 |
+|------|----------|------|------|----------|
+| **基本法索引** | `core/basic_law_index.md` | v1.0.0 | ✅ 活跃 | 2026/2/2 |
+| **程序法索引** | `core/procedural_law_index.md` | v1.0.0 | ✅ 活跃 | 2026/2/2 |
+| **技术法索引** | `core/technical_law_index.md` | v1.0.0 | ✅ 活跃 | 2026/2/2 |
+
+### DS标准实现状态 (关键标准)
+| 标准 | 用途 | 状态 | 实现状态 |
+|------|------|------|----------|
+| **DS-007** | 上下文管理 | ✅ 已实现 | `standards/DS-007_context_management.md` |
+| **DS-050** | 特性规范模板 | ✅ 已实现 | `standards/DS-050_feature_specification.md` |
+| **DS-060** | 代码审查标准 | ✅ 已实现 | `standards/DS-060_code_review.md` |
+| **DS-001** | UTF-8输出配置 | ⚠️ 待实现 | 引用但未实现 |
+| **DS-002** | 原子文件写入 | ⚠️ 待实现 | 引用但未实现 |
+
+### WF工作流实现状态
+| 工作流 | 用途 | 状态 | 实现状态 |
+|--------|------|------|----------|
+| **WF-201** | CDD核心工作流 | ✅ 已实现 | `protocols/WF-201_cdd_workflow.md` |
+| **WF-001** | 澄清工作流 | ✅ 已实现 | `protocols/WF-001_clarify_workflow.md` |
+| **WF-202** | 灰度晋升协议 | ⚠️ 待实现 | 引用但未实现 |
+
+### 模板引用一致性
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| **索引引用一致性** | ✅ 通过 | 所有索引文件路径正确 |
+| **DS标准引用完整性** | 🟡 部分通过 | 7/37 标准已实现 |
+| **WF工作流引用完整性** | 🟡 部分通过 | 2/12 工作流已实现 |
+| **SKILL.md路由正确性** | ✅ 通过 | 所有模板引用路径正确 |
+
+---
+
+## 🔄 活动上下文更新指南 [v1.6.0新增]
+
+### 自动更新机制
+活动上下文支持以下自动更新方式：
+
+1. **CDD审计集成**:
+   ```bash
+   python scripts/cdd_audit.py --gate 1 --format json --update-context
+   ```
+
+2. **熵值计算更新**:
+   ```bash
+   python scripts/measure_entropy.py --format active-context
+   ```
+
+3. **模板状态同步**:
+   ```bash
+   python scripts/verify_versions.py --check-templates
+   ```
+
+### 手动更新要点
+当需要手动更新活动上下文时：
+
+1. **熵值数据**: 更新`{{Hc_VALUE}}`, `{{Hs_VALUE}}`, `{{Ha_VALUE}}`, `{{H_SYS_VALUE}}`
+2. **验证状态**: 更新"最后验证"时间戳
+3. **模板状态**: 同步`knowledge_graph.md`中的模板状态概览
+4. **宪法事件**: 记录重要的宪法变更事件
+
+### 占位符说明
+- `{{PROJECT_NAME}}`: 项目名称 (手动设置)
+- `{{Hc_VALUE}}`: 认知负载熵值 (通过熵值计算更新)
+- `{{Hs_VALUE}}`: 结构离散熵值 (通过熵值计算更新)
+- `{{Ha_VALUE}}`: 同构偏离熵值 (通过熵值计算更新)
+- `{{H_SYS_VALUE}}`: 综合熵值 (通过熵值计算更新)
+- 状态值: 自动根据熵值范围计算
+
+---
+
 ## 核心能力 (Bootloader v1.6.0)
 
 - **启动协议**: Bootloader Sequence (README input -> T0 Kernel)
