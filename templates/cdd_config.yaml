@@ -97,3 +97,26 @@ paths:
     axioms: "templates/axioms"
     standards: "templates/standards"
     protocols: "templates/protocols"
+
+# ============================================
+# v1.6.0: 工具集扩展 (Toolkit Expansion)
+# ============================================
+
+# 工具集配置
+toolkit:
+  code_review:
+    enabled: true
+    template: "templates/standards/DS-060_code_review.md"
+    protocol: "templates/protocols/WF-review.md"
+    auto_trigger:
+      on_git_push: false
+      on_pr_open: true
+    severity_levels:
+      critical: "🔴 立即修复"
+      major: "🟠 合并前修复"
+      minor: "🟡 建议修复"
+    checklist:
+      - security: "SQL注入、XSS、硬编码Secrets"
+      - architecture: "分层结构、依赖管理"
+      - robustness: "边缘情况、错误处理"
+      - compliance: "CDD工作流、T0/T1/T2规范"
