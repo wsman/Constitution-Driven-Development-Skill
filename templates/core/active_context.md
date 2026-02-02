@@ -1,13 +1,13 @@
 # Active Context (活动上下文)
 
-**版本**: v1.6.0
+**版本**: v1.6.1
 **最后更新**: 2026/2/2
 **维护者**: {{PROJECT_NAME}}
-**宪法模式**: Bootloader v1.6.0
+**宪法模式**: Bootloader v1.6.1
 
 ---
 
-## 引导加载状态 (Bootloader Status) [v1.6.0]
+## 引导加载状态 (Bootloader Status) [v1.6.1]
 
 | 阶段 | 状态 | 检查项 |
 |------|------|--------|
@@ -33,14 +33,14 @@
 | 维度 | 状态 | 说明 |
 |------|------|------|
 | **宪法模式** | 🟢 执法中 | Automated Judiciary Active |
-| **版本** | v1.6.0 | 全局一致性锁定 (Gate 1) |
+| **版本** | v1.6.1 | 全局一致性锁定 (Gate 1) |
 | **最后验证** | 2026/2/2 | 29/29 Tests Passed (Gate 2) |
 | **熵值状态** | 🟡 良好 | $H_{sys} = 0.35$ (Gate 3) |
 | **自动化门禁** | ✅ 激活 | GitHub Actions (3 Gates) |
 
 ---
 
-## 📉 熵值监测仪表盘 (Entropy Metrics) [v1.6.0]
+## 📉 熵值监测仪表盘 (Entropy Metrics) [v1.6.1]
 
 **核心指标**: $H_{sys}$ (归一化系统熵)
 $$H_{sys} = 0.4 \cdot H_{cog} + 0.3 \cdot H_{struct} + 0.3 \cdot H_{align}$$
