@@ -1,13 +1,13 @@
 # Active Context (活动上下文)
 
-**版本**: v1.3.2
+**版本**: v1.5.0
 **最后更新**: {{TIMESTAMP}}
 **维护者**: {{PROJECT_NAME}}
-**宪法模式**: Bootloader v1.3.2
+**宪法模式**: Bootloader v1.5.0
 
 ---
 
-## 引导加载状态 (Bootloader Status) [v1.3.2更新]
+## 引导加载状态 (Bootloader Status) [v1.5.0更新]
 
 | 阶段 | 状态 | 检查项 |
 |------|------|--------|
@@ -30,14 +30,14 @@
 
 | 维度 | 状态 | 说明 |
 |------|------|------|
-| **宪法模式** | 🟢 活跃 | Bootloader v1.3.2 |
-| **版本** | v1.3.2 | {{PROJECT_VERSION}} |
+| **宪法模式** | 🟢 活跃 | Bootloader v1.5.0 |
+| **版本** | v1.5.0 | {{PROJECT_VERSION}} |
 | **上下文占用** | {{TOKEN_USAGE}} | <8000 tokens |
 | **熵值状态** | {{H_SYS_STATUS}} | 目标: $\leq 0.3$ |
 
 ---
 
-## 📉 熵值监测仪表盘 (Entropy Metrics) [v1.3.2]
+## 📉 熵值监测仪表盘 (Entropy Metrics) [v1.5.0]
 
 **核心指标**: $H_{sys}$ (归一化系统熵)
 $$H_{sys} = 0.4 \cdot H_{cog} + 0.3 \cdot H_{struct} + 0.3 \cdot H_{align}$$
@@ -51,7 +51,7 @@ $$H_{sys} = 0.4 \cdot H_{cog} + 0.3 \cdot H_{struct} + 0.3 \cdot H_{align}$$
 
 *注: $H_{align}$ 衡量代码实现与 `systemPatterns`/`techContext` 的偏离度。*
 
-### 🎯 熵值解读标准 [v1.3.2更新]
+### 🎯 熵值解读标准 [v1.5.0更新]
 
 | $H_{sys}$ 范围 | 状态 | 行动建议 |
 |----------------|------|----------|
@@ -61,11 +61,10 @@ $$H_{sys} = 0.4 \cdot H_{cog} + 0.3 \cdot H_{struct} + 0.3 \cdot H_{align}$$
 | 0.7 - 1.0 | 🔴 危险 | 系统腐化，强制执行 WF-206 重构协议 |
 
 *注: 校准通过标准为 $H_{sys} \le 0.3$，良好状态为 $H_{sys} \le 0.5$*
-| 0.7 - 1.0 | 🔴 危险 | 立即停止开发，执行重构 |
 
 ---
 
-## 三级验证状态 (Tier 1-3) [v1.3.2新增]
+## 三级验证状态 (Tier 1-3) [v1.5.0新增]
 
 | Tier | 名称 | 验证内容 | 状态 | 上次验证 |
 |------|------|----------|------|----------|
@@ -75,7 +74,7 @@ $$H_{sys} = 0.4 \cdot H_{cog} + 0.3 \cdot H_{struct} + 0.3 \cdot H_{align}$$
 
 ---
 
-## 核心能力 (Bootloader v1.3.2)
+## 核心能力 (Bootloader v1.5.0)
 
 - **启动协议**: Bootloader Sequence (README input -> T0 Kernel)
 - **检索协议**: $O(1)$索引 + $O(\log k)$图谱
