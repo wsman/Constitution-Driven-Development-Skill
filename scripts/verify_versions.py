@@ -249,7 +249,7 @@ class VersionChecker:
         
         return fixes_applied > 0
     
-    def run(self, fix: bool = False) -> bool:
+    def run(self, fix: bool = False, target_version: Optional[str] = None) -> bool:
         """运行版本检查"""
         print("🔍 CDD 版本一致性检查")
         print("=" * 50)
@@ -276,28 +276,37 @@ class VersionChecker:
         else:
             if fix:
                 print("\n🛠️  正在尝试自动修复...")
-                # 使用最常出现的版本作为目标
-                version_counts = {}
-                for v in versions.values():
-                    if v:
-                        version_counts[v] = version_counts.get(v, 0) + 1
                 
-                if version_counts:
-                    target_version = max(version_counts.items(), key=lambda x: x[1])[0]
-                    if self.fix_versions(target_version):
-                        print(f"✅ 已修复版本号为: v{target_version}")
-                        
-                        # 重新检查
-                        print("\n🔍 修复后重新检查...")
-                        versions = self.check_all_files()
-                        is_consistent, consistency_report = self.analyze_consistency(versions)
-                        print(consistency_report)
-                        return is_consistent
-                    else:
-                        print("❌ 自动修复失败")
-                        return False
+                # 确定目标版本
+                if target_version:
+                    # 使用用户指定的目标版本
+                    print(f"使用指定版本: v{target_version}")
+                    final_target_version = target_version
                 else:
-                    print("❌ 无法确定目标版本号")
+                    # 使用最常出现的版本作为目标
+                    version_counts = {}
+                    for v in versions.values():
+                        if v:
+                            version_counts[v] = version_counts.get(v, 0) + 1
+                    
+                    if version_counts:
+                        final_target_version = max(version_counts.items(), key=lambda x: x[1])[0]
+                        print(f"自动检测到常用版本: v{final_target_version}")
+                    else:
+                        print("❌ 无法确定目标版本号")
+                        return False
+                
+                if self.fix_versions(final_target_version):
+                    print(f"✅ 已修复版本号为: v{final_target_version}")
+                    
+                    # 重新检查
+                    print("\n🔍 修复后重新检查...")
+                    versions = self.check_all_files()
+                    is_consistent, consistency_report = self.analyze_consistency(versions)
+                    print(consistency_report)
+                    return is_consistent
+                else:
+                    print("❌ 自动修复失败")
                     return False
             else:
                 print("💡 提示: 使用 --fix 参数尝试自动修复版本不一致问题")
@@ -322,11 +331,15 @@ def main():
         default=".",
         help="项目根目录路径 (默认: 当前目录)"
     )
+    parser.add_argument(
+        "--target-version",
+        help="指定目标版本号 (格式: X.Y.Z)，用于 --fix 模式"
+    )
     
     args = parser.parse_args()
     
     checker = VersionChecker(args.project, args.verbose)
-    success = checker.run(args.fix)
+    success = checker.run(args.fix, args.target_version)
     
     sys.exit(0 if success else 1)
 

@@ -1,6 +1,6 @@
 # Constitution-Driven Development Skill (CDD)
 
-**Version**: 1.5.0  
+**Version**: 1.6.0  
 **Codename**: Ecosystem & Automation  
 **License**: Apache-2.0  
 **Author**: wsman
@@ -255,7 +255,7 @@ Before completing any task, verify:
 - See `templates/tech_context.md` for Tier 2 verification template
 - See `templates/behavior_context.md` for Tier 3 verification template
 
-## 🚀 CDD v1.5.0 (Ecosystem & Automation) - Gold Release
+## 🚀 CDD v1.6.0 (Ecosystem & Automation) - Gold Release
 
 **Status**: 🟢 Production Ready | **Score**: 9.0/10 | **Audit**: deepseek-reasoner
 
