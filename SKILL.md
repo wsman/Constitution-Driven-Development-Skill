@@ -42,6 +42,8 @@ Use these commands to interact with the project. Do not hallucinate commands.
 | **Clean Workspace**| "clean up", "remove test files" | `python scripts/cdd_audit.py --clean --force` | Removes temporary `specs/` directories. |
 | **Check Entropy** | "is system healthy?", "check entropy" | `python scripts/cdd_audit.py --gate 3` | Check if $H_{sys} \le 0.7$. If high, suggest architectural decoupling. [Ref: reference/entropy_metrics.md] |
 
+💡 **Tip**: See **Section V** for detailed interaction examples and prompt templates for common scenarios.
+
 ---
 
 ## 🧠 III. Detailed Reference Index (三级递进导航)
@@ -84,3 +86,53 @@ Use these files to deepen your understanding when encountering complex scenarios
     * If creating: Run `cdd-feature.py`.
     * If modifying: Verify T2 specs exist.
 3.  **On Finish**: Run `cdd_audit.py`. If $H_{sys} > 0.7$, Stop & Refactor.
+
+---
+
+## 💡 V. Prompt Templates for Common Scenarios
+
+### Scenario A: New Project Initialization (新项目启动)
+* **User Intent**: "Initialize a new project named 'Omega-Protocol'."
+* **AI Action Strategy**:
+    1.  **Check**: Read `SKILL.md` -> Detect "Bootstrap CDD" capability.
+    2.  **Execute**: Run `python {SKILL_ROOT}/scripts/deploy_cdd.py "Omega-Protocol" --target .`
+    3.  **Rooting**: Create `memory_bank/` -> Write `project_readme.md` (The Seed).
+    4.  **Sprouting**: Derive `active_context.md` & Laws (The Sprout).
+
+### Scenario B: Feature Development (日常开发)
+* **User Intent**: "Add a user login feature."
+* **AI Action Strategy**:
+    1.  **Memory Bank Check**: Locate `memory_bank/`.
+    2.  **Audit**: Run `python scripts/cdd_audit.py --format json --ai-hint`.
+    3.  **Plan**: Run `python scripts/cdd-feature.py "User Login" "Implement authentication"`.
+    4.  **Act**: Write code in `src/`.
+    5.  **Verify**: Run `make audit` before committing.
+
+### Scenario C: System Audit & Status Check (系统审计与状态检查)
+* **User Intent**: "Check system health" or "Is the project compliant?"
+* **AI Action Strategy**:
+    1.  **Execute**: Run `python scripts/cdd_audit.py --format json --ai-hint`.
+    2.  **Analyze**: Parse JSON output.
+        * If `success: false`: Read `ai_remediation_plan` and offer to fix (e.g., `python scripts/cdd_audit.py --fix`).
+        * If `success: true`: Check $H_{sys}$ value.
+    3.  **Report**: "System Entropy $H_{sys}$ = X. Status: [Green/Yellow/Red]."
+
+### Scenario D: Refactoring & Entropy Management (重构与熵值管理)
+* **User Intent**: "The system feels messy" or "Entropy is high."
+* **AI Action Strategy**:
+    1.  **Measure**: Run `python scripts/cdd_audit.py --gate 3`.
+    2.  **Diagnose**: Identify high-entropy components (e.g., `C_dir` is low, `C_sig` is low).
+    3.  **Refactor Plan**:
+        * Propose moving files to match `system_patterns.md`.
+        * Propose updating `tech_context.md` interfaces.
+    4.  **Execute**: Perform file moves/edits.
+    5.  **Verify**: Run audit again to confirm $H_{sys}$ reduction.
+
+### Scenario E: Constitutional Amendment (宪法修正与法律更新)
+* **User Intent**: "We need to change the tech stack to Rust" or "Update the review process."
+* **AI Action Strategy**:
+    1.  **Locate**: Identify relevant T0/T1 document (e.g., `tech_context.md` or `active_context.md`).
+    2.  **Draft**: Create a change request or edit the markdown directly.
+    3.  **Impact Analysis**: Check if this change violates `basic_law_index.md`.
+    4.  **Commit**: "docs: amend T1 tech context for Rust migration".
+    5.  **Sync**: Ensure `project_readme.md` is updated if the change is major.

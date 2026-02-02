@@ -15,7 +15,7 @@ from pathlib import Path
 
 # 核心模板映射 (Source in Skill -> Target in Memory Bank)
 CORE_TEMPLATES = {
-    "templates/core/project_readme_template.md": "core/project_readme_template.md",
+    "reference/project_readme_template.md": "core/project_readme_template.md",
     "templates/core/active_context.md": "core/active_context.md",
     "templates/core/knowledge_graph.md": "core/knowledge_graph.md",
     "templates/core/basic_law_index.md": "core/basic_law_index.md",

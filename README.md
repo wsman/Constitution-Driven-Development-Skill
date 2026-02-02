@@ -135,7 +135,7 @@ cp cdd/templates/protocols/*.md memory_bank/protocols/
 cp cdd/templates/standards/*.md memory_bank/standards/
 
 # Create project README from template
-cp cdd/templates/core/project_readme_template.md README.md
+cp reference/project_readme_template.md README.md
 ```
 
 ## Structure
@@ -152,7 +152,6 @@ cdd/
 │   │   ├── procedural_law_index.md  # Procedural Law Index
 │   │   ├── technical_law_index.md   # Technical Law Index
 │   │   ├── cdd_document_system_guide.md                 # Template Usage Guide
-│   │   └── project_readme_template.md  # Project README Template
 │   ├── axioms/                      # T1-系统公理层
 │   │   ├── system_patterns.md       # Architecture patterns
 │   │   ├── tech_context.md          # Interface signatures
@@ -286,7 +285,7 @@ Before completing any task, verify:
 |-----------|----------|
 | `scripts/deploy_cdd.py` | **Spore Protocol**: Seed→Root→Sprout deployment with Memory Bank First |
 | `SKILL.md` | Enhanced with Memory Bank First constitutional guardrails (v1.6.1) |
-| `templates/core/project_readme_template.md` | Updated with correct memory_bank/core/ paths |
+| `reference/project_readme_template.md` | Updated with correct memory_bank/core/ paths |
 | Memory Bank Architecture | Biological growth model: **Seed → Root → Sprout** |
 | Cross-Space Interaction | AI agent resolves `{SKILL_ROOT}` for remote deployment |
 | Automated Detection | AI automatically detects and initializes missing `memory_bank/` |

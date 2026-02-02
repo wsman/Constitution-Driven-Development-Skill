@@ -152,7 +152,6 @@ cdd/templates/
 │   ├── procedural_law_index.md    # 程序法索引
 │   ├── technical_law_index.md     # 技术法索引
 │   ├── knowledge_graph.md         # 知识图谱模板
-│   └── project_readme_template.md # 项目背景文档模板
 ├── axioms/                        # T1: 系统公理层
 │   ├── system_patterns.md         # 架构约束
 │   ├── tech_context.md            # 接口约束
@@ -198,7 +197,7 @@ cp templates/core/technical_law_index.md memory_bank/00_indices/
 **在项目根目录创建** `README.md`（与 `memory_bank/` 同级）：
 
 ```bash
-cp templates/core/project_readme_template.md README.md
+cp reference/project_readme_template.md README.md
 ```
 
 编辑 `README.md`，填入项目背景信息：
