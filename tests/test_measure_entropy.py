@@ -175,7 +175,8 @@ class TestEntropyCalculator:
             assert result == 0.5  # 默认值
     
     @patch('re.findall')
-    def test_calculate_c_sig_with_interface_definitions(self, mock_findall, calculator):
+    @patch('pathlib.Path.read_text')
+    def test_calculate_c_sig_with_interface_definitions(self, mock_read_text, mock_findall, calculator):
         """测试接口签名覆盖率计算（有接口定义）"""
         # 模拟 techContext.md 内容
         calculator.tech_context_file.write_text("""
@@ -193,9 +194,15 @@ def method2():
             []  # 在 TypeScript 文件中找到的实现
         ]
         
-        with patch.object(calculator.project_path, 'rglob') as mock_rglob:
+        # 模拟文件读取内容
+        mock_read_text.return_value = "def method1():\n    pass"
+        
+        with patch('scripts.measure_entropy.Path.rglob') as mock_rglob:
+            # 创建一个模拟的 Path 对象，避免实际文件读取
+            mock_path = Mock()
+            mock_path.read_text.return_value = "def method1():\n    pass"
             # 模拟 Python 文件
-            mock_rglob.return_value = [calculator.project_path / "test.py"]
+            mock_rglob.return_value = [mock_path]
             
             result = calculator.calculate_c_sig()
             
@@ -334,12 +341,10 @@ class TestMainFunction:
         }
         mock_calculator.return_value.calculate_h_sys.return_value = mock_metrics
         
-        # 运行主函数
-        with patch('sys.exit') as mock_exit:
-            main()
-            
-            # 验证退出码
-            mock_exit.assert_called_once_with(0)
+        # 运行主函数并检查返回值
+        result = main()
+        # 成功状态应返回 0 (因为 h_sys <= 0.5)
+        assert result == 0
     
     @patch('argparse.ArgumentParser.parse_args')
     @patch('scripts.measure_entropy.EntropyCalculator')
@@ -363,12 +368,10 @@ class TestMainFunction:
         )
         mock_calculator.return_value.calculate_h_sys.return_value = mock_metrics
         
-        # 运行主函数
-        with patch('sys.exit') as mock_exit:
-            main()
-            
-            # 验证退出码为1（危险状态）
-            mock_exit.assert_called_once_with(1)
+        # 运行主函数并检查返回值
+        result = main()
+        # 危险状态应返回 1 (因为 h_sys > 0.5)
+        assert result == 1
 
 
 if __name__ == "__main__":

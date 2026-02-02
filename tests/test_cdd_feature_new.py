@@ -24,11 +24,14 @@ class MockCddFeatureModule:
     
     @staticmethod
     def sanitize_name(name):
-        """模拟 sanitize_name 函数"""
+        """模拟 sanitize_name 函数 - 与实际实现保持一致"""
         name = name.lower()
-        # 允许中文字符和基本拉丁字符
-        name = re.sub(r'[^\u4e00-\u9fa5a-z0-9\s-]', '', name)
-        name = re.sub(r'\s+', '-', name)
+        # Replace underscores and spaces with hyphens (与实际实现一致)
+        name = re.sub(r'[_\s]+', '-', name)
+        # Remove any characters that are not alphanumeric, hyphens, or Chinese characters
+        name = re.sub(r'[^a-z0-9\-\u4e00-\u9fa5]', '', name)
+        # Remove leading/trailing hyphens
+        name = re.sub(r'^-+|-+$', '', name)
         return name
     
     @staticmethod
@@ -95,7 +98,7 @@ class TestCddFeatureFunctions:
         
         # 特殊字符处理
         assert cdd_feature.sanitize_name("Test@#$%^&*()") == "test"
-        assert cdd_feature.sanitize_name("  Extra   Spaces  ") == "extra---spaces"
+        assert cdd_feature.sanitize_name("  Extra   Spaces  ") == "extra-spaces"
         
         # 边界情况
         assert cdd_feature.sanitize_name("") == ""
@@ -180,14 +183,23 @@ class TestCddFeatureFunctions:
     
     @patch('pathlib.Path.exists')
     @patch('sys.exit')
-    def test_check_environment_missing_templates_dir(self, mock_exit, mock_exists):
+    @patch('builtins.print')
+    def test_check_environment_missing_templates_dir(self, mock_print, mock_exit, mock_exists):
         """测试环境检查（缺少模板目录）"""
         # 模拟模板目录不存在
         mock_exists.return_value = False
+        # 设置 sys.exit 抛出 SystemExit 异常
+        mock_exit.side_effect = SystemExit(1)
         
+        # 调用 check_environment，应该会调用 sys.exit(1)
         with pytest.raises(SystemExit):
             cdd_feature.check_environment()
+        
+        # 验证 sys.exit 被正确调用
         mock_exit.assert_called_once_with(1)
+        
+        # 验证错误信息被打印
+        mock_print.assert_called_once()
 
 
 class TestErrorHandling:

@@ -65,8 +65,12 @@ def get_next_feature_id():
 def sanitize_name(name):
     """Convert description to kebab-case"""
     name = name.lower()
-    name = re.sub(r'[^a-z0-9\s-]', '', name)
-    name = re.sub(r'\s+', '-', name)
+    # Replace underscores and spaces with hyphens
+    name = re.sub(r'[_\s]+', '-', name)
+    # Remove any characters that are not alphanumeric, hyphens, or Chinese characters
+    name = re.sub(r'[^a-z0-9\-\u4e00-\u9fa5]', '', name)
+    # Remove leading/trailing hyphens
+    name = re.sub(r'^-+|-+$', '', name)
     return name
 
 def create_branch(branch_name):
