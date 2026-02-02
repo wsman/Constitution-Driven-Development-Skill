@@ -130,7 +130,7 @@ cdd/
 │   │   ├── knowledge_graph.md       # Knowledge Graph (v1.6.0, Mermaid)
 │   │   ├── procedural_law_index.md  # Procedural Law Index
 │   │   ├── technical_law_index.md   # Technical Law Index
-│   │   ├── guide.md                 # Template Usage Guide
+│   │   ├── cdd_document_system_guide.md                 # Template Usage Guide
 │   │   └── project_readme_template.md  # Project README Template
 │   ├── axioms/                      # T1-系统公理层
 │   │   ├── system_patterns.md       # Architecture patterns
@@ -249,7 +249,7 @@ Before completing any task, verify:
 ## References
 
 - See `SKILL.md` Appendix A for entropy calculation scripts
-- See `templates/guide.md` for template usage guide
+- See `templates/cdd_document_system_guide.md` for template usage guide
 - See `templates/knowledge_graph.md` for Mermaid visualization examples
 - See `templates/system_patterns.md` for Tier 1 verification template
 - See `templates/tech_context.md` for Tier 2 verification template
