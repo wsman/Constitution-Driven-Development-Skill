@@ -236,12 +236,12 @@ def test_cdd_feature_script_execution():
     # 检查脚本内容
     content = script_path.read_text()
     
-    # 检查关键函数是否存在
+    # 检查关键函数和类是否存在（v2.0版本）
     assert "def sanitize_name" in content
     assert "def get_next_feature_id" in content
-    assert "def create_branch" in content
-    assert "def check_environment" in content
-    assert "def instantiate_templates" in content
+    assert "def create_git_branch" in content  # v2.0 renamed
+    assert "class TemplateEngine" in content  # v2.0 new class
+    assert "class ContextBuilder" in content  # v2.0 new class
     
     # 检查主函数
     assert "def main()" in content
@@ -249,13 +249,13 @@ def test_cdd_feature_script_execution():
 
 
 def test_cdd_feature_dry_run():
-    """测试干运行模式"""
+    """测试无分支创建模式（原干运行模式）"""
     script_path = Path(__file__).parent.parent / "scripts" / "cdd-feature.py"
     
-    # 模拟运行脚本
+    # 模拟运行脚本（使用 --no-branch 参数）
     import subprocess
     result = subprocess.run(
-        [sys.executable, str(script_path), "--dry-run", "Test Feature"],
+        [sys.executable, str(script_path), "--no-branch", "Test Feature", "Test Description"],
         capture_output=True,
         text=True
     )
@@ -263,8 +263,9 @@ def test_cdd_feature_dry_run():
     # 检查是否成功执行（退出码为0）
     assert result.returncode == 0, f"Script failed: {result.stderr}"
     
-    # 检查输出中包含期望的内容
-    assert "Dry Run" in result.stdout or "dry-run" in result.stdout.lower()
+    # v2.0 没有 dry-run 参数，检查脚本是否正常运行（不创建分支）
+    # 检查脚本是否成功执行，即返回码为0
+    # 注意：脚本会等待用户输入（目录已存在时），这里假设目录不存在
 
 
 if __name__ == "__main__":
