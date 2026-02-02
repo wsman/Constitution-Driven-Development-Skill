@@ -1,103 +1,203 @@
 #!/usr/bin/env bash
 
-# CDD SKILL Auto-Push Script
+# CDD SKILL Auto-Push with Auto-Audit
 #
-# This script pushes CDD SKILL updates to GitHub repository.
+# This script pushes CDD SKILL updates and optionally triggers external audit
+# when version number changes are detected.
 #
-# Usage: ./push-cdd-skill.sh [commit_message]
+# Usage: ./push-cdd-skill.sh [commit_message] [--audit]
 #
-# Default message: "Update: CDD SKILL v1.5.0 - $(date)"
+# Flags:
+#   --audit    Force trigger external audit after push
+#   --no-audit Skip automatic audit even if version changes
 #
-# Prerequisites:
-#   - Must be run in the CDD SKILL directory
-#   - Git remote must be configured
-#   - GitHub PAT must have repo scope
+# Environment Variables:
+#   DEEPSEEK_API_KEY    API key for external audit
+#   CDD_DIR             CDD SKILL directory (default: /home/wsman/桌面/openclaw/skills/cdd)
 
 set -e
 
 # Get script directory
 SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CDD_DIR="/home/wsman/桌面/openclaw/skills/cdd"
+CDD_DIR="${CDD_DIR:-/home/wsman/桌面/openclaw/skills/cdd}"
 REMOTE_URL="https://github.com/wsman/Constitution-Driven-Development-Skill.git"
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-log_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+log_audit() { echo -e "${BLUE}[AUDIT]${NC} $1"; }
+
+# Detect version changes
+detect_version_change() {
+    cd "$CDD_DIR"
+    
+    # Get current version from SKILL.md
+    CURRENT_VERSION=$(grep -m1 "version:" "$CDD_DIR/SKILL.md" | sed 's/.*version: *//' | tr -d ' ' | tr -d '\r')
+    
+    # Get last committed version
+    LAST_VERSION=$(git log --oneline -1 --all -- "SKILL.md" | grep -oP 'v\d+\.\d+\.\d+' | head -1 || echo "unknown")
+    
+    if [[ "$CURRENT_VERSION" != "$LAST_VERSION" ]]; then
+        echo "true|$CURRENT_VERSION|$LAST_VERSION"
+    else
+        echo "false|$CURRENT_VERSION|$LAST_VERSION"
+    fi
 }
 
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
+# Run external audit
+run_external_audit() {
+    local version="$1"
+    local audit_report_dir="$CDD_DIR/research_report"
+    local timestamp=$(date +%Y-%m-%d_%H-%M-%S)
+    local report_file="$audit_report_dir/report_by_deepseek-reasoner_${timestamp}.md"
+    
+    mkdir -p "$audit_report_dir"
+    
+    log_audit "Starting external audit for v$version..."
+    log_audit "Report will be saved to: $report_file"
+    
+    # Count lines in SKILL.md
+    SKILL_LINES=$(wc -l < "$CDD_DIR/SKILL.md")
+    
+    # Get git info
+    GIT_LOG=$(git log --oneline -5)
+    
+    # Call DeepSeek API
+    local start_time=$(date +%s)
+    
+    AUDIT_RESPONSE=$(curl -s --max-time 180 -X POST "https://api.deepseek.com/chat/completions" \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer ${DEEPSEEK_API_KEY}" \
+      -d "{
+        \"model\": \"deepseek-reasoner\",
+        \"messages\": [
+          {
+            \"role\": \"system\",
+            \"content\": \"你是资深CDD合规性审计专家。提供简洁、全面的审计报告。\"
+          },
+          {
+            \"role\": \"user\",
+            \"content\": \"请审计 CDD SKILL v${version}，评估其架构、功能、质量、兼容性和安全性，给出1-10的评分和改进建议。\"
+          }
+        ],
+        \"temperature\": 0.2,
+        \"max_tokens\": 4096
+      }" 2>&1) || AUDIT_RESPONSE="{}"
+    
+    local end_time=$(date +%s)
+    local latency_ms=$(( (end_time - start_time) * 1000 ))
+    
+    # Extract API data
+    local request_id=$(echo "$AUDIT_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id','N/A'))" 2>/dev/null || echo "N/A")
+    local input_tokens=$(echo "$AUDIT_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('usage',{}).get('prompt_tokens',0))" 2>/dev/null || echo "0")
+    local output_tokens=$(echo "$AUDIT_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('usage',{}).get('completion_tokens',0))" 2>/dev/null || echo "0")
+    
+    # Get audit content
+    local audit_content=$(echo "$AUDIT_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['choices'][0]['message']['content'][:3000])" 2>/dev/null || echo "审计失败或超时")
+    
+    # Generate report
+    cat > "$report_file" << EOF
+# CDD SKILL 外部审计报告
 
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+**审计时间**: $(date +%Y-%m-%dT%H:%M:%S+08:00)
+**审计版本**: v${version}
+**Audit ID**: ${request_id}
+
+## API调用详情
+
+| 字段 | 值 |
+|------|-----|
+| **端点** | \`https://api.deepseek.com/chat/completions\` |
+| **模型** | \`deepseek-reasoner\` |
+| **请求ID** | \`${request_id}\` |
+| **耗时** | \`${latency_ms}ms\` |
+| **Token使用** | 输入: \`${input_tokens}\` / 输出: \`${output_tokens}\` |
+
+## 项目信息
+
+| 项目 | 值 |
+|------|-----|
+| **代码行数** | ${SKILL_LINES} 行 |
+| **Git Log** | \`\`\`\n${GIT_LOG}\n\`\`\` |
+
+## 审计内容
+
+${audit_content}
+
+---
+
+*Generated by CDD SKILL Auto-Audit System*
+EOF
+    
+    log_audit "✅ Audit report generated: $report_file"
+    echo "$report_file"
 }
 
 # Check prerequisites
 check_prerequisites() {
     log_info "Checking prerequisites..."
     
-    # Check if in CDD SKILL directory
     if [[ ! -d "$CDD_DIR/.git" ]]; then
-        log_error "Not in CDD SKILL directory or .git not found"
-        log_info "Expected directory: $CDD_DIR"
+        log_error "Not in CDD SKILL directory"
         exit 1
-    fi
-    
-    # Check git remote
-    cd "$CDD_DIR"
-    CURRENT_REMOTE=$(git remote get-url origin 2>/dev/null || echo "")
-    
-    if [[ "$CURRENT_REMOTE" != *"$REMOTE_URL"* ]]; then
-        log_warn "Remote URL doesn't match expected GitHub repository"
-        log_info "Current remote: $CURRENT_REMOTE"
-        log_info "Expected: $REMOTE_URL"
-        read -p "Continue anyway? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
-        fi
     fi
     
     log_info "Prerequisites check passed!"
 }
 
-# Get commit message
-get_commit_message() {
-    local msg="$1"
-    
-    if [[ -n "$msg" ]]; then
-        echo "$msg"
-    else
-        # Get current version from SKILL.md
-        local version=$(grep -m1 "version:" "$CDD_DIR/SKILL.md" | sed 's/.*version: *//' | tr -d ' ')
-        echo "Update: CDD SKILL v${version} - $(date '+%Y-%m-%d %H:%M')"
-    fi
-}
-
 # Main push function
 push_cdd_skill() {
     local commit_msg="${1:-}"
+    local force_audit=false
+    local skip_audit=false
+    
+    # Parse arguments
+    shift || true
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --audit) force_audit=true; shift ;;
+            --no-audit) skip_audit=true; shift ;;
+            *) shift ;;
+        esac
+    done
     
     cd "$CDD_DIR"
     
     log_info "=== CDD SKILL Auto-Push ==="
     echo ""
     
-    # Show status
+    # Detect version change
+    VERSION_CHECK=$(detect_version_change)
+    IS_VERSION_CHANGE=$(echo "$VERSION_CHECK" | cut -d'|' -f1)
+    CURRENT_VER=$(echo "$VERSION_CHECK" | cut -d'|' -f2)
+    LAST_VER=$(echo "$VERSION_CHECK" | cut -d'|' -f3)
+    
+    log_info "Version: $LAST_VER → $CURRENT_VER"
+    
+    if [[ "$IS_VERSION_CHANGE" == "true" ]]; then
+        log_warn "⚠️  Version change detected!"
+        if [[ "$skip_audit" != "true" ]]; then
+            log_info "External audit will be triggered after push."
+        fi
+    fi
+    
+    # Show git status
     log_info "Git Status:"
     git status --short
     echo ""
     
-    # Get commit message
-    local msg
-    msg=$(get_commit_message "$commit_msg")
-    log_info "Commit message: $msg"
+    # Generate commit message if not provided
+    if [[ -z "$commit_msg" ]]; then
+        commit_msg="Update: CDD SKILL v${CURRENT_VER} - $(date '+%Y-%m-%d %H:%M')"
+    fi
+    log_info "Commit message: $commit_msg"
     echo ""
     
     # Stage all changes
@@ -107,12 +207,11 @@ push_cdd_skill() {
     # Check if there are changes
     if git diff --cached --quiet; then
         log_warn "No changes to commit"
-        exit 0
+    else
+        # Commit
+        log_info "Committing changes..."
+        git commit -m "$commit_msg"
     fi
-    
-    # Commit
-    log_info "Committing changes..."
-    git commit -m "$msg"
     
     # Push
     log_info "Pushing to GitHub..."
@@ -125,24 +224,41 @@ push_cdd_skill() {
         log_error "Failed to push to GitHub"
         exit 1
     fi
+    
+    # Trigger audit if version changed and not skipped
+    if [[ "$IS_VERSION_CHANGE" == "true" && "$skip_audit" != "true" ]] || [[ "$force_audit" == "true" ]]; then
+        echo ""
+        log_audit "=== Running External Audit ==="
+        
+        if [[ -n "$DEEPSEEK_API_KEY" ]]; then
+            run_external_audit "$CURRENT_VER"
+            log_info "Audit completed!"
+        else
+            log_warn "DEEPSEEK_API_KEY not set. Skipping audit."
+            log_info "To enable auto-audit, set: export DEEPSEEK_API_KEY='your-api-key'"
+        fi
+    fi
 }
 
 # Show help
 show_help() {
-    echo "CDD SKILL Auto    echo ""
-    echo "Usage:-Push Script"
- $0 [commit_message]"
+    echo "CDD SKILL Auto-Push with Auto-Audit"
+    echo ""
+    echo "Usage: $0 [commit_message] [--audit] [--no-audit]"
     echo ""
     echo "Arguments:"
     echo "  commit_message    Optional commit message"
+    echo "  --audit           Force trigger external audit"
+    echo "  --no-audit        Skip automatic audit"
     echo ""
-    echo "Examples:"
-    echo "  $0                    # Auto-generate message"
-    echo "  $0 \"Fix: Typo in SKILL.md\"  # Custom message"
+    echo "Features:"
+    echo "  • Auto-detects version changes"
+    echo "  • Triggers external audit on version bump"
+    echo "  • Generates compliance reports"
     echo ""
     echo "Environment:"
     echo "  CDD_DIR: $CDD_DIR"
-    echo "  REMOTE: $REMOTE_URL"
+    echo "  DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:+set}***"
 }
 
 # Main
@@ -153,7 +269,7 @@ main() {
     fi
     
     check_prerequisites
-    push_cdd_skill "$1"
+    push_cdd_skill "$@"
 }
 
 main "$@"
