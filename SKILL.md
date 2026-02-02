@@ -860,7 +860,16 @@ T0文档变更检测
 
 ### ⭐ 外部审计API调用信息记录标准 (v2.0)
 
-**从2026-02-01起，所有审计报告必须包含完整的API调用信息**：
+**从2026-02-01起，所有审计报告必须包含完整的API调用信息，且所有数据必须是精确值，严禁估算！**
+
+#### 🔴 严格禁止
+- ❌ 禁止使用"约"、"大概"、"估计"等模糊词汇描述 API 数据
+- ❌ 禁止在报告中使用估算的 Token 数量、延迟时间
+- ❌ 禁止使用占位符 `{xxx}` 而不填充实际值
+
+#### ✅ 必须遵循的精确数据规范
+
+所有审计报告**必须**在报告开头包含以下表格，**每个字段必须是实际 API 响应的精确值**：
 
 ```markdown
 ## API调用详情
@@ -891,6 +900,123 @@ T0文档变更检测
 
 **响应状态**: {STATUS_CODE} OK
 ```
+
+#### 📊 精确数据获取流程
+
+**步骤 1: 记录发送时间**
+```python
+SEND_TS = int(datetime.now().timestamp())
+SEND_TIME = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+08:00")
+```
+
+**步骤 2: 调用 API**
+```python
+response = requests.post(
+    "https://api.deepseek.com/chat/completions",
+    json={
+        "model": "deepseek-reasoner",
+        "messages": [...],
+        "temperature": 0.2,
+        "max_tokens": 8192
+    },
+    headers={"Authorization": f"Bearer {API_KEY}"},
+    timeout=180
+)
+```
+
+**步骤 3: 记录接收时间并提取精确数据**
+```python
+RECV_TS = int(datetime.now().timestamp())
+RECV_TIME = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+08:00")
+LATENCY_MS = (RECV_TS - SEND_TS) * 1000  # 精确毫秒数
+
+REQUEST_ID = response.json()["id"]  # 精确请求ID
+PROMPT_TOKENS = response.json()["usage"]["prompt_tokens"]  # 精确输入Token
+COMPLETION_TOKENS = response.json()["usage"]["completion_tokens"]  # 精确输出Token
+TOTAL_TOKENS = response.json()["usage"]["total_tokens"]  # 精确总Token
+```
+
+**步骤 4: 生成报告（使用精确值）**
+```markdown
+| 字段 | 值 |
+|------|-----|
+| **请求ID** | `99dd4d29-2ae2-4116-ba45-acd489fd4420` |
+| **耗时** | `15500ms` |
+| **Token使用** | 输入: 49 / 输出: 155 / 总计: 204 |
+```
+
+#### ⚠️ 错误示例（禁止使用）
+
+```markdown
+❌ 错误示例：
+- 耗时: 约90秒 (禁止估算)
+- Token使用: 输入: ~300 / 输出: ~4000 (禁止估算)
+- 请求ID: 自动生成 (必须使用精确ID)
+```
+
+#### ✅ 正确示例（必须使用）
+
+```markdown
+✅ 正确示例：
+- 耗时: `15500ms` (精确值)
+- Token使用: 输入: 49 / 输出: 155 / 总计: 204 (精确值)
+- 请求ID: `99dd4d29-2ae2-4116-ba45-acd489fd4420` (精确ID)
+```
+
+#### 📋 完整报告结构
+
+```markdown
+# T0文档审计报告 (T0 Document Audit Report)
+
+## 审计元数据
+- **审计时间**: {timestamp}
+- **触发原因**: {trigger}
+- **审查范围**: {scope}
+- **审计模型**: deepseek-reasoner
+- **Audit ID**: `{AUDIT_ID}`
+
+## API调用详情
+
+### 调用 #1: 审计请求
+| 字段 | 值 |
+|------|-----|
+| **端点** | `https://api.deepseek.com/chat/completions` |
+| **模型** | `deepseek-reasoner` |
+| **请求ID** | `99dd4d29-2ae2-4116-ba45-acd489fd4420` |
+| **发送时间** | `2026-02-02T08:15:00+08:00` |
+| **收到时间** | `2026-02-02T08:15:15+08:00` |
+| **耗时** | `15500ms` |
+| **Token使用** | 输入: 49 / 输出: 155 / 总计: 204 |
+
+**请求参数**:
+```json
+{
+  "model": "deepseek-reasoner",
+  "messages": [...],
+  "temperature": 0.2,
+  "max_tokens": 8192
+}
+```
+
+**响应状态**: `200` OK
+
+---
+
+## 审查摘要
+{summary}
+...
+```
+
+---
+
+#### 🚨 违规处理
+
+| 违规行为 | 处理措施 |
+|----------|----------|
+| 使用估算数据 | 报告无效，要求重写 |
+| 使用模糊词汇 | 报告无效，要求重写 |
+| 缺少必填字段 | 报告无效，要求重写 |
+| 数据不精确 | 报告无效，要求重写 |
 
 ### 外部审计者系统提示
 
