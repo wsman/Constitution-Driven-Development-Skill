@@ -183,15 +183,31 @@ Use with OpenClaw + MiniMax M2.1 for development, DeepSeek-Reasoner for auditing
 
 ## 🛡️ 宪法门禁 (Constitutional Guardrails)
 
-本项目实施了严格的 CDD 自动化审计（GitHub Actions）。任何 PR 必须通过以下三道门禁才能合并：
+本项目依据 **CDD (Constitution-Driven Development)** 实施自动化审计。任何提交必须通过以下三道自动化门禁：
 
-| 门禁 (Gate) | 检查项 | 失败原因 | 修复方法 |
+| 门禁 (Gate) | 检查项 | 宪法依据 | 失败后果 |
 |-------------|--------|----------|----------|
-| **Gate 1** | **版本一致性** | 文档版本号不统一 (违反 §102.3) | 运行 `python scripts/verify_versions.py --fix` |
-| **Gate 2** | **行为验证** | 单元测试失败 (功能倒退) | 运行 `pytest` 并修复代码逻辑 |
-| **Gate 3** | **熵值监控** | 系统熵值 $H_{sys} > 0.5$ | 运行 `python scripts/measure_entropy.py` 查看详情，进行重构或文档对齐 |
+| **Gate 1** | **版本一致性** | §102.3 同步公理 | 拒绝合并 (Non-negotiable) |
+| **Gate 2** | **行为验证** | Tier 3 行为标准 | 拒绝合并 (Functional Regression) |
+| **Gate 3** | **熵值监控** | 系统热力学定律 | $H_{sys} > 0.5$ 时构建失败 |
 
-> **提示**: 在提交代码前，建议在本地运行所有检查以避免流水线失败。
+### 💻 本地开发 (Makefile)
+
+为确保代码能通过 CI 门禁，请在提交前使用 `Makefile` 进行本地预审：
+
+```bash
+# 运行完整宪法审计 (推荐)
+make audit
+
+# 仅检查版本一致性
+make gate1
+
+# 自动修复版本漂移
+make fix-versions
+
+```
+
+更多细节请参考 [自动化工作流文档](https://www.google.com/search?q=.github/workflows/cdd_guardrails.yml)。
 
 ## CDD Workflow
 
