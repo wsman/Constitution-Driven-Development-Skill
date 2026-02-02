@@ -2,14 +2,14 @@
 name: cdd
 description: 宪法驱动开发 (Constitution-Driven Development) v1.5.0 Ecosystem & Automation。使用MiniMax M2.1模型进行AI辅助开发，基于合规度熵值模型、Spec-Kit工作流、三级验证和质量门禁。集成GitHub Issues同步、特性脚手架脚本、宪法修正案协议。
 model: minimax/MiniMax-M2.1
-version: v1.5.0
+version: v1.6.0
 ---
 
 # 宪法驱动开发 (CDD) v1.5.0
 
 使用 MiniMax M2.1 模型进行 AI 辅助软件开发，遵循逆熵实验室三级法律体系约束。
 
-**版本**: v1.5.0 (Ecosystem & Automation)
+**版本**: v1.6.0 (Ecosystem & Automation)
 
 **状态**: 🟢 Release Ready
 
