@@ -1992,3 +1992,76 @@ python scripts/cdd-feature.py "Add User Login" --dry-run
 | **总体评分** | **8.0/10** | **Release Ready** |
 
 **审计报告**: `research_report/cdd_skill_v1.5.0_comprehensive_audit_*.md`
+
+---
+
+## 🛠️ v1.6.0: 工具集扩展 (Toolkit Expansion)
+
+**版本**: v1.6.0  
+**日期**: 2026-02-02  
+**目标**: 扩展开发工具能力，引入代码审查 (Code Review) 工具
+
+### 新增标准 (Standard)
+
+| ID | 文件 | 用途 |
+|----|------|------|
+| **DS-060** | `templates/standards/DS-060_code_review.md` | 代码审查输出模板 |
+
+### 新增协议 (Protocol)
+
+| ID | 文件 | 用途 |
+|----|------|------|
+| **WF-review** | `templates/protocols/WF-review.md` | 代码审查指令集 |
+
+### 工具集配置
+
+```yaml
+# v1.6.0 Toolkit Configuration
+
+toolkit:
+  code_review:
+    enabled: true
+    template: "templates/standards/DS-060_code_review.md"
+    protocol: "templates/protocols/WF-review.md"
+    auto_trigger:
+      on_git_push: false
+      on_pr_open: true
+```
+
+### 代码审查维度
+
+| 维度 | 检查项 |
+|------|--------|
+| **安全性** | SQL注入、XSS、硬编码Secrets |
+| **架构一致性** | 分层结构、依赖管理 |
+| **健壮性** | 边缘情况、错误处理 |
+| **合规性** | CDD工作流、T0/T1/T2规范 |
+
+### 严重等级
+
+| 等级 | 标记 | 说明 |
+|------|------|------|
+| Critical | 🔴 | 安全漏洞、阻断性问题 |
+| Major | 🟠 | 架构违规、性能问题 |
+| Minor | 🟡 | 代码风格、文档缺失 |
+
+### 使用方法
+
+**交互指令**:
+```
+/review <target_file>
+```
+
+**示例**:
+```
+/review src/auth/login.py
+```
+
+**AI Action**:
+1. Read target file
+2. Load T1 Axioms
+3. Generate Review Report following DS-060
+
+---
+
+*CDD SKILL v1.6.0 - Toolkit Expansion*
