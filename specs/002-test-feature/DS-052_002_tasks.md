@@ -11,15 +11,15 @@
 ## 1. 文档元数据
 
 ```markdown
-**特性名称**: {{feature_name}}
-**特性ID**: {{feature_id}}
-**特性分支**: `{{git_branch}}`
-**创建时间**: {{timestamp}}
-**引用Spec**: DS-050_{{feature_id}}_spec.md
-**引用Plan**: DS-051_{{feature_id}}_plan.md
+**特性名称**: test-feature
+**特性ID**: 002
+**特性分支**: `main`
+**创建时间**: 2026-02-02
+**引用Spec**: DS-050_002_spec.md
+**引用Plan**: DS-051_002_plan.md
 **状态**: Draft → In Progress → Done
-**作者**: {{author}}
-**项目版本**: {{project_version}}
+**作者**: wsman
+**项目版本**: 1.5.0
 ```
 
 ---
@@ -266,5 +266,5 @@ activeContext (Current Task)
 ---
 
 **引用标准**: DS-052 v1.0.0  
-**最后更新**: {{TIMESTAMP}}  
+**最后更新**: 2026-02-02  
 **版本**: v1.0.0

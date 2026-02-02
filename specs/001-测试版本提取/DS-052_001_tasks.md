@@ -11,12 +11,15 @@
 ## 1. 文档元数据
 
 ```markdown
-**特性名称**: [FEATURE NAME]
-**特性分支**: `[###-feature-name]`
+**特性名称**: 测试版本提取
+**特性ID**: 001
+**特性分支**: `main`
 **创建时间**: 2026-02-02
-**引用Spec**: DS-050_FEATURE_SPECIFICATION.md
-**引用Plan**: DS-051_IMPLEMENTATION_PLAN.md
+**引用Spec**: DS-050_001_spec.md
+**引用Plan**: DS-051_001_plan.md
 **状态**: Draft → In Progress → Done
+**作者**: wsman
+**项目版本**: 1.5.0
 ```
 
 ---

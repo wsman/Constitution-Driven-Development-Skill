@@ -69,4 +69,4 @@ $$	ext{Context}_{loaded} = 	ext{T0 Kernel} + 	ext{State Mode}(T1 + T2) + 	ext{Wo
 ---
 
 **引用标准**: DS-007 v1.0.0
-**最后更新**: 2026-02-01
+**最后更新**: {{timestamp}}

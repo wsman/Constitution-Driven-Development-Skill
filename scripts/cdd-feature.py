@@ -95,8 +95,8 @@ class ContextBuilder:
             return "unknown"
         
         content = file_path.read_text(encoding=DEFAULT_ENCODING)
-        # 匹配模式: "**版本**: v1.5.0" 或 "Version: v1.5.0"
-        match = re.search(r"(?:版本|Version)[:：]\s*(v\d+\.\d+\.\d+)", content, re.IGNORECASE)
+        # 匹配模式: "**版本**: v1.5.0" 或 "Version: 1.5.0" (允许v前缀)
+        match = re.search(r"(?:版本|Version)[^:：]*[:：]\s*(?:v)?(\d+\.\d+\.\d+)", content, re.IGNORECASE)
         if match:
             return match.group(1)
         return "unknown"

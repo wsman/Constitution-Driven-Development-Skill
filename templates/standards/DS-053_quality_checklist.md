@@ -224,6 +224,6 @@ State B: 规划阶段
 
 ---
 
-**标准版本**: v1.3.2  
-**最后更新**: {{TIMESTAMP}}  
+**标准版本**: v1.4.0  
+**最后更新**: {{timestamp}}  
 **来源**: spec-kit checklist.md
