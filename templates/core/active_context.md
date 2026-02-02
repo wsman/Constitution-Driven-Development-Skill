@@ -84,9 +84,9 @@ $$H_{sys} = 0.4 \cdot H_{cog} + 0.3 \cdot H_{struct} + 0.3 \cdot H_{align}$$
 ### 核心索引模板状态
 | 模板 | 文件路径 | 版本 | 状态 | 上次验证 |
 |------|----------|------|------|----------|
-| **基本法索引** | `core/basic_law_index.md` | v1.0.0 | ✅ 活跃 | 2026/2/2 |
-| **程序法索引** | `core/procedural_law_index.md` | v1.0.0 | ✅ 活跃 | 2026/2/2 |
-| **技术法索引** | `core/technical_law_index.md` | v1.0.0 | ✅ 活跃 | 2026/2/2 |
+| **基本法索引** | `core/basic_law_index.md` | v1.6.0 | ✅ 活跃 | 2026/2/2 |
+| **程序法索引** | `core/procedural_law_index.md` | v1.6.0 | ✅ 活跃 | 2026/2/2 |
+| **技术法索引** | `core/technical_law_index.md` | v1.6.0 | ✅ 活跃 | 2026/2/2 |
 
 ### DS标准实现状态 (关键标准)
 | 标准 | 用途 | 状态 | 实现状态 |

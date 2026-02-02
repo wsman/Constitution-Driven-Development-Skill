@@ -217,10 +217,10 @@ cp templates/core/active_context.md memory_bank/01_active_state/activeContext.md
 ```
 
 #### (可选) 创建知识图谱
-复制模板到 `memory_bank/02_systemaxioms/KNOWLEDGE_GRAPH.md`：
+复制模板到 `memory_bank/core/knowledge_graph.md`：
 
 ```bash
-cp templates/core/knowledge_graph.md memory_bank/02_systemaxioms/
+cp templates/core/knowledge_graph.md memory_bank/core/
 ```
 
 #### (可选) 创建配置文件

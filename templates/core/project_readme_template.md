@@ -38,9 +38,9 @@
 
 | 服务 | 用途 | 文档位置 |
 |------|------|----------|
-| [API服务1] | [用途描述] | memory_bank/00_indices/01_basic_law_index.md |
-| [数据服务2] | [用途描述] | memory_bank/00_indices/03_technical_law_index.md |
-| [数据库3] | [用途描述] | memory_bank/00_indices/03_technical_law_index.md |
+| [API服务1] | [用途描述] | memory_bank/core/basic_law_index.md |
+| [数据服务2] | [用途描述] | memory_bank/core/technical_law_index.md |
+| [数据库3] | [用途描述] | memory_bank/core/technical_law_index.md |
 
 *注：外部服务的法律约束和接口定义需在技术法中明确，确保符合宪法§302原子写入和§440通信韧性原则。*
 
@@ -56,11 +56,11 @@
 ## 相关文档
 
 - **CDD Memory Bank**: `memory_bank/` - 项目的宪法文档体系（单一真理源）
-- **基本法**: `memory_bank/00_indices/01_basic_law_index.md` - 核心公理与宪法约束
-- **程序法**: `memory_bank/00_indices/02_procedural_law_index.md` - 工作流与执行协议
-- **技术法**: `memory_bank/00_indices/03_technical_law_index.md` - 技术标准与实现规范
-- **活跃上下文**: `memory_bank/01_active_state/activeContext.md` - 当前项目状态与熵值监控
-- **知识图谱**: `memory_bank/02_systemaxioms/KNOWLEDGE_GRAPH.md` - 高维关联导航与领域知识
+- **基本法**: `memory_bank/core/basic_law_index.md` - 核心公理与宪法约束
+- **程序法**: `memory_bank/core/procedural_law_index.md` - 工作流与执行协议
+- **技术法**: `memory_bank/core/technical_law_index.md` - 技术标准与实现规范
+- **活跃上下文**: `memory_bank/core/active_context.md` - 当前项目状态与熵值监控
+- **知识图谱**: `memory_bank/core/knowledge_graph.md` - 高维关联导航与领域知识
 
 *使用三级递进导航*:
 1. **SKILL.md** (第一级) - 快速了解CDD工作流和工具链

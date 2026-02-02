@@ -1,12 +1,12 @@
 # 基本法索引 (Basic Law Index)
 
-**版本**: v1.0.0 (基本法版本独立于项目版本)
+**版本**: v1.6.0 (基本法版本独立于项目版本)
 **状态**: [🟢 活跃 | 🟡 维护中 | 🔴 重构中]
 **项目**: [项目名称]
 **最后更新**: [YYYY-MM-DD]
 **说明**: [项目名称]的基本法核心公理摘要，作为 CDD 开发时始终加载的内核。本文件定义了项目的宪法约束和核心原则。
 
-*注：基本法版本 v1.0.0 是宪法模板版本，与项目业务版本独立。宪法变更需遵循 WF-amend 修正案协议。*
+*注：基本法版本 v1.6.0 是宪法模板版本，与项目业务版本独立。宪法变更需遵循 WF-amend 修正案协议。*
 
 ---
 
@@ -40,9 +40,9 @@
 ```
 
 ### 项目特定配置
-- **核心索引**: `memory_bank/00_indices/` 目录下的3个索引文件
-- **领域图谱**: `memory_bank/02_systemaxioms/KNOWLEDGE_GRAPH.md`
-- **活动上下文**: `memory_bank/01_active_state/activeContext.md`
+- **核心索引**: `memory_bank/core/` 目录下的3个索引文件
+- **领域图谱**: `memory_bank/core/knowledge_graph.md`
+- **活动上下文**: `memory_bank/core/active_context.md`
 - **[项目名称]特定知识**: [描述项目特定知识结构]
 
 ---
@@ -90,9 +90,9 @@ pytest [项目测试目录]/ --cov=[项目模块]
 当需要具体执行[项目名称]的某一任务时：
 
 ### 1. 检索阶段
-- **标准索引检索**: 在 `memory_bank/00_indices/` 中查找相关条款
+- **标准索引检索**: 在 `memory_bank/core/` 中查找相关条款
 - **[项目特定]检索**: [描述项目特定检索关键词和模式]
-- **图谱辅助检索**: 复杂问题使用 `KNOWLEDGE_GRAPH.md` 导航
+- **图谱辅助检索**: 复杂问题使用 `memory_bank/core/knowledge_graph.md` 导航
 
 ### 2. 加载阶段
 - **文件选择**: 根据索引结果读取具体的 DS-xxx 或 WF-xxx 文件
