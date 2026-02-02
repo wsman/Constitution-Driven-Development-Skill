@@ -945,6 +945,116 @@ TOTAL_TOKENS = response.json()["usage"]["total_tokens"]  # 精确总Token
 | **Token使用** | 输入: 49 / 输出: 155 / 总计: 204 |
 ```
 
+---
+
+#### 🔒 原始数据保护标准 (v2.1)
+
+**从2026-02-02起，所有审计报告必须使用 DeepSeek API 返回的原始数据，禁止二次加工！**
+
+##### 🔴 严格禁止
+- ❌ 禁止对 API 返回的原始数据进行任何修改
+- ❌ 禁止将精确数据替换为估算值
+- ❌ 禁止更改请求ID、时间戳、Token数量
+- ❌ 禁止在报告中添加/删除/修改 API 返回内容
+
+##### ✅ 正确流程
+
+**步骤 1: 记录原始响应**
+```python
+# 直接保存原始响应，不要修改任何字段
+raw_response = response.json()
+
+# 提取原始数据（禁止修改）
+REQUEST_ID = raw_response["id"]
+LATENCY_MS = (RECV_TS - SEND_TS) * 1000
+PROMPT_TOKENS = raw_response["usage"]["prompt_tokens"]
+COMPLETION_TOKENS = raw_response["usage"]["completion_tokens"]
+TOTAL_TOKENS = raw_response["usage"]["total_tokens"]
+```
+
+**步骤 2: 直接写入报告（禁止加工）**
+```markdown
+| 字段 | 值 |
+|------|-----|
+| **请求ID** | `${REQUEST_ID}` |  <!-- 直接使用原始值 -->
+| **耗时** | `${LATENCY_MS}ms` |  <!-- 直接使用原始值 -->
+| **Token使用** | 输入: ${PROMPT_TOKENS} / 输出: ${COMPLETION_TOKENS} / 总计: ${TOTAL_TOKENS} |  <!-- 直接使用原始值 -->
+```
+
+**步骤 3: 验证数据一致性**
+```python
+# 验证：确保写入报告的数据与原始数据完全一致
+assert report_request_id == raw_response["id"]
+assert report_latency == (RECV_TS - SEND_TS) * 1000
+assert report_prompt_tokens == raw_response["usage"]["prompt_tokens"]
+# ... 验证所有字段
+```
+
+##### ❌ 错误示例（禁止使用）
+
+```python
+# ❌ 错误示例1：修改请求ID
+REQUEST_ID = "custom-id"  # 禁止！
+
+# ❌ 错误示例2：修改 Token 数量
+PROMPT_TOKENS = 300  # 即使估算正确也禁止！
+
+# ❌ 错误示例3：修改延迟时间
+LATENCY_MS = 120000  # 即使四舍五入也禁止！
+
+# ❌ 错误示例4：使用占位符
+REPORT_CONTENT = f"Token使用: 输入: ~{tokens}/..."  # 禁止使用 ~
+```
+
+##### ✅ 正确示例（必须使用）
+
+```python
+# ✅ 正确示例：直接使用原始数据
+REQUEST_ID = raw_response["id"]  # 精确值
+LATENCY_MS = (RECV_TS - SEND_TS) * 1000  # 精确值
+PROMPT_TOKENS = raw_response["usage"]["prompt_tokens"]  # 精确值
+```
+
+##### 📋 报告生成标准模板
+
+```markdown
+# T0文档审计报告
+
+## API调用详情
+
+### 调用 #1: 审计请求
+| 字段 | 值 |
+|------|-----|
+| **端点** | `https://api.deepseek.com/chat/completions` |
+| **模型** | `deepseek-reasoner` |
+| **请求ID** | `a30fd9d3-eea0-4e9c-88b5-d628c6086f4b` |
+| **发送时间** | `2026-02-02T09:05:08+08:00` |
+| **收到时间** | `2026-02-02T09:06:14+08:00` |
+| **耗时** | `66000ms` |
+| **Token使用** | 输入: 306 / 输出: 2580 / 总计: 2886 |
+
+**请求参数**:
+```json
+{
+  "model": "deepseek-reasoner",
+  "messages": [...],
+  "temperature": 0.2,
+  "max_tokens": 6000
+}
+```
+
+**响应状态**: `200` OK
+```
+
+##### 🚨 违规处理
+
+| 违规行为 | 处理措施 |
+|----------|----------|
+| 修改原始 API 数据 | 报告无效，要求重写 |
+| 使用估算值替代精确值 | 报告无效，要求重写 |
+| 遗漏 API 调用信息 | 报告无效，要求重写 |
+| 二次加工响应内容 | 报告无效，要求重写 |
+
 #### ⚠️ 错误示例（禁止使用）
 
 ```markdown
