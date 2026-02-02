@@ -50,7 +50,7 @@ Use these files to deepen your understanding when encountering complex scenarios
 | **工作流程** | `external_auditor.md` | `protocols/WF-review.md`, `standards/DS-060_code_review.md` | 审计工具接口与验证 |
 | **法律框架** | `legal_framework.md` | `core/basic_law_index.md`, `core/procedural_law_index.md`, `core/technical_law_index.md`, ...(+1更多) | 核心公理与宪法约束 |
 | **法律框架** | `template_usage.md` | `standards/DS-050_feature_specification.md`, `standards/DS-051_implementation_plan.md`, `standards/DS-052_atomic_tasks.md`, ...(+1更多) | T2文档模板使用指南 |
-| **技术实现** | `cdd_model_config.md` | `core/active_context.md`, `core/guide.md` | 双模型AI角色配置 |
+| **技术实现** | `cdd_model_config.md` | `core/active_context.md` | 双模型AI角色配置 |
 | **技术实现** | `entropy_metrics.md` | `core/active_context.md`, `standards/DS-054_environment_hardening.md` | 系统熵值公式与阈值 |
 | **技术实现** | `entropy_calculation_guide.md` | `axioms/system_patterns.md`, `axioms/tech_context.md`, `axioms/behavior_context.md` | 熵值计算实现细节 |
 | **架构体系** | `architecture_map.md` | `core/active_context.md`, `axioms/system_patterns.md`, `standards/DS-050_feature_specification.md` | 三级递进架构地图与导航 |
