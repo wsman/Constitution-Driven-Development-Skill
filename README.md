@@ -87,11 +87,31 @@ graph TD
 
 ## Quick Start
 
+### 🌱 Using the Spore Deployer (推荐 - 自动化部署)
+
+使用新的 `deploy_cdd.py` 脚本自动化初始化 Memory Bank 结构和工具链：
+
 ```bash
 # Clone this skill to your OpenClaw skills directory
 git clone https://github.com/wsman/Constitution-Driven-Development-Skill.git
 cp -r Constitution-Driven-Development-Skill/ ../openclaw/skills/cdd/
 
+# Navigate to your target project directory
+cd /path/to/your/project
+
+# 使用 Spore 部署协议初始化 Memory Bank
+python ../openclaw/skills/cdd/scripts/deploy_cdd.py "Your Project Name"
+
+# 或者，如果已经在 CDD 技能库目录中：
+cd /path/to/openclaw/skills/cdd
+python scripts/deploy_cdd.py "Your Project Name" --target /path/to/your/project
+```
+
+### 📁 手动方法 (备选方案)
+
+如果需要手动控制，可以使用原始方法：
+
+```bash
 # For a new project, create Memory Bank:
 cd /path/to/your/project
 mkdir -p memory_bank/core

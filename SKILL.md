@@ -30,6 +30,7 @@ Use these commands to interact with the project. Do not hallucinate commands.
 
 | Capability | User Intent / Trigger | Execution Command | AI Action Strategy |
 | :--- | :--- | :--- | :--- |
+| **Bootstrap CDD** | "init project", "deploy cdd", "start development" | `python scripts/deploy_cdd.py "{Name}"` | **Spore Protocol (Seed→Root→Sprout)**: 1. **Seeding**: Initialize memory_bank structure. 2. **Rooting**: Fill project_readme_template.md with seed info. 3. **Sprouting**: Derive 5-dimensional truth from README. |
 | **Audit System** | "check status", "verify", "pre-commit" | `python scripts/cdd_audit.py --format json --ai-hint` | Parse JSON. If `success: false`, read `logs` and fix specific Gates. [Ref: reference/external_auditor.md] |
 | **Create Feature** | "new feature", "start task", "implement X" | `python scripts/cdd-feature.py "{name}" "{desc}"` | Run command, then ask user to review the generated `specs/...` files. [Ref: reference/template_usage.md] |
 | **Fix Versions** | "fix drift", "version mismatch", "Gate 1 fail" | `python scripts/cdd_audit.py --fix` | Run to auto-resolve §102.3 violations. [Ref: reference/core_workflow.md] |
