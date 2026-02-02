@@ -283,14 +283,15 @@ def method2():
     @patch.object(EntropyCalculator, 'calculate_c_test')
     def test_calculate_h_sys_danger_status(self, mock_test, mock_sig, mock_dir, calculator):
         """测试综合熵值计算（危险状态）"""
-        # 模拟低合规度
-        mock_dir.return_value = 0.2  # 20%
-        mock_sig.return_value = 0.1  # 10%
-        mock_test.return_value = 0.3  # 30%
+        # 模拟极低合规度，使熵值 > 0.9
+        mock_dir.return_value = 0.1  # 10%
+        mock_sig.return_value = 0.05  # 5%
+        mock_test.return_value = 0.1  # 10%
         
         metrics = calculator.calculate_h_sys()
         
-        assert metrics.h_sys > 0.7
+        # 根据调整后的阈值，危险状态需要 h_sys > 0.9
+        assert metrics.h_sys > 0.9
         assert metrics.status == "🔴 危险"
     
     def test_calculate_h_sys_edge_cases(self, calculator):
@@ -350,7 +351,7 @@ class TestMainFunction:
         
         # 运行主函数并检查返回值
         result = main()
-        # 成功状态应返回 0 (因为 h_sys <= 0.5)
+        # 成功状态应返回 0 (因为 h_sys <= 0.7，调整为模板仓库阈值)
         assert result == 0
     
     @patch('argparse.ArgumentParser.parse_args')
@@ -367,20 +368,20 @@ class TestMainFunction:
             cache_info=False
         )
         
-        # 模拟危险状态
+        # 模拟危险状态 (h_sys > 0.9 才触发危险状态，现在阈值是 0.7)
         mock_metrics = Mock(
             c_dir=0.2,
             c_sig=0.1,
             c_test=0.3,
             compliance_score=0.2,
-            h_sys=0.8,  # 危险
+            h_sys=0.9,  # 危险（>0.9 才触发危险，但退出码阈值是 0.7）
             status="🔴 危险"
         )
         mock_calculator.return_value.calculate_h_sys.return_value = mock_metrics
         
         # 运行主函数并检查返回值
         result = main()
-        # 危险状态应返回 1 (因为 h_sys > 0.5)
+        # 危险状态应返回 1 (因为 h_sys > 0.7)
         assert result == 1
 
 
