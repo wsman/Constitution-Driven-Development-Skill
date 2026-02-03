@@ -2,7 +2,8 @@
 """
 CDD 熵值计算脚本 (Compliance-Based Entropy Model)
 
-v1.4.0 - Refactored to use scripts.utils
+v1.4.1 - Security Enhancement: Spore Isolation Guard
+Implements §300.1 Spore Protocol with self-check allowance.
 """
 
 import argparse
@@ -17,6 +18,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from scripts.utils.cache_manager import CacheManager
 from scripts.utils.command_utils import run_command
+from scripts.utils.spore_guard import check_spore_isolation, SKILL_ROOT
 
 @dataclass
 class EntropyMetrics:
@@ -236,18 +238,30 @@ class EntropyCalculator:
         return metrics
 
 def main():
-    parser = argparse.ArgumentParser(description="CDD 熵值计算脚本 (v1.4.0 Refactored)")
+    parser = argparse.ArgumentParser(description="CDD 熵值计算脚本 (v1.4.1 Refactored)")
     parser.add_argument("--project", "-p", default=".", help="项目路径")
     parser.add_argument("--verbose", "-v", action="store_true", help="显示详细输出")
     parser.add_argument("--json", "-j", action="store_true", help="JSON格式输出")
     parser.add_argument("--force-recalculate", action="store_true", help="强制重新计算")
     parser.add_argument("--clear-cache", action="store_true", help="清除缓存")
     parser.add_argument("--cache-info", action="store_true", help="显示缓存信息")
+    parser.add_argument("--self-audit", action="store_true", help="允许自检模式（测量CDD技能自身的熵值）")
     
     args = parser.parse_args()
     
+    # [Security] 孢子隔离警告（熵值计算允许自检，但需要警告）
+    project_path = Path(args.project)
+    resolved_path = project_path.resolve()
+    
+    if resolved_path == SKILL_ROOT and not args.self_audit:
+        print("\n⚠️  **SPORE WARNING: Self-Measurement Detected**")
+        print(f"    You are measuring entropy of the CDD Skill Root itself.")
+        print(f"    This is allowed for self-audit purposes.")
+        print("    To suppress this warning, use --self-audit flag.")
+        print("    To measure a different project, specify --project <path>\n")
+    
     if args.clear_cache:
-        CacheManager(Path(args.project)).clear_cache()
+        CacheManager(project_path).clear_cache()
         print("✅ 缓存已清除")
         return 0
     
@@ -267,7 +281,7 @@ def main():
     if args.json:
         print(json.dumps(metrics.to_dict(), indent=2))
     else:
-        print(f"\n📊 CDD 熵值报告 (v1.4.0)\nH_sys: {metrics.h_sys:.4f} [{metrics.status}]")
+        print(f"\n📊 CDD 熵值报告 (v1.4.1)\nH_sys: {metrics.h_sys:.4f} [{metrics.status}]")
     
     return 0 if metrics.h_sys <= calculator.THRESHOLD_WARNING else 1
 

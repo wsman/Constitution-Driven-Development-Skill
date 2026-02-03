@@ -248,24 +248,68 @@ def test_cdd_feature_script_execution():
     assert '__name__ == "__main__"' in content
 
 
-def test_cdd_feature_dry_run():
+def test_cdd_feature_dry_run(tmp_path):
     """测试无分支创建模式（原干运行模式）"""
     script_path = Path(__file__).parent.parent / "scripts" / "cdd-feature.py"
     
-    # 模拟运行脚本（使用 --no-branch 参数）
+    # 创建临时目标目录（不在 CDD 技能根目录中）
+    target_dir = tmp_path / "test-project"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    
+    # 在目标目录中创建一个简单的 README.md 以提供上下文
+    readme_file = target_dir / "README.md"
+    readme_file.write_text("# Test Project\n\nVersion: 1.0.0")
+
+    # 模拟运行脚本（使用 --no-branch 和 --target 参数）
     import subprocess
     result = subprocess.run(
-        [sys.executable, str(script_path), "--no-branch", "Test Feature", "Test Description"],
+        [
+            sys.executable,
+            str(script_path),
+            "--no-branch",
+            "Test Feature", 
+            "Test Description",
+            "--target",
+            str(target_dir)
+        ],
         capture_output=True,
         text=True
     )
-    
+
     # 检查是否成功执行（退出码为0）
-    assert result.returncode == 0, f"Script failed: {result.stderr}"
+    assert result.returncode == 0, f"Script failed: {result.stderr}\nOutput: {result.stdout}"
     
-    # v2.0 没有 dry-run 参数，检查脚本是否正常运行（不创建分支）
-    # 检查脚本是否成功执行，即返回码为0
-    # 注意：脚本会等待用户输入（目录已存在时），这里假设目录不存在
+    # 验证 specs 目录和文件是否生成
+    specs_dir = target_dir / "specs"
+    assert specs_dir.exists(), f"Specs directory not created: {specs_dir}"
+    
+    # 查找生成的特性目录（格式：001-test-feature）
+    feature_dirs = list(specs_dir.glob("001-*"))
+    assert len(feature_dirs) > 0, f"No feature directory created in {specs_dir}"
+    
+    feature_dir = feature_dirs[0]
+    assert feature_dir.is_dir(), f"Feature directory not found: {feature_dir}"
+    
+    # 检查关键文件是否生成
+    expected_files = [
+        "DS-050_001_spec.md",
+        "DS-051_001_plan.md", 
+        "DS-052_001_tasks.md",
+        "feature_001_README.md"
+    ]
+    
+    for filename in expected_files:
+        file_path = feature_dir / filename
+        assert file_path.exists(), f"Missing expected file: {file_path}"
+        # 验证文件内容非空
+        content = file_path.read_text()
+        assert len(content) > 0, f"File is empty: {file_path}"
+        # 验证占位符被替换 - 注意: 脚本会将 "Test Feature" 转换为 "test-feature"
+        # 检查清理后的特性名称或特性ID是否出现在文件中
+        if "001" in filename:  # 文件包含特性ID
+            assert "001" in content, f"Feature ID '001' not in {filename}"
+        # 检查任何与特性相关的标记
+        assert "test-feature" in content or "001" in content, f"Feature reference not found in {filename}"
 
 
 if __name__ == "__main__":

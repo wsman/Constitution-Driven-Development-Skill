@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-CDD Spore Deployer (v2.0)
-=========================
+CDD Spore Deployer (v2.0.1)
+===========================
 "Seed to Sprout" Deployment Protocol.
 Initializes the memory_bank structure for AI cognitive expansion.
+
+Security Enhancement: Spore Isolation Guard (v2.0.1)
+Implements §300.1 Spore Protocol to prevent self-deployment.
 """
 
 import os
@@ -12,6 +15,10 @@ import shutil
 import argparse
 import datetime
 from pathlib import Path
+
+# 导入孢子卫士
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from scripts.utils.spore_guard import check_spore_isolation
 
 # 核心模板映射 (Source in Skill -> Target in Memory Bank)
 CORE_TEMPLATES = {
@@ -233,7 +240,11 @@ Example:
     args = parser.parse_args()
     
     try:
-        deploy(Path(args.target), args.name, args.force)
+        # [Security] 实施孢子隔离
+        target_path = Path(args.target)
+        check_spore_isolation(target_path, "deploy_cdd.py")
+        
+        deploy(target_path, args.name, args.force)
     except KeyboardInterrupt:
         print("\n❌ Deployment interrupted by user.")
         sys.exit(1)

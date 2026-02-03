@@ -7,38 +7,42 @@
 
 ### 1. Project Initialization Tools
 
-#### `deploy_cdd.py` (The Spore Deployer) v2.0
-Deploys CDD Memory Bank structure to target projects using **Spore Protocol (Seed→Root→Sprout)**.
+#### `deploy_cdd.py` (The Spore Deployer) v2.0.1
+Deploys CDD Memory Bank structure to target projects using **Spore Protocol (Seed→Root→Sprout)** with strict spore isolation enforcement.
 * **Usage**: `python scripts/deploy_cdd.py "Project Name" [--target <path>] [--force]`
 * **Function**:
-    1. Creates complete `memory_bank/` directory structure: `core/`, `axioms/`, `protocols/`, `standards/`
-    2. Copies all T0-T2 templates with proper placeholder replacement
-    3. Initializes `active_context.md` with project metadata
+    1. **Spore Isolation Check**: Prevents deployment to CDD skill root directory
+    2. Creates complete `memory_bank/` directory structure: `core/`, `axioms/`, `protocols/`, `standards/`
+    3. Copies all T0-T2 templates with proper placeholder replacement
+    4. Initializes `active_context.md` with project metadata
+* **Spore Isolation Behavior**: Strict blocking. Exits with code 100 if target is CDD skill root. 
 * **Use Cases**:
     - **Start New Project**: Initialize Memory Bank for a new project
     - **Migrate Existing**: Add CDD structure to legacy projects
 * **Key Parameters**:
     - `--target`: Target directory (default: current directory)
     - `--force`: Overwrite existing files (use with caution)
-* **Constitutional Basis**: §102.3 Synchronization Axiom
+* **Constitutional Basis**: §102.3 Synchronization Axiom, §300.1 Spore Isolation Protocol
 
 ### 2. Development Phase Tools
 
-#### `cdd-feature.py` (The Scaffolder) v2.1.0
-Generates T2 documentation skeletons based on templates.
+#### `cdd-feature.py` (The Scaffolder) v2.1.2
+Generates T2 documentation skeletons based on templates with spore isolation protection.
 * **Usage**: `python scripts/cdd-feature.py "feature_name" [description] [--target <path>] [--no-branch]`
 * **Function**:
-    1. Reads templates from `templates/04_standards/` (Source).
-    2. Creates `specs/{ID}-{name}/` directory in target project.
-    3. Generates DS-050 (spec), DS-051 (plan), DS-052 (tasks), and a feature README.
-    4. Optionally creates a Git branch with the feature name.
+    1. **Spore Isolation Check**: Prevents spec generation in CDD skill root directory
+    2. Reads templates from `templates/04_standards/` (Source).
+    3. Creates `specs/{ID}-{name}/` directory in target project.
+    4. Generates DS-050 (spec), DS-051 (plan), DS-052 (tasks), and a feature README.
+    5. Optionally creates a Git branch with the feature name.
+* **Spore Isolation Behavior**: Strict blocking. Prevents spec generation in CDD skill root to avoid contamination.
 * **Use Cases**:
     - **State A→B Transition**: Generate T2 Specs during planning phase
     - **New Feature Development**: Create standardized feature documentation
 * **Key Parameters**:
     - `--target`: Target project directory (default: current directory)
     - `--no-branch`: Skip git branch creation
-* **Constitutional Basis**: §141 State Machine Axiom
+* **Constitutional Basis**: §141 State Machine Axiom, §300.1 Spore Isolation Protocol
 
 ### 3. Verification Phase Tools
 
@@ -59,46 +63,64 @@ Enforces the Legal Framework (§100-§300) through automated constitutional gate
     - `--ai-hint`: Provide AI-friendly hints for self-healing
 * **Constitutional Basis**: §201.3 Three-Tier Verification Axiom
 
-#### `measure_entropy.py` (The Meter) v1.4.0
-Calculates the system entropy score ($H_{sys}$) with detailed breakdown.
-* **Usage**: `python scripts/measure_entropy.py [--project <path>] [--json] [--verbose] [--force-recalculate]`
+#### `measure_entropy.py` (The Meter) v1.4.1
+Calculates the system entropy score ($H_{sys}$) with detailed breakdown and smart spore isolation.
+* **Usage**: `python scripts/measure_entropy.py [--project <path>] [--json] [--verbose] [--force-recalculate] [--self-audit]`
 * **Output**: JSON report with $H_{cog}$, $H_{struct}$, $H_{align}$, and overall $H_{sys}$
 * **Function**:
-    1. Calculates cognitive load ($H_{cog}$): $T_{load} / 8000$
-    2. Calculates structural entropy ($H_{struct}$): $1 - N_{linked}/N_{total}$
-    3. Calculates alignment deviation ($H_{align}$): $N_{violation} / N_{constraints}$
-    4. Computes weighted sum: $H_{sys} = 0.4H_{cog} + 0.3H_{struct} + 0.3H_{align}$
+    1. **Spore Isolation Check**: Warns when measuring CDD skill root (allows self-audit with warning)
+    2. Calculates cognitive load ($H_{cog}$): $T_{load} / 8000$
+    3. Calculates structural entropy ($H_{struct}$): $1 - N_{linked}/N_{total}$
+    4. Calculates alignment deviation ($H_{align}$): $N_{violation} / N_{constraints}$
+    5. Computes weighted sum: $H_{sys} = 0.4H_{cog} + 0.3H_{struct} + 0.3H_{align}$
+* **Spore Isolation Behavior**: Warning mode. Allows self-audit with clear warning message, supports Gate 3 verification.
 * **Use Cases**:
     - **Entropy Monitoring**: Regular system health checks
     - **Crisis Detection**: Identify when $H_{sys} > 0.7$ (danger state)
     - **Refactoring Validation**: Measure entropy reduction after refactoring
+    - **Gate 3 Enforcement**: Used by `cdd_audit.py` for constitutional audit
 * **Key Parameters**:
     - `--project`: Target project path (default: current directory)
     - `--json`: JSON format output for programmatic consumption
     - `--force-recalculate`: Ignore cache and recalculate entropy
-* **Constitutional Basis**: §201.5 Entropy Reduction Axiom
+    - `--self-audit`: Suppress spore warning when measuring CDD skill root
+* **Constitutional Basis**: §201.5 Entropy Reduction Axiom, §300.1 Spore Isolation Protocol
 
 ### 4. Maintenance Phase Tools
 
-#### `verify_versions.py` (The Synchronizer) v1.7.0
-Ensures version consistency across all CDD files and can automatically fix discrepancies.
-* **Usage**: `python scripts/verify_versions.py [--fix] [--project <path>] [--target-version X.Y.Z]`
+#### `verify_versions.py` (The Synchronizer) v1.7.1
+Ensures version consistency across all CDD files with intelligent spore isolation.
+* **Usage**: `python scripts/verify_versions.py [--fix] [--project <path>] [--target-version X.Y.Z] [--skip-guard]`
 * **Function**:
-    1. Scans all CDD-related files for version markers
-    2. Detects version inconsistencies
-    3. Can automatically fix inconsistencies with `--fix` flag
-    4. Supports bulk version updates with `--target-version`
+    1. **Smart Spore Isolation**: Read-only checks allowed for CDD skill root, write operations (`--fix`) blocked
+    2. Scans all CDD-related files for version markers
+    3. Detects version inconsistencies
+    4. Can automatically fix inconsistencies with `--fix` flag (blocked for CDD skill root)
+    5. Supports bulk version updates with `--target-version`
+* **Spore Isolation Behavior**: Intelligent mode. Read-only checks allowed for self-audit, write operations blocked to prevent corruption.
 * **Use Cases**:
     - **Gate 1 Enforcement**: Version consistency checking
-    - **Version Drift Repair**: Fix accidental version mismatches
-    - **Bulk Updates**: Update all files to a new target version
+    - **Version Drift Repair**: Fix accidental version mismatches in external projects
+    - **Bulk Updates**: Update all files to a new target version in external projects
+    - **Self-Audit**: Check CDD skill root version consistency (read-only)
 * **Key Parameters**:
-    - `--fix`: Automatically fix version inconsistencies
+    - `--fix`: Automatically fix version inconsistencies (blocked for CDD skill root)
     - `--project`: Target project directory
     - `--target-version`: Specify target version for bulk updates
-* **Constitutional Basis**: §102.3 Synchronization Axiom
+    - `--skip-guard`: Bypass spore guard (use with caution for CDD skill maintenance)
+* **Constitutional Basis**: §102.3 Synchronization Axiom, §300.1 Spore Isolation Protocol
 
 ### 5. Utility Modules (`scripts/utils/`)
+
+#### `spore_guard.py`
+Enforces spore isolation protocol to prevent CDD tool contamination.
+* **Purpose**: Implement mathematical isolation $S_{tool} \cap S_{target} = \varnothing$
+* **Features**:
+  - Path detection and validation
+  - Standardized error messages with exit code 100
+  - SKILL_ROOT constant definition
+  - Integration with all main tools
+* **Used By**: `deploy_cdd.py`, `cdd-feature.py`, `measure_entropy.py`, `verify_versions.py`
 
 #### `cache_manager.py`
 Manages entropy calculation caching to improve performance.

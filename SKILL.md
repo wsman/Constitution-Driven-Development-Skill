@@ -1,6 +1,6 @@
 ---
 name: cdd-governance
-description: Constitution-Driven Development (CDD) v1.6.1 Kernel.
+description: Constitution-Driven Development (CDD) v1.6.1 Kernel with Spore Isolation.
 model: minimax/MiniMax-M2.1
 version: v1.6.1
 type: governance-framework
@@ -110,7 +110,7 @@ templates/
 1.  **Memory First**: Never code without an approved T2 Spec (`DS-050`) in `memory_bank/`.
 2.  **Atomic Sync**: Code changes must be committed WITH their documentation updates.
 3.  **Entropy Gate**: If $H_{sys} > 0.7$, refuse new features; propose refactoring.
-4.  **Spore Isolation**: Do not modify host files outside `src/`, `tests/`, and `memory_bank/`.
+4.  **Spore Isolation**: Prevent CDD tool contamination through mathematical isolation: $S_{tool} \cap S_{target} = \varnothing$. All tools now enforce strict isolation, preventing accidental operations on CDD skill root directory.
 
 ## 🛠️ Capability Manifest (Toolchain)
 *Run these from the project root:*
@@ -118,11 +118,11 @@ templates/
 ### Python Scripts
 | Command | Action |
 |:---|:---|
-| `python scripts/deploy_cdd.py "{Name}"` | **Initialize**: Deploys Memory Bank spore to target project. |
-| `python scripts/cdd-feature.py "{Feat}"` | **Plan**: Scaffolds T2 specs (DS-050/051/052) from templates. |
+| `python scripts/deploy_cdd.py "{Name}"` | **Initialize**: Deploys Memory Bank spore to target project. **v2.0.1** enforces spore isolation. |
+| `python scripts/cdd-feature.py "{Feat}"` | **Plan**: Scaffolds T2 specs (DS-050/051/052) from templates. **v2.1.2** prevents spec generation in CDD root. |
 | `python scripts/cdd_audit.py` | **Verify**: Runs Gate 1-3 constitutional audit. |
-| `python scripts/measure_entropy.py` | **Measure**: Calculates system entropy ($H_{sys}$) metrics. |
-| `python scripts/verify_versions.py` | **Consistency**: Checks/fixes version alignment across all CDD files. |
+| `python scripts/measure_entropy.py` | **Measure**: Calculates system entropy ($H_{sys}$) metrics. **v1.4.1** provides self-audit warnings. |
+| `python scripts/verify_versions.py` | **Consistency**: Checks/fixes version alignment across all CDD files. **v1.7.1** has intelligent isolation. |
 
 ### Make Commands (Local Development)
 | Command | Action |

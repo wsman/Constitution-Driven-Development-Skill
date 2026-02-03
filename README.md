@@ -217,8 +217,8 @@ cdd/
 │       └── DS-060_code_review.md               # Code review findings template
 └── scripts/                           # Toolchain scripts
     ├── cdd_audit.py                   # Constitutional auditor (Gate 1-3)
-    ├── cdd-feature.py                 # Feature scaffold generator (v2.1.0)
-    ├── deploy_cdd.py                  # Spore deployer (v2.0)
+    ├── cdd-feature.py                 # Feature scaffold generator (v2.1.2)
+    ├── deploy_cdd.py                  # Spore deployer (v2.0.1)
     ├── measure_entropy.py             # Entropy calculator (v1.4.0)
     ├── verify_versions.py             # Version consistency checker (v1.7.0)
     └── utils/                         # Utility modules

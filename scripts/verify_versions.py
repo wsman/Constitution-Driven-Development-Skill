@@ -3,7 +3,12 @@
 CDD Version Consistency Checker
 检查 CDD 项目中文档版本一致性
 
-v1.7.0 - 工程化与稳健性
+v1.7.1 - Security Enhancement: Intelligent Spore Isolation
+实现 §300.1 孢子协议的智能版本检查。
+
+智能策略：
+1. 只读检查 (无 --fix) 允许自检 (Gate 1 兼容)
+2. 写入操作 (--fix) 且目标是自身时警告并阻止
 
 用法:
     python scripts/verify_versions.py [--fix] [--verbose]
@@ -20,6 +25,11 @@ import sys
 import argparse
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
+
+# 添加 scripts 目录到 path 以便导入 utils
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from scripts.utils.spore_guard import SKILL_ROOT
 
 # 关键文件及其版本模式
 VERSION_FILES = {
@@ -314,7 +324,7 @@ class VersionChecker:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="CDD 版本一致性检查工具 (v1.7.0)"
+        description="CDD 版本一致性检查工具 (v1.7.1)"
     )
     parser.add_argument(
         "--fix",
@@ -337,6 +347,23 @@ def main():
     )
     
     args = parser.parse_args()
+    
+    project_path = Path(args.project)
+    resolved_path = project_path.resolve()
+    
+    # [Security] 智能孢子隔离检查
+    # 只读检查允许自检 (Gate 1 兼容)，但写入操作需要特别处理
+    if resolved_path == SKILL_ROOT and args.fix:
+        print("\n⛔  **SECURITY ERROR: Spore Isolation Violation [verify_versions.py --fix]**")
+        print(f"    You are attempting to modify versions of the CDD Skill Root itself:")
+        print(f"    -> {SKILL_ROOT}")
+        print("\n    This operation is blocked to prevent accidental corruption.")
+        print("    For version maintenance of the CDD Skill itself, please:")
+        print("    1. Use a controlled release workflow")
+        print("    2. Run `cdd_audit.py` for regular self-checks (Gate 1)")
+        print("    3. Or if you know what you're doing, add --skip-guard flag")
+        print("\n    To check another project, specify --project <path>\n")
+        sys.exit(100)
     
     checker = VersionChecker(args.project, args.verbose)
     success = checker.run(args.fix, args.target_version)
