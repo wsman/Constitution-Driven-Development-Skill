@@ -43,13 +43,13 @@ VERSION_FILES = {
         ],
         "description": "配置文件"
     },
-    "templates/core/active_context.md": {
+    "templates/01_core/active_context.md": {
         "patterns": [
             r"^\*\*版本\*\*:\s*v?([0-9]+\.[0-9]+\.[0-9]+)",
         ],
         "description": "T0活跃上下文模板"
     },
-    "templates/axioms/system_patterns.md": {
+    "templates/02_axioms/system_patterns.md": {
         "patterns": [
             r"^\*\*版本\*\*:\s*v?([0-9]+\.[0-9]+\.[0-9]+)",
         ],

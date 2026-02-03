@@ -32,14 +32,14 @@ DEFAULT_ENCODING = "utf-8"
 # 1. 确定 SKILL_ROOT (工具自身的安装位置)
 # 用于定位模板文件，不随运行位置改变
 SKILL_ROOT = Path(__file__).resolve().parent.parent
-TEMPLATES_DIR = SKILL_ROOT / "templates" / "standards"
+TEMPLATES_DIR = SKILL_ROOT / "templates" / "04_standards"
 
 # 默认模板映射 (文件名 -> 目标后缀)
 TEMPLATE_MAPPING = {
     "DS-050_feature_specification.md": "_spec.md",
     "DS-051_implementation_plan.md": "_plan.md",
     "DS-052_atomic_tasks.md": "_tasks.md",
-    "feature_readme_template.md": "_README.md",
+    "07_feature_readme_template.md": "_README.md",
 }
 
 # -----------------------------------------------------------------------------
@@ -51,15 +51,21 @@ class TemplateEngine:
     
     def __init__(self, templates_dir: Path):
         self.templates_dir = templates_dir
+        self.reference_dir = templates_dir.parent.parent / "reference"
         if not self.templates_dir.exists():
             print(f"⚠️ Warning: Templates directory not found at source: {self.templates_dir}")
 
     def load_template(self, template_name: str) -> str:
-        """从工具自身目录加载模板"""
+        """从工具自身目录加载模板，支持多个位置"""
+        # 1. 首先尝试从 templates/04_standards/ 加载
         template_path = self.templates_dir / template_name
-        
         if template_path.exists():
             return template_path.read_text(encoding=DEFAULT_ENCODING)
+        
+        # 2. 尝试从 reference/ 加载 (用于 07_feature_readme_template.md)
+        ref_path = self.reference_dir / template_name
+        if ref_path.exists():
+            return ref_path.read_text(encoding=DEFAULT_ENCODING)
         
         print(f"⚠️ Template missing: {template_name}, using fallback.")
         return f"# Feature: {{{{ feature_name }}}}\n\n> Auto-generated fallback for {template_name}\n"
@@ -136,11 +142,11 @@ class ContextBuilder:
             "project": self.target_root / "README.md",
             "active_context": self._resolve_path(
                 "memory_bank/core/active_context.md", 
-                "templates/core/active_context.md"
+                "templates/01_core/active_context.md"
             ),
             "system_patterns": self._resolve_path(
                 "memory_bank/axioms/system_patterns.md", 
-                "templates/axioms/system_patterns.md"
+                "templates/02_axioms/system_patterns.md"
             )
         }
 
@@ -276,7 +282,12 @@ def main():
         tpl_content = engine.load_template(template_file)
         rendered_content = engine.render(tpl_content, context)
         
-        prefix = template_file.split('_')[0]
+        # 特殊处理 feature readme 模板，保持前缀为 "feature"
+        if template_file == "07_feature_readme_template.md":
+            prefix = "feature"
+        else:
+            prefix = template_file.split('_')[0]
+        
         output_filename = f"{prefix}_{feature_id}{suffix}"
         output_path = feature_dir / output_filename
         

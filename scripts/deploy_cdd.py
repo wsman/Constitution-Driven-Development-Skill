@@ -15,40 +15,40 @@ from pathlib import Path
 
 # 核心模板映射 (Source in Skill -> Target in Memory Bank)
 CORE_TEMPLATES = {
-    "reference/project_readme_template.md": "core/project_readme_template.md",
-    "templates/core/active_context.md": "core/active_context.md",
-    "templates/core/knowledge_graph.md": "core/knowledge_graph.md",
-    "templates/core/basic_law_index.md": "core/basic_law_index.md",
-    "templates/core/procedural_law_index.md": "core/procedural_law_index.md",
-    "templates/core/technical_law_index.md": "core/technical_law_index.md"
+    "reference/06_project_readme_template.md": "core/project_readme_template.md",
+    "templates/01_core/active_context.md": "core/active_context.md",
+    "templates/01_core/knowledge_graph.md": "core/knowledge_graph.md",
+    "templates/01_core/basic_law_index.md": "core/basic_law_index.md",
+    "templates/01_core/procedural_law_index.md": "core/procedural_law_index.md",
+    "templates/01_core/technical_law_index.md": "core/technical_law_index.md"
 }
 
 AXIOMS_TEMPLATES = {
-    "templates/axioms/behavior_context.md": "axioms/behavior_context.md",
-    "templates/axioms/system_patterns.md": "axioms/system_patterns.md",
-    "templates/axioms/tech_context.md": "axioms/tech_context.md"
+    "templates/02_axioms/behavior_context.md": "axioms/behavior_context.md",
+    "templates/02_axioms/system_patterns.md": "axioms/system_patterns.md",
+    "templates/02_axioms/tech_context.md": "axioms/tech_context.md"
 }
 
 # 协议和工作流模板
 PROTOCOL_TEMPLATES = {
-    "templates/protocols/WF-001_clarify_workflow.md": "protocols/WF-001_clarify_workflow.md",
-    "templates/protocols/WF-201_cdd_workflow.md": "protocols/WF-201_cdd_workflow.md",
-    "templates/protocols/WF-amend.md": "protocols/WF-amend.md",
-    "templates/protocols/WF-analyze.md": "protocols/WF-analyze.md",
-    "templates/protocols/WF-review.md": "protocols/WF-review.md",
-    "templates/protocols/WF-sync-issues.md": "protocols/WF-sync-issues.md"
+    "templates/03_protocols/WF-001_clarify_workflow.md": "protocols/WF-001_clarify_workflow.md",
+    "templates/03_protocols/WF-201_cdd_workflow.md": "protocols/WF-201_cdd_workflow.md",
+    "templates/03_protocols/WF-amend.md": "protocols/WF-amend.md",
+    "templates/03_protocols/WF-analyze.md": "protocols/WF-analyze.md",
+    "templates/03_protocols/WF-review.md": "protocols/WF-review.md",
+    "templates/03_protocols/WF-sync-issues.md": "protocols/WF-sync-issues.md"
 }
 
 # DS 标准模板
 STANDARDS_TEMPLATES = {
-    "templates/standards/DS-007_context_management.md": "standards/DS-007_context_management.md",
-    "templates/standards/DS-050_feature_specification.md": "standards/DS-050_feature_specification.md",
-    "templates/standards/DS-051_implementation_plan.md": "standards/DS-051_implementation_plan.md",
-    "templates/standards/DS-052_atomic_tasks.md": "standards/DS-052_atomic_tasks.md",
-    "templates/standards/DS-053_quality_checklist.md": "standards/DS-053_quality_checklist.md",
-    "templates/standards/DS-054_environment_hardening.md": "standards/DS-054_environment_hardening.md",
-    "templates/standards/DS-060_code_review.md": "standards/DS-060_code_review.md",
-    "templates/standards/feature_readme_template.md": "standards/feature_readme_template.md"
+    "templates/04_standards/DS-007_context_management.md": "standards/DS-007_context_management.md",
+    "templates/04_standards/DS-050_feature_specification.md": "standards/DS-050_feature_specification.md",
+    "templates/04_standards/DS-051_implementation_plan.md": "standards/DS-051_implementation_plan.md",
+    "templates/04_standards/DS-052_atomic_tasks.md": "standards/DS-052_atomic_tasks.md",
+    "templates/04_standards/DS-053_quality_checklist.md": "standards/DS-053_quality_checklist.md",
+    "templates/04_standards/DS-054_environment_hardening.md": "standards/DS-054_environment_hardening.md",
+    "templates/04_standards/DS-060_code_review.md": "standards/DS-060_code_review.md",
+    "reference/07_feature_readme_template.md": "standards/feature_readme_template.md"
 }
 
 # 配置文件和工具链
