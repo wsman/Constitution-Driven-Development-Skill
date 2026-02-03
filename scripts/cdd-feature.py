@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-CDD Feature Scaffold (Legislative Generator) v2.1
-=================================================
+CDD Feature Scaffold (Legislative Generator) v2.1.1
+===================================================
 自动化生成符合 CDD 宪法标准的特性文档结构。
 
-改进内容 (v2.1):
-1. 解耦 SKILL_ROOT (模板源) 与 TARGET_ROOT (生成目标)
-2. 支持跨项目运行：python /path/to/skill/cdd-feature.py "Name" --target /path/to/project
-3. 修正 Git 操作上下文路径
+改进内容 (v2.1.1):
+1. [Security] 实施孢子隔离机制 (Spore Isolation): 防止在 SKILL_ROOT 自身内部生成 specs
+2. 优化路径解析歧义，强制要求显式目标路径或非自身路径
+3. 解耦 SKILL_ROOT (模板源) 与 TARGET_ROOT (生成目标)
+4. 支持跨项目运行：python /path/to/skill/cdd-feature.py "Name" --target /path/to/project
+5. 修正 Git 操作上下文路径
 
 Usage:
     python scripts/cdd-feature.py <feature_name> [description] [--target <path>]
@@ -26,7 +28,7 @@ from typing import Dict, Any, Optional
 # Configuration & Constants
 # -----------------------------------------------------------------------------
 
-VERSION = "v2.1.0"
+VERSION = "v2.1.1"
 DEFAULT_ENCODING = "utf-8"
 
 # 1. 确定 SKILL_ROOT (工具自身的安装位置)
@@ -91,6 +93,8 @@ class ContextBuilder:
         p1 = self.target_root / deployed_path
         if p1.exists():
             return p1
+        # [Fix] 如果目标就是 SKILL_ROOT 本身（虽然会被隔离检查拦截，但作为防御编程），
+        # 这里的回退逻辑需要谨慎，避免读取错误的上下文
         return self.target_root / source_path
 
     def _extract_version(self, file_path: Path) -> str:
@@ -224,6 +228,22 @@ def create_git_branch(branch_name: str, cwd: Path):
         except subprocess.CalledProcessError as e:
             print(f"❌ Failed to create branch: {e}")
 
+def _check_spore_isolation(target_root: Path):
+    """
+    [Security] 孢子隔离检查
+    确保目标目录不是 CDD Skill 自身，防止污染工具库。
+    """
+    # 简单的路径比对
+    # 注意：resolve() 会处理符号链接和相对路径，确保比对准确
+    if target_root == SKILL_ROOT:
+        print("\n⛔  **SECURITY ERROR: Spore Isolation Violation**")
+        print(f"    You are trying to generate specs inside the CDD Skill Root:")
+        print(f"    -> {SKILL_ROOT}")
+        print("\n    The CDD Skill is a tool, not the target project.")
+        print("    Please specify the target project path explicitly:")
+        print(f"\n    python scripts/cdd-feature.py <name> --target ../your-project-path\n")
+        sys.exit(1)
+
 # -----------------------------------------------------------------------------
 # Main Execution
 # -----------------------------------------------------------------------------
@@ -238,10 +258,14 @@ def main():
 
     # 1. 路径解析 (Skill vs Target)
     target_root = Path(args.target).resolve()
+    
+    # [Fix] 执行孢子隔离检查
+    _check_spore_isolation(target_root)
+    
     specs_dir = target_root / "specs"
 
-    print(f"🔧 CDD Scaffold v2.1")
-    print(f"   Skill Source: {SKILL_ROOT}")
+    print(f"🔧 CDD Scaffold {VERSION}")
+    print(f"   Skill Source:   {SKILL_ROOT}")
     print(f"   Target Project: {target_root}")
 
     # 2. 准备输出目录
@@ -259,11 +283,21 @@ def main():
 
     # 3. 构建上下文 (基于 Target)
     print("🧠 Building context from target...")
-    builder = ContextBuilder(target_root)
-    context = builder.build(feature_id, clean_name, args.description)
-    
-    print(f"   Project Version: {context.get('project_version')}")
-    print(f"   Core Version:    {context.get('active_context_version')}")
+    try:
+        builder = ContextBuilder(target_root)
+        context = builder.build(feature_id, clean_name, args.description)
+        print(f"   Project Version: {context.get('project_version')}")
+        print(f"   Core Version:    {context.get('active_context_version')}")
+    except Exception as e:
+        print(f"⚠️  Warning: Failed to build full context: {e}")
+        print("   Proceeding with basic context.")
+        context = {
+            "FEATURE_ID": feature_id, 
+            "FEATURE_NAME": clean_name,
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d"),
+            "author": "Unknown",
+            "git_branch": "unknown"
+        }
 
     # 4. 创建特性目录
     if feature_dir.exists():
@@ -279,20 +313,23 @@ def main():
     engine = TemplateEngine(TEMPLATES_DIR)
     
     for template_file, suffix in TEMPLATE_MAPPING.items():
-        tpl_content = engine.load_template(template_file)
-        rendered_content = engine.render(tpl_content, context)
-        
-        # 特殊处理 feature readme 模板，保持前缀为 "feature"
-        if template_file == "07_feature_readme_template.md":
-            prefix = "feature"
-        else:
-            prefix = template_file.split('_')[0]
-        
-        output_filename = f"{prefix}_{feature_id}{suffix}"
-        output_path = feature_dir / output_filename
-        
-        output_path.write_text(rendered_content, encoding=DEFAULT_ENCODING)
-        print(f"   📄 Generated: {output_path.relative_to(target_root)}")
+        try:
+            tpl_content = engine.load_template(template_file)
+            rendered_content = engine.render(tpl_content, context)
+            
+            # 特殊处理 feature readme 模板，保持前缀为 "feature"
+            if template_file == "07_feature_readme_template.md":
+                prefix = "feature"
+            else:
+                prefix = template_file.split('_')[0]
+            
+            output_filename = f"{prefix}_{feature_id}{suffix}"
+            output_path = feature_dir / output_filename
+            
+            output_path.write_text(rendered_content, encoding=DEFAULT_ENCODING)
+            print(f"   📄 Generated: {output_path.relative_to(target_root)}")
+        except Exception as e:
+            print(f"❌ Failed to generate {template_file}: {e}")
 
     # 6. Git 操作 (在 Target 中执行)
     if not args.no_branch:
