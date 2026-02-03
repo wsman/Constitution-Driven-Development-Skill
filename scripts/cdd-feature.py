@@ -1,47 +1,38 @@
 #!/usr/bin/env python3
 """
-CDD Feature Scaffold (Legislative Generator) v2.0
+CDD Feature Scaffold (Legislative Generator) v2.1
 =================================================
 自动化生成符合 CDD 宪法标准的特性文档结构。
 
-功能升级 (v2.0):
-1. 基于文件的模板系统 (TemplateEngine)
-2. 智能上下文注入 (ContextBuilder)
-3. 动态版本提取
-4. 标准化目录结构生成
+改进内容 (v2.1):
+1. 解耦 SKILL_ROOT (模板源) 与 TARGET_ROOT (生成目标)
+2. 支持跨项目运行：python /path/to/skill/cdd-feature.py "Name" --target /path/to/project
+3. 修正 Git 操作上下文路径
 
 Usage:
-    python scripts/cdd-feature.py <feature_name> [description]
+    python scripts/cdd-feature.py <feature_name> [description] [--target <path>]
 """
 
 import sys
 import os
 import re
-import shutil
 import argparse
 import datetime
 import subprocess
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, Optional
 
 # -----------------------------------------------------------------------------
 # Configuration & Constants
 # -----------------------------------------------------------------------------
 
-VERSION = "v2.0.0"
+VERSION = "v2.1.0"
 DEFAULT_ENCODING = "utf-8"
 
-# 核心路径定义
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-TEMPLATES_DIR = PROJECT_ROOT / "templates" / "standards"
-SPECS_DIR = PROJECT_ROOT / "specs"
-
-# 关键版本源文件 (用于提取版本号)
-VERSION_SOURCE_FILES = {
-    "project": PROJECT_ROOT / "README.md",
-    "active_context": PROJECT_ROOT / "templates" / "core" / "active_context.md",
-    "system_patterns": PROJECT_ROOT / "templates" / "axioms" / "system_patterns.md",
-}
+# 1. 确定 SKILL_ROOT (工具自身的安装位置)
+# 用于定位模板文件，不随运行位置改变
+SKILL_ROOT = Path(__file__).resolve().parent.parent
+TEMPLATES_DIR = SKILL_ROOT / "templates" / "standards"
 
 # 默认模板映射 (文件名 -> 目标后缀)
 TEMPLATE_MAPPING = {
@@ -49,7 +40,6 @@ TEMPLATE_MAPPING = {
     "DS-051_implementation_plan.md": "_plan.md",
     "DS-052_atomic_tasks.md": "_tasks.md",
     "feature_readme_template.md": "_README.md",
-    # 未来可扩展 DS-053, DS-054 等
 }
 
 # -----------------------------------------------------------------------------
@@ -57,21 +47,20 @@ TEMPLATE_MAPPING = {
 # -----------------------------------------------------------------------------
 
 class TemplateEngine:
-    """负责加载和渲染 Markdown 模板"""
+    """负责从 SKILL_ROOT 加载和渲染 Markdown 模板"""
     
     def __init__(self, templates_dir: Path):
         self.templates_dir = templates_dir
         if not self.templates_dir.exists():
-            print(f"⚠️ Warning: Templates directory not found: {self.templates_dir}")
+            print(f"⚠️ Warning: Templates directory not found at source: {self.templates_dir}")
 
     def load_template(self, template_name: str) -> str:
-        """从文件加载模板，如果文件不存在则返回内置的简易 Fallback"""
+        """从工具自身目录加载模板"""
         template_path = self.templates_dir / template_name
         
         if template_path.exists():
             return template_path.read_text(encoding=DEFAULT_ENCODING)
         
-        # Fallback: 如果找不到模板文件，返回一个最小化的默认内容
         print(f"⚠️ Template missing: {template_name}, using fallback.")
         return f"# Feature: {{{{ feature_name }}}}\n\n> Auto-generated fallback for {template_name}\n"
 
@@ -84,32 +73,54 @@ class TemplateEngine:
         return result
 
 class ContextBuilder:
-    """负责构建项目上下文元数据"""
+    """负责从目标项目中构建上下文元数据"""
     
-    def __init__(self, project_root: Path):
-        self.project_root = project_root
+    def __init__(self, target_root: Path):
+        self.target_root = target_root
+
+    def _resolve_path(self, deployed_path: str, source_path: str) -> Path:
+        """
+        智能路径解析：优先检查 memory_bank (标准部署结构)，回退到 templates (开发模式)
+        """
+        p1 = self.target_root / deployed_path
+        if p1.exists():
+            return p1
+        return self.target_root / source_path
 
     def _extract_version(self, file_path: Path) -> str:
-        """尝试从文件中提取 '版本: vX.Y.Z' 或类似模式"""
+        """从目标文件中提取版本号"""
         if not file_path.exists():
             return "unknown"
         
-        content = file_path.read_text(encoding=DEFAULT_ENCODING)
-        # 匹配模式: "**版本**: v1.5.0" 或 "Version: 1.5.0" (允许v前缀)
-        match = re.search(r"(?:版本|Version)[^:：]*[:：]\s*(?:v)?(\d+\.\d+\.\d+)", content, re.IGNORECASE)
-        if match:
-            return match.group(1)
+        try:
+            content = file_path.read_text(encoding=DEFAULT_ENCODING)
+            # 匹配模式: "**版本**: v1.5.0" 或 "Version: 1.5.0"
+            match = re.search(r"(?:版本|Version)[^:：]*[:：]\s*(?:v)?(\d+\.\d+\.\d+)", content, re.IGNORECASE)
+            if match:
+                return match.group(1)
+        except Exception:
+            pass
         return "unknown"
 
     def _get_git_info(self) -> Dict[str, str]:
-        """获取当前 Git 用户和分支信息"""
+        """获取目标项目的 Git 信息 (指定 cwd)"""
         try:
-            author = subprocess.check_output(["git", "config", "user.name"], text=True).strip()
+            author = subprocess.check_output(
+                ["git", "config", "user.name"], 
+                cwd=self.target_root, 
+                text=True, 
+                stderr=subprocess.DEVNULL
+            ).strip()
         except:
             author = "Unknown Developer"
             
         try:
-            branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
+            branch = subprocess.check_output(
+                ["git", "branch", "--show-current"], 
+                cwd=self.target_root, 
+                text=True, 
+                stderr=subprocess.DEVNULL
+            ).strip()
         except:
             branch = "unknown-branch"
             
@@ -118,31 +129,40 @@ class ContextBuilder:
     def build(self, feature_id: str, feature_name: str, description: str) -> Dict[str, Any]:
         """构建完整的上下文合并字典"""
         
-        # 1. 基础信息
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d")
         
-        # 2. 版本提取
+        # 1. 定位目标项目的关键文件
+        file_map = {
+            "project": self.target_root / "README.md",
+            "active_context": self._resolve_path(
+                "memory_bank/core/active_context.md", 
+                "templates/core/active_context.md"
+            ),
+            "system_patterns": self._resolve_path(
+                "memory_bank/axioms/system_patterns.md", 
+                "templates/axioms/system_patterns.md"
+            )
+        }
+
+        # 2. 提取信息
         versions = {
-            "project_version": self._extract_version(VERSION_SOURCE_FILES["project"]),
-            "active_context_version": self._extract_version(VERSION_SOURCE_FILES["active_context"]),
-            "system_patterns_version": self._extract_version(VERSION_SOURCE_FILES["system_patterns"]),
+            "project_version": self._extract_version(file_map["project"]),
+            "active_context_version": self._extract_version(file_map["active_context"]),
+            "system_patterns_version": self._extract_version(file_map["system_patterns"]),
         }
         
-        # 3. Git 信息
         git_info = self._get_git_info()
         
-        # 4. 组合上下文 (Snake Case Keys)
+        # 3. 组合
         context = {
-            "FEATURE_ID": feature_id,          # 兼容旧模板
-            "FEATURE_NAME": feature_name,      # 兼容旧模板
-            "TIMESTAMP": timestamp,            # 兼容旧模板
-            
+            "FEATURE_ID": feature_id,
+            "FEATURE_NAME": feature_name,
+            "TIMESTAMP": timestamp,
             "feature_id": feature_id,
             "feature_name": feature_name,
             "feature_description": description,
             "timestamp": timestamp,
-            "project_name": self.project_root.name,
-            
+            "project_name": self.target_root.name,
             **versions,
             **git_info
         }
@@ -155,13 +175,12 @@ class ContextBuilder:
 
 def sanitize_name(name: str) -> str:
     """Convert 'Add User Login' to 'add-user-login'"""
-    # 替换非字母数字字符为横杠
     s = re.sub(r'[^a-zA-Z0-9\u4e00-\u9fa5]+', '-', name)
     s = s.strip('-').lower()
     return s
 
 def get_next_feature_id(specs_dir: Path) -> str:
-    """Scan specs dir to find next ID (e.g., '003')"""
+    """在目标 specs 目录中扫描下一个 ID"""
     if not specs_dir.exists():
         return "001"
     
@@ -179,26 +198,25 @@ def get_next_feature_id(specs_dir: Path) -> str:
     
     return f"{max_id + 1:03d}"
 
-def create_git_branch(branch_name: str):
-    """Create and switch to a new git branch"""
+def create_git_branch(branch_name: str, cwd: Path):
+    """在目标目录创建 Git 分支"""
     try:
         # Check if branch exists
         subprocess.run(
             ["git", "rev-parse", "--verify", branch_name], 
             stdout=subprocess.DEVNULL, 
             stderr=subprocess.DEVNULL,
+            cwd=cwd,
             check=True
         )
         print(f"ℹ️  Branch '{branch_name}' already exists. Switching to it...")
-        subprocess.run(["git", "checkout", branch_name], check=True)
+        subprocess.run(["git", "checkout", branch_name], cwd=cwd, check=True)
     except subprocess.CalledProcessError:
-        # Branch does not exist, create it
         print(f"🌿 Creating new branch: {branch_name}")
         try:
-            subprocess.run(["git", "checkout", "-b", branch_name], check=True)
+            subprocess.run(["git", "checkout", "-b", branch_name], cwd=cwd, check=True)
         except subprocess.CalledProcessError as e:
             print(f"❌ Failed to create branch: {e}")
-            # Non-fatal, continue with file generation
 
 # -----------------------------------------------------------------------------
 # Main Execution
@@ -208,33 +226,40 @@ def main():
     parser = argparse.ArgumentParser(description=f"CDD Feature Scaffold {VERSION}")
     parser.add_argument("name", help="Feature name (e.g. 'user-login')")
     parser.add_argument("description", nargs="?", default="No description provided", help="Feature description")
+    parser.add_argument("--target", default=".", help="Target project directory (default: current dir)")
     parser.add_argument("--no-branch", action="store_true", help="Skip git branch creation")
     args = parser.parse_args()
 
-    # 1. Prepare Paths & IDs
-    if not SPECS_DIR.exists():
-        SPECS_DIR.mkdir(parents=True)
-        print(f"📁 Created specs directory: {SPECS_DIR}")
+    # 1. 路径解析 (Skill vs Target)
+    target_root = Path(args.target).resolve()
+    specs_dir = target_root / "specs"
+
+    print(f"🔧 CDD Scaffold v2.1")
+    print(f"   Skill Source: {SKILL_ROOT}")
+    print(f"   Target Project: {target_root}")
+
+    # 2. 准备输出目录
+    if not specs_dir.exists():
+        specs_dir.mkdir(parents=True, exist_ok=True)
+        print(f"📁 Created specs directory: {specs_dir}")
 
     clean_name = sanitize_name(args.name)
-    feature_id = get_next_feature_id(SPECS_DIR)
+    feature_id = get_next_feature_id(specs_dir)
     full_feature_name = f"{feature_id}-{clean_name}"
-    feature_dir = SPECS_DIR / full_feature_name
+    feature_dir = specs_dir / full_feature_name
     
     print(f"🚀 Initializing Feature: {full_feature_name}")
     print(f"   ID: {feature_id}")
-    print(f"   Name: {clean_name}")
 
-    # 2. Context Building
-    print("🧠 Building context...")
-    builder = ContextBuilder(PROJECT_ROOT)
+    # 3. 构建上下文 (基于 Target)
+    print("🧠 Building context from target...")
+    builder = ContextBuilder(target_root)
     context = builder.build(feature_id, clean_name, args.description)
     
-    # Debug: Print loaded versions
     print(f"   Project Version: {context.get('project_version')}")
     print(f"   Core Version:    {context.get('active_context_version')}")
 
-    # 3. Create Directory
+    # 4. 创建特性目录
     if feature_dir.exists():
         print(f"⚠️  Directory already exists: {feature_dir}")
         response = input("   Overwrite? [y/N] ").lower()
@@ -243,34 +268,26 @@ def main():
             sys.exit(1)
     else:
         feature_dir.mkdir()
-        print(f"📁 Created feature directory: {feature_dir}")
 
-    # 4. Generate Files from Templates
+    # 5. 生成文件 (Source Templates -> Target Specs)
     engine = TemplateEngine(TEMPLATES_DIR)
     
     for template_file, suffix in TEMPLATE_MAPPING.items():
-        # Load
         tpl_content = engine.load_template(template_file)
-        
-        # Render
         rendered_content = engine.render(tpl_content, context)
         
-        # Determine Output Filename
-        # E.g., DS-050_003_spec.md
-        prefix = template_file.split('_')[0] # "DS-050"
+        prefix = template_file.split('_')[0]
         output_filename = f"{prefix}_{feature_id}{suffix}"
         output_path = feature_dir / output_filename
         
-        # Write
         output_path.write_text(rendered_content, encoding=DEFAULT_ENCODING)
-        print(f"   📄 Generated: {output_filename}")
+        print(f"   📄 Generated: {output_path.relative_to(target_root)}")
 
-    # 5. Git Branching
+    # 6. Git 操作 (在 Target 中执行)
     if not args.no_branch:
-        create_git_branch(full_feature_name)
+        create_git_branch(full_feature_name, cwd=target_root)
 
-    print(f"\n✅ Feature scaffold ready at: specs/{full_feature_name}/")
-    print("   Next Step: Fill in the specifications using CDD process.")
+    print(f"\n✅ Feature scaffold ready at: {feature_dir}")
 
 if __name__ == "__main__":
     main()
