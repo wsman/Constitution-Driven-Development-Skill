@@ -138,6 +138,35 @@ cp cdd/templates/standards/*.md memory_bank/standards/
 cp reference/project_readme_template.md README.md
 ```
 
+## 🛡️ Standard Usage Protocol (标准使用协议)
+
+为了确保 CDD SKILL 的稳定性和目标项目的安全性，所有操作必须遵循以下 **"自检-执行"** 流程：
+
+### Phase 1: Environment Self-Check (环境自检)
+在调用任何 CDD 工具之前，**必须**先检查 CDD SKILL 本身的宪法合规性。此步骤确保工具链未被篡改且处于稳定状态。
+
+```bash
+# ⚠️ 仅作用于 CDD SKILL 自身目录
+# 运行 Gate 1-3 完整审计
+python scripts/cdd_audit.py
+
+```
+
+> **注意**: `cdd_audit.py` 是唯一一个**严禁**指定外部目标文件夹的脚本。它被硬编码为仅审计本技能库 (`PROJECT_ROOT`)。
+
+### Phase 2: Targeted Execution (指定目标执行)
+
+确认环境无误后，使用交付工具对您的业务项目进行操作。**所有交付脚本都必须明确指定目标路径。**
+
+| 脚本名称 | 用途 | 必需参数 | 示例 |
+| --- | --- | --- | --- |
+| `deploy_cdd.py` | 部署 CDD 结构 | `--target <path>` | `python scripts/deploy_cdd.py "MyProj" --target ../my-app` |
+| `cdd-feature.py` | 生成特性文档 | `--target <path>` | `python scripts/cdd-feature.py "Login" --target ../my-app` |
+| `measure_entropy.py` | 测量系统熵值 | `--project <path>` | `python scripts/measure_entropy.py --project ../my-app` |
+| `verify_versions.py` | 校验版本一致性 | `--project <path>` | `python scripts/verify_versions.py --project ../my-app` |
+
+> 🚫 **警告**: 严禁在不带参数的情况下运行上述脚本，否则它们将默认修改 CDD SKILL 自身的源码结构。
+
 ## Structure
 
 ```

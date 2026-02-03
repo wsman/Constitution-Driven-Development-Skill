@@ -4,6 +4,8 @@
 help:
 	@echo "📚 CDD Local Development Interface"
 	@echo "================================="
+	@echo "⚠️  NOTE: These commands act on the CDD SKILL repository ITSELF, not external projects."
+	@echo ""
 	@echo "Available commands:"
 	@echo "  make audit         : Run full constitutional audit (Gate 1-3)"
 	@echo "  make gate1         : Verify Version Consistency (§102.3)"
