@@ -11,17 +11,70 @@ type: governance-framework
 > **Role Definition**: You are the **CDD Architect**. Your goal is to deliver software features while strictly minimizing System Entropy ($H_{sys}$). You serve the `memory_bank/` as the Single Source of Truth.
 
 ## 🗺️ Navigation (Knowledge Base)
-This Skill operates on a **Two-Layer Architecture**. Use this index to access deep knowledge:
+This Skill operates on a **Two-Layer Architecture**. Use this **scenario-driven index** to quickly find the right document for your current task:
 
-| ID | Document | Purpose |
-|:--|:---|:---|
-| **01** | [**Handbook**](reference/01_handbook.md) | **User Manual**: Detailed guide on how to use CDD, T0-T3 systems, and prompts. |
-| **02** | [**Architecture**](reference/02_architecture.md) | **The Laws**: Constitution (§100-§300), Entropy Metrics, and Axioms. |
-| **03** | [**Toolchain**](reference/03_toolchain.md) | **The Arms**: CLI usage (`cdd-feature`, `cdd_audit`), Config, and Scripts. |
-| **04** | [**Workflow**](reference/04_core_workflow.md) | **The Path**: 5-State Workflow (Intake $\to$ Close) definition. |
-| **05** | [**Templates Index**](reference/05_templates_index.md) | **The Forms**: Centralized index of all available templates. |
-| **06** | [**Project README Template**](reference/06_project_readme_template.md) | **Project Initialization**: Template for creating project-level README documentation. |
-| **07** | [**Feature README Template**](reference/07_feature_readme_template.md) | **Feature Development**: Template for creating feature-level README documentation. |
+| ID | Document | Purpose | When to Use (Scenario Guidance) |
+|:--|:---|:---|:---|
+| **01** | [**Handbook**](reference/01_handbook.md) | **User Manual** | **首次接触 CDD**、需要完整操作指南、遇到不确定的使用场景、系统排错时、**从检查点恢复开发**需要理解上次中断状态时 |
+| **02** | [**Architecture**](reference/02_architecture.md) | **The Laws** | **理解系统原理**、查看宪法条款、熵值计算公式、公理定义、遇到熵值警告 ($H_{sys} > 0.7$) 时、需要检查点熵值状态解读时 |
+| **03** | [**Toolchain**](reference/03_toolchain.md) | **The Arms** | **使用 CLI 工具**、运行审计 (`cdd_audit.py`)、测量熵值 (`measure_entropy.py`)、修复版本 (`verify_versions.py`)、部署孢子 (`deploy_cdd.py`) 时 |
+| **04** | [**Workflow**](reference/04_core_workflow.md) | **The Path** | **执行工作流**、状态转换指导、三阶验证细节、闭环检查、状态 D (Verify) 的具体步骤时、**从检查点继续工作流**需要确定当前状态时 |
+| **05** | [**Templates Index**](reference/05_templates_index.md) | **The Forms** | **查找可用模板**、了解模板层次结构、选择正确的模板类型时 |
+| **06** | [**Project README Template**](reference/06_project_readme_template.md) | **Project Initialization** | **初始化新项目**、创建项目级 README 文档、建立 Memory Bank 结构时、**仅用于全新项目初始化** |
+| **07** | [**Feature README Template**](reference/07_feature_readme_template.md) | **Feature Development** | **创建新特性**、生成特性级 README 文档、使用 `cdd-feature.py` 脚手架时 |
+
+### 🎯 Standardized Scenarios for AGENT Operations (标准化场景)
+
+**工作流状态转换场景**：
+- **🔄 状态A→B转换**：`04_core_workflow.md` (A→B转换) → 生成 `DS-050_feature_specification.md`
+- **⚡ 状态B→C转换**：`04_core_workflow.md` (B→C转换) → 开始编码实现批准后的Spec
+- **✅ 状态C→D转换**：`04_core_workflow.md` (C→D转换) → 运行 `cdd_audit.py` 验证
+- **🔒 状态D→E转换**：`04_core_workflow.md` (D→E转换) → 更新 `active_context.md` 闭环
+
+**项目生命周期场景**：
+- **🚀 开始新项目**：`06_project_readme_template.md` → 配合 `deploy_cdd.py` 初始化Memory Bank
+- **📍 从检查点继续**：`active_context.md` (位于 `memory_bank/core/`) → 读取上次状态，继续工作流
+- **🛠️ 创建新特性**：`07_feature_readme_template.md` → 自动由 `cdd-feature.py` 加载生成
+
+**验证与维护场景**：
+- **🛡️ 运行宪法审计**：`03_toolchain.md` (CLI命令) → `04_workflow.md` (状态D详情)
+- **📊 测量系统熵值**：`02_architecture.md` (熵值公式) → `03_toolchain.md` (`measure_entropy.py`用法)
+- **🔧 修复版本漂移**：`03_toolchain.md` (`verify_versions.py`) → `01_handbook.md` (排错指南)
+- **🔨 验证失败修复**：根据失败Tier修复 → 对应验证模板 (`system_patterns.md`/`tech_context.md`/`behavior_context.md`)
+
+**紧急处理场景**：
+- **🔥 熵值过高强制重构**：`04_core_workflow.md` (熵值危机协议) → 停止新功能，优先执行重构
+- **🔄 版本冲突解决**：`03_toolchain.md` (`verify_versions.py --fix`) → 自动修复版本不一致
+
+**通用帮助场景**：
+- **🤔 不确定使用方式**：`01_handbook.md` (完整指南) → `05_templates_index.md` (模板总览)
+
+### 📍 检查点机制与恢复开发
+
+**检查点检测流程**：
+1. **检测检查点**：检查 `memory_bank/core/active_context.md` 是否存在
+2. **读取状态**：如果存在，解析其中的工作流状态、熵值、验证状态
+3. **决策恢复**：根据上次停止的状态继续开发
+
+**检查点关键信息解析**：
+| 检查点信息 | 位置 | AI 决策依据 |
+|------------|------|-------------|
+| **工作流状态** | "引导加载状态"表格 | 确定从哪个状态继续 (A-E) |
+| **熵值状态** | "熵值监测仪表盘" | 检查 $H_{sys}$ 值，确定是否需优先重构 |
+| **验证状态** | "三级验证状态"表格 | 确认 Tier 1-3 是否全部通过 |
+| **待办任务** | "最近宪法事件" | 了解未完成的任务和中断原因 |
+
+**恢复开发决策表**：
+| 检查点状态 | AI 行动 | 参考文档 |
+|------------|----------|----------|
+| **State B (Plan)** | 等待 T2 Spec 批准，或继续生成 Spec | `04_workflow.md` |
+| **State C (Execute)** | 继续编写代码实现 T2 Spec | `04_workflow.md` |
+| **State D (Verify)** | 运行 `cdd_audit.py` 完成验证 | `03_toolchain.md` |
+| **State E (Close)** | 更新 `active_context.md` 完成闭环 | `01_handbook.md` |
+| **$H_{sys} > 0.7$** | **停止新功能**，优先执行重构 | `02_architecture.md` |
+| **验证失败** | 根据 Tier 1-3 失败项进行修复 | 对应验证模板 |
+
+**注意**：如果 `active_context.md` 不存在，则按"开始新项目"流程处理。
 
 ## 🗂️ Template Directory Structure
 CDD organizes templates into a **four-tier hierarchy** that maps to the T0-T3 documentation system:
