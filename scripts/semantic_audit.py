@@ -12,6 +12,7 @@ from pathlib import Path
 # Ensure we can import utils
 sys.path.append(str(Path(__file__).parent.parent))
 from scripts.utils.llm_bridge import LLMBridge
+from scripts.utils.tool_bridge import ToolBridge
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -90,67 +91,41 @@ Output strictly valid JSON:
 }}
 """
 
-def load_three_tier_laws() -> dict:
-    """Load the three-tier legal system from the constitution files"""
+def load_three_tier_laws(io_bridge: ToolBridge) -> dict:
+    """Load the three-tier legal system from the constitution files using ToolBridge"""
     laws = {
         "basic_law": "",
         "technical_law": "", 
         "procedural_law": ""
     }
     
-    # 1. Basic Law (Constitutional Core)
-    basic_law_paths = [
-        PROJECT_ROOT / "memory_bank/core/basic_law_index.md",
-        PROJECT_ROOT / "templates/01_core/basic_law_index.md"
-    ]
+    # 定义加载优先级 (解决单一真理源歧义问题)
+    # 优先 memory_bank (Live Truth), 备选 templates (Static Truth)
     
-    for path in basic_law_paths:
-        if path.exists():
-            try:
-                content = path.read_text(encoding="utf-8")
-                laws["basic_law"] = f"\n--- BASIC LAW: {path.name} ---\n{content}\n"
-                break
-            except Exception:
-                continue
+    def try_load(relative_paths):
+        for p in relative_paths:
+            if io_bridge.file_exists(p):
+                content = io_bridge.read_file(p)
+                if content:
+                    return f"\n--- LAW FILE: {p} ---\n{content}\n"
+        return ""
     
-    # 2. Technical Law (Technical Standards)
-    tech_law_paths = [
-        PROJECT_ROOT / "memory_bank/core/technical_law_index.md",
-        PROJECT_ROOT / "templates/01_core/technical_law_index.md"
-    ]
+    laws["basic_law"] = try_load([
+        "memory_bank/core/basic_law_index.md",
+        "templates/01_core/basic_law_index.md"
+    ])
     
-    for path in tech_law_paths:
-        if path.exists():
-            try:
-                content = path.read_text(encoding="utf-8")
-                laws["technical_law"] = f"\n--- TECHNICAL LAW: {path.name} ---\n{content}\n"
-                break
-            except Exception:
-                continue
+    laws["technical_law"] = try_load([
+        "memory_bank/core/technical_law_index.md",
+        "templates/01_core/technical_law_index.md"
+    ])
     
-    # 3. Procedural Law (Workflow Protocols)
-    proc_law_paths = [
-        PROJECT_ROOT / "memory_bank/core/procedural_law_index.md",
-        PROJECT_ROOT / "templates/01_core/procedural_law_index.md"
-    ]
-    
-    for path in proc_law_paths:
-        if path.exists():
-            try:
-                content = path.read_text(encoding="utf-8")
-                laws["procedural_law"] = f"\n--- PROCEDURAL LAW: {path.name} ---\n{content}\n"
-                break
-            except Exception:
-                continue
+    laws["procedural_law"] = try_load([
+        "memory_bank/core/procedural_law_index.md",
+        "templates/01_core/procedural_law_index.md"
+    ])
     
     return laws
-
-def load_text(path: Path) -> str:
-    if not path.exists(): return ""
-    try:
-        return f"\n--- DOCUMENT: {path.name} ---\n{path.read_text(encoding='utf-8')}\n"
-    except Exception:
-        return "" # Skip binary files
 
 def main():
     parser = argparse.ArgumentParser()
@@ -158,11 +133,13 @@ def main():
     parser.add_argument("--spec", help="Specific spec file to validate against")
     args = parser.parse_args()
     
-    bridge = LLMBridge(PROJECT_ROOT)
+    # 初始化双桥 (Two Bridges)
+    llm_bridge = LLMBridge(PROJECT_ROOT)
+    io_bridge = ToolBridge(PROJECT_ROOT)  # 新增 IO 桥接器
     
-    # 1. Load the Three-Tier Legal System
+    # 1. Load the Three-Tier Legal System (Using Bridge)
     print("⚖️  Loading Three-Tier Legal System...")
-    laws = load_three_tier_laws()
+    laws = load_three_tier_laws(io_bridge)
     
     if not laws["basic_law"]:
         print("⛔ FATAL: Basic Law (Constitution) not found. Cannot proceed with judicial review.")
@@ -175,57 +152,72 @@ def main():
     # 2. Load the "Contract" (Spec)
     spec_text = ""
     if args.spec:
-        spec_text = load_text(Path(args.spec))
+        spec_text = io_bridge.read_file(args.spec)
+        if spec_text:
+            spec_text = f"\n--- SPECIFICATION: {args.spec} ---\n{spec_text}\n"
     else:
         # Smart Context: Find the most recently active spec
-        specs_dir = PROJECT_ROOT / "templates/04_standards" # Default to standards for demo
+        specs_dir = "templates/04_standards"  # Default to standards for demo
         # Check actual specs dir if exists
-        real_specs = PROJECT_ROOT / "specs"
-        if real_specs.exists(): specs_dir = real_specs
+        real_specs = "specs"
+        if io_bridge.file_exists(real_specs):
+            specs_dir = real_specs
         
-        candidates = sorted(specs_dir.glob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True)
+        candidates = io_bridge.list_files(specs_dir, extension=".md")
         if candidates:
-            # Skip templates/indexes usually
-            target_spec = next((f for f in candidates if "template" not in f.name), candidates[0])
-            print(f"📜 Auto-selected Contract: {target_spec.name}")
-            spec_text = load_text(target_spec)
+            # Filter out templates and select the most relevant
+            filtered = [f for f in candidates if "template" not in f.lower()]
+            if filtered:
+                target_spec = filtered[0]  # 简化: 选择第一个非模板文件
+                print(f"📜 Auto-selected Contract: {target_spec}")
+                content = io_bridge.read_file(target_spec)
+                if content:
+                    spec_text = f"\n--- SPECIFICATION: {target_spec} ---\n{content}\n"
 
     # 3. Load the "Evidence" (Code)
     code_text = ""
-    target_path = PROJECT_ROOT / args.target
+    target_path = args.target
     
     # Check if target exists
-    if not target_path.exists():
+    if not io_bridge.file_exists(target_path) and not io_bridge.file_exists(target_path + "/"):  # 检查目录
         # Check for alternative source directories
-        alt_paths = [PROJECT_ROOT / "scripts", PROJECT_ROOT]
+        alt_paths = ["scripts", "."]
         for alt_path in alt_paths:
-            if alt_path.exists():
+            if io_bridge.file_exists(alt_path) or io_bridge.file_exists(alt_path + "/"):
                 target_path = alt_path
                 print(f"⚠️  Target '{args.target}' not found, using alternative: {alt_path}")
                 break
     
-    if target_path.exists():
-        # Limit evidence size for context window efficiency
-        extensions = {".py", ".ts", ".js", ".go", ".java"}
-        # If it's a file, just load it
-        if target_path.is_file():
-            code_text = load_text(target_path)
-        else:
-            # It's a directory, sample files
-            files = []
-            for ext in extensions:
-                files.extend(target_path.rglob(f"*{ext}"))
-            # Filter out test files
-            files = [f for f in files[:10] if "test" not in f.name and "__pycache__" not in str(f)]
-            for f in files:
-                code_text += load_text(f)
+    # 收集证据文件
+    evidence_files = []
+    
+    # 如果是文件
+    if io_bridge.file_exists(target_path):
+        evidence_files = [target_path]
+    else:
+        # 如果是目录，采样文件
+        extensions = [".py", ".ts", ".js", ".go", ".java"]
+        for ext in extensions:
+            files = io_bridge.list_files(target_path, recursive=True, extension=ext)
+            evidence_files.extend(files)
+        
+        # 过滤测试文件，限制数量
+        evidence_files = [
+            f for f in evidence_files[:20]  # 限制数量
+            if "test" not in f.lower() and "__pycache__" not in f
+        ]
+    
+    for file_path in evidence_files:
+        content = io_bridge.read_file(file_path)
+        if content:
+            code_text += f"\n--- CODE FILE: {file_path} ---\n{content}\n"
     
     if not code_text:
         print("⚠️  No evidence (code) found. Case dismissed.")
         sys.exit(0)
 
     # 4. Court Session
-    print(f"\n⚖️  Supreme Court in session. Docket: {target_path.relative_to(PROJECT_ROOT)}")
+    print(f"\n⚖️  Supreme Court in session. Docket: {target_path}")
     print(f"   - Total Law Length: {len(laws['basic_law']) + len(laws['technical_law']) + len(laws['procedural_law'])} chars")
     print(f"   - Contract Length: {len(spec_text)} chars")
     print(f"   - Evidence Length: {len(code_text)} chars")
@@ -239,7 +231,7 @@ def main():
         code=code_text
     )
     
-    result = bridge.call_judge(prompt, "Please render your verdict based on the three-tier legal system.")
+    result = llm_bridge.call_judge(prompt, "Please render your verdict based on the three-tier legal system.")
 
     # 5. Pronounce Judgment
     verdict = result.get("verdict")

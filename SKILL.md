@@ -123,6 +123,7 @@ templates/
 | `python scripts/cdd_audit.py` | **Verify**: Runs Gate 1-3 constitutional audit. |
 | `python scripts/measure_entropy.py` | **Measure**: Calculates system entropy ($H_{sys}$) metrics. **v1.4.1** provides self-audit warnings. |
 | `python scripts/verify_versions.py` | **Consistency**: Checks/fixes version alignment across all CDD files. **v1.7.1** has intelligent isolation. |
+| `python scripts/utils/tool_bridge.py` | **Bridge Test**: Runs ToolBridge self-test to verify §438 compliance and spore protocol safety. **v1.0.0** implements DS-039 standard. |
 
 ### Make Commands (Local Development)
 | Command | Action |
@@ -137,6 +138,9 @@ templates/
 ### Utility Modules (`scripts/utils/`)
 - `cache_manager.py`: Manages entropy calculation caching
 - `command_utils.py`: Common CLI execution utilities
+- `tool_bridge.py`: **NEW** - Implements DS-039 standard for §438 tool invocation compliance and spore protocol safety
+- `llm_bridge.py`: Connects to external AI auditors (deepseek-reasoner)
+- `spore_guard.py`: Enforces mathematical isolation: $S_{tool} \cap S_{target} = \varnothing$
 
 ## 📁 Project Root Files
 | File | Purpose |
