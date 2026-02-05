@@ -2,8 +2,9 @@
 """
 CDD 熵值计算脚本 (Compliance-Based Entropy Model)
 
-v1.4.1 - Security Enhancement: Spore Isolation Guard
+v1.5.0 - Automated Entropy Analyzer Integration (Phase 1 MVP)
 Implements §300.1 Spore Protocol with self-check allowance.
+Integrates EntropyAnalyzer for hotspot detection.
 """
 
 import argparse
@@ -11,7 +12,7 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Optional
 
 # 添加 scripts 目录到 path 以便导入 utils
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -19,6 +20,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from scripts.utils.cache_manager import CacheManager
 from scripts.utils.command_utils import run_command
 from scripts.utils.spore_guard import check_spore_isolation, SKILL_ROOT
+from scripts.utils.entropy_analyzer import create_entropy_analyzer
 
 @dataclass
 class EntropyMetrics:
@@ -237,15 +239,88 @@ class EntropyCalculator:
         self.log(f"计算完成: H_sys = {h_sys:.4f} ({status})")
         return metrics
 
+
+def analyze_entropy_hotspots(project_path: str, args) -> int:
+    """
+    运行熵值热点分析（新功能）
+    
+    Args:
+        project_path: 项目路径
+        args: 命令行参数
+        
+    Returns:
+        int: 退出码
+    """
+    print("🔍 CDD 熵值热点分析 (v1.5.0)")
+    print(f"📁 项目路径: {project_path}")
+    
+    try:
+        # 创建熵值分析器
+        analyzer = create_entropy_analyzer(project_path)
+        
+        # 检查是否需要特定格式
+        if args.format == "json":
+            report = analyzer.generate_diagnostic_report(format="json", top_n=args.top_n)
+            print(json.dumps(report, indent=2, ensure_ascii=False))
+        elif args.format == "markdown":
+            report = analyzer.generate_diagnostic_report(format="markdown", top_n=args.top_n)
+            print(report)
+        else:  # both
+            json_report, md_report = analyzer.generate_diagnostic_report(format="both", top_n=args.top_n)
+            
+            if args.output:
+                # 保存报告到文件
+                output_path = Path(args.output)
+                if args.format == "json" or args.format == "both":
+                    json_path = output_path.with_suffix('.json') if output_path.suffix != '.json' else output_path
+                    json_path.write_text(json.dumps(json_report, indent=2, ensure_ascii=False), encoding='utf-8')
+                    print(f"✅ JSON 报告已保存: {json_path}")
+                
+                if args.format == "markdown" or args.format == "both":
+                    md_path = output_path.with_suffix('.md') if output_path.suffix != '.md' else output_path
+                    md_path.write_text(md_report, encoding='utf-8')
+                    print(f"✅ Markdown 报告已保存: {md_path}")
+            else:
+                # 打印到控制台
+                if args.format == "both":
+                    print("\n📊 JSON 报告:")
+                    print(json.dumps(json_report, indent=2, ensure_ascii=False))
+                    print("\n📋 Markdown 报告:")
+                    print(md_report)
+        
+        return 0
+        
+    except Exception as e:
+        print(f"❌ 熵值分析失败: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+
 def main():
-    parser = argparse.ArgumentParser(description="CDD 熵值计算脚本 (v1.4.1 Refactored)")
+    parser = argparse.ArgumentParser(description="CDD 熵值计算脚本 (v1.5.0 with Entropy Analyzer)")
+    
+    # 原有参数
     parser.add_argument("--project", "-p", default=".", help="项目路径")
     parser.add_argument("--verbose", "-v", action="store_true", help="显示详细输出")
-    parser.add_argument("--json", "-j", action="store_true", help="JSON格式输出")
+    parser.add_argument("--json", "-j", action="store_true", help="JSON格式输出（兼容模式）")
     parser.add_argument("--force-recalculate", action="store_true", help="强制重新计算")
     parser.add_argument("--clear-cache", action="store_true", help="清除缓存")
     parser.add_argument("--cache-info", action="store_true", help="显示缓存信息")
     parser.add_argument("--self-audit", action="store_true", help="允许自检模式（测量CDD技能自身的熵值）")
+    
+    # 新增分析参数
+    analysis_group = parser.add_argument_group("熵值热点分析选项")
+    analysis_group.add_argument("--analyze", "-a", action="store_true", 
+                               help="运行熵值热点分析（新增功能）")
+    analysis_group.add_argument("--analyze-struct", action="store_true",
+                               help="仅分析结构熵 ($H_{struct}$)")
+    analysis_group.add_argument("--format", choices=["json", "markdown", "both"], default="both",
+                               help="输出格式（默认: both）")
+    analysis_group.add_argument("--output", "-o", type=str,
+                               help="输出文件路径（可选，默认输出到控制台）")
+    analysis_group.add_argument("--top-n", type=int, default=10,
+                               help="显示前 N 个热点（默认: 10）")
     
     args = parser.parse_args()
     
@@ -260,30 +335,41 @@ def main():
         print("    To suppress this warning, use --self-audit flag.")
         print("    To measure a different project, specify --project <path>\n")
     
+    # 清除缓存
     if args.clear_cache:
         CacheManager(project_path).clear_cache()
         print("✅ 缓存已清除")
         return 0
     
-    calculator = EntropyCalculator(
-        project_path=args.project,
-        verbose=args.verbose,
-        force_recalculate=args.force_recalculate
-    )
-    
+    # 缓存信息
     if args.cache_info:
-        info = calculator.cache.get_cache_info()
+        cache = CacheManager(project_path)
+        info = cache.get_cache_info()
         print(json.dumps(info, indent=2) if args.json else f"📊 缓存信息: {info}")
         return 0
     
-    metrics = calculator.calculate_h_sys()
-    
-    if args.json:
-        print(json.dumps(metrics.to_dict(), indent=2))
+    # 判断运行模式
+    if args.analyze or args.analyze_struct:
+        # 运行熵值热点分析
+        return analyze_entropy_hotspots(str(project_path), args)
     else:
-        print(f"\n📊 CDD 熵值报告 (v1.4.1)\nH_sys: {metrics.h_sys:.4f} [{metrics.status}]")
-    
-    return 0 if metrics.h_sys <= calculator.THRESHOLD_WARNING else 1
+        # 原有的熵值计算模式（向后兼容）
+        calculator = EntropyCalculator(
+            project_path=args.project,
+            verbose=args.verbose,
+            force_recalculate=args.force_recalculate
+        )
+        
+        metrics = calculator.calculate_h_sys()
+        
+        if args.json:
+            print(json.dumps(metrics.to_dict(), indent=2))
+        else:
+            print(f"\n📊 CDD 熵值报告 (v1.5.0)\nH_sys: {metrics.h_sys:.4f} [{metrics.status}]")
+            print("💡 提示: 使用 --analyze 参数运行熵值热点分析")
+        
+        return 0 if metrics.h_sys <= calculator.THRESHOLD_WARNING else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
