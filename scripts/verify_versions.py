@@ -257,6 +257,64 @@ class VersionChecker:
             except Exception as e:
                 self.log(f"修复 templates/cdd_config.yaml 失败: {e}")
         
+        # 修复 active_context.md
+        active_ctx_path = self.project_root / "templates/01_core/active_context.md"
+        if active_ctx_path.exists():
+            try:
+                content = active_ctx_path.read_text(encoding='utf-8')
+                
+                # 修复版本行
+                content = re.sub(
+                    r'^\*\*版本\*\*:\s*v?[0-9]+\.[0-9]+\.[0-9]+',
+                    f'**版本**: v{target_version}',
+                    content,
+                    flags=re.MULTILINE
+                )
+                
+                # 修复引导加载状态中的版本号
+                content = re.sub(
+                    r'引导加载状态 \(Bootloader Status\) \[v[0-9]+\.[0-9]+\.[0-9]+\]',
+                    f'引导加载状态 (Bootloader Status) [v{target_version}]',
+                    content,
+                    flags=re.MULTILINE
+                )
+                
+                # 修复熵值监测仪表盘中的版本号
+                content = re.sub(
+                    r'熵值监测仪表盘 \(Entropy Metrics\) \[v[0-9]+\.[0-9]+\.[0-9]+\]',
+                    f'熵值监测仪表盘 (Entropy Metrics) [v{target_version}]',
+                    content,
+                    flags=re.MULTILINE
+                )
+                
+                active_ctx_path.write_text(content, encoding='utf-8')
+                self.log(f"已修复 templates/01_core/active_context.md -> v{target_version}")
+                fixes_applied += 1
+                
+            except Exception as e:
+                self.log(f"修复 templates/01_core/active_context.md 失败: {e}")
+        
+        # 修复 system_patterns.md
+        system_patterns_path = self.project_root / "templates/02_axioms/system_patterns.md"
+        if system_patterns_path.exists():
+            try:
+                content = system_patterns_path.read_text(encoding='utf-8')
+                
+                # 修复版本行
+                content = re.sub(
+                    r'^\*\*版本\*\*:\s*v?[0-9]+\.[0-9]+\.[0-9]+',
+                    f'**版本**: v{target_version}',
+                    content,
+                    flags=re.MULTILINE
+                )
+                
+                system_patterns_path.write_text(content, encoding='utf-8')
+                self.log(f"已修复 templates/02_axioms/system_patterns.md -> v{target_version}")
+                fixes_applied += 1
+                
+            except Exception as e:
+                self.log(f"修复 templates/02_axioms/system_patterns.md 失败: {e}")
+        
         return fixes_applied > 0
     
     def run(self, fix: bool = False, target_version: Optional[str] = None) -> bool:
@@ -361,7 +419,7 @@ def main():
         print("    For version maintenance of the CDD Skill itself, please:")
         print("    1. Use a controlled release workflow")
         print("    2. Run `cdd_audit.py` for regular self-checks (Gate 1)")
-        print("    3. Or if you know what you're doing, add --skip-guard flag")
+        print("    3. Or if you know what you're doing, use a controlled maintenance workflow")
         print("\n    To check another project, specify --project <path>\n")
         sys.exit(100)
     

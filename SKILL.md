@@ -2,7 +2,7 @@
 name: cdd-governance
 description: Constitution-Driven Development (CDD) v1.6.1 Kernel with Spore Isolation.
 model: minimax/MiniMax-M2.1
-version: v1.6.1
+version: v1.7.0
 type: governance-framework
 ---
 

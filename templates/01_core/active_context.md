@@ -1,13 +1,13 @@
 # Active Context (活动上下文)
 
-**版本**: v1.6.1
+**版本**: v1.7.0
 **最后更新**: 2026/2/2
 **维护者**: {{PROJECT_NAME}}
 **宪法模式**: Bootloader v1.6.1
 
 ---
 
-## 引导加载状态 (Bootloader Status) [v1.6.1]
+## 引导加载状态 (Bootloader Status) [v1.7.0]
 
 | 阶段 | 状态 | 检查项 |
 |------|------|--------|
@@ -40,7 +40,7 @@
 
 ---
 
-## 📉 熵值监测仪表盘 (Entropy Metrics) [v1.6.1]
+## 📉 熵值监测仪表盘 (Entropy Metrics) [v1.7.0]
 
 **核心指标**: $H_{sys}$ (归一化系统熵)
 $$H_{sys} = 0.4 \cdot H_{cog} + 0.3 \cdot H_{struct} + 0.3 \cdot H_{align}$$

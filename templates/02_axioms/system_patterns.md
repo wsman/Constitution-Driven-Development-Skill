@@ -1,7 +1,7 @@
 # System Patterns (系统模式)
 
 **类型**: T1 (System Axioms)
-**版本**: v1.6.1
+**版本**: v1.7.0
 **用途**: 定义系统的架构蓝图与代码结构约束 (Tier 1 验证依据)
 
 ---
@@ -135,4 +135,4 @@ diff -u systemPatterns.md#tree current_structure.txt
 
 **宪法依据**: §114, §181
 **最后更新**: {{TIMESTAMP}}
-**版本**: v1.6.0
+**版本**: v1.7.0
