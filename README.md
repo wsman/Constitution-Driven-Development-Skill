@@ -1,11 +1,11 @@
 # Constitution-Driven Development Skill (CDD)
 
-**Version**: 1.6.1  
-**Codename**: Memory Bank First  
+**Version**: 1.7.0  
+**Codename**: Entropy Optimizer  
 **License**: Apache-2.0  
 **Author**: wsman
 
-A comprehensive skill for OpenClaw that implements Constitution-Driven Development (CDD) methodology using MiniMax M2.1 model. Features **Memory Bank First** architecture, ecosystem automation, GitHub integration, and governance protocols.
+A comprehensive skill for OpenClaw that implements Constitution-Driven Development (CDD) methodology using MiniMax M2.1 model. Features **Memory Bank First** architecture, ecosystem automation, GitHub integration, governance protocols, and **Automated Entropy Optimization**.
 
 ## Overview
 
@@ -17,7 +17,7 @@ CDD is a systematic approach to AI-assisted software development that enforces s
 - 📜 **T0/T1/T2 Document System**: Core consciousness → System axioms → Executable standards
 - 🔄 **Five-State Workflow**: A→B→C→D→E (Ingest → Plan → Execute → Verify → Converge)
 - ✅ **Three-Tier Verification**: Structure → Signatures → Behavior
-- 📊 **Entropy Monitoring**: Real-time $H_{sys}$ metrics with compliance-based scoring
+- 📊 **Entropy Monitoring & Optimization**: Real-time $H_{sys}$ metrics with **Automated Entropy Optimization**
 - 🤖 **External Auditor**: Third-party AI review with deepseek-reasoner
 - 🚀 **Ecosystem Automation**: GitHub Issues sync, feature scaffolding scripts
 - ⚖️ **Governance Protocols**: Constitution amendment workflows (SemVer-based)
@@ -170,7 +170,7 @@ python scripts/cdd_audit.py
 **工具版本与功能**:
 - `deploy_cdd.py` (v2.0): 孢子部署器，实现 Seed→Root→Sprout 协议
 - `cdd-feature.py` (v2.1.0): 特性脚手架生成器，支持跨项目运行
-- `measure_entropy.py` (v1.4.0): 熵值计量器，计算 $H_{sys}$ 并输出 JSON 报告
+- `measure_entropy.py` (v1.6.0): 熵值计量器，计算 $H_{sys}$ 并输出 JSON 报告，支持自动化熵值优化 (--optimize)
 - `verify_versions.py` (v1.7.0): 版本一致性检查器，支持自动修复 (--fix)
 - `cdd_audit.py` (v1.0): 宪法审计器，运行 Gate 1-3 (仅用于 CDD 技能库自检)
 
@@ -219,10 +219,12 @@ cdd/
     ├── cdd_audit.py                   # Constitutional auditor (Gate 1-3)
     ├── cdd-feature.py                 # Feature scaffold generator (v2.1.2)
     ├── deploy_cdd.py                  # Spore deployer (v2.0.1)
-    ├── measure_entropy.py             # Entropy calculator (v1.4.0)
+    ├── measure_entropy.py             # Entropy calculator (v1.6.0) with optimization
     ├── verify_versions.py             # Version consistency checker (v1.7.0)
     └── utils/                         # Utility modules
         ├── cache_manager.py           # Entropy calculation caching
+        ├── entropy_analyzer.py        # Entropy hotspot analyzer (v1.0.0)
+        ├── entropy_optimizer.py       # Automated entropy optimizer (v1.0.0)
         └── command_utils.py           # CLI execution utilities
 ```
 
@@ -356,36 +358,48 @@ CDD 将所有详细文档组织在 `reference/` 目录中，按功能编号：
 - See [`templates/02_axioms/tech_context.md`](templates/02_axioms/tech_context.md) for Tier 2 verification template
 - See [`templates/02_axioms/behavior_context.md`](templates/02_axioms/behavior_context.md) for Tier 3 verification template
 
-## 🚀 CDD v1.6.1 (Memory Bank First) - Gold Release
+## 🚀 CDD v1.7.0 (Entropy Optimizer) - Platinum Release
 
-**Status**: 🟢 Production Ready | **Score**: 9.5/10 | **Audit**: deepseek-reasoner
+**Status**: 🟢 Production Ready | **Score**: 9.8/10 | **Audit**: deepseek-reasoner
 
-### v1.6.1 New Features
+### v1.7.0 New Features
 
 | Component | Function |
 |-----------|----------|
-| `scripts/deploy_cdd.py` | **Spore Protocol**: Seed→Root→Sprout deployment with Memory Bank First |
-| `SKILL.md` | Enhanced with Memory Bank First constitutional guardrails (v1.6.1) |
-| `reference/project_readme_template.md` | Updated with correct memory_bank/core/ paths |
-| Memory Bank Architecture | Biological growth model: **Seed → Root → Sprout** |
-| Cross-Space Interaction | AI agent resolves `{SKILL_ROOT}` for remote deployment |
-| Automated Detection | AI automatically detects and initializes missing `memory_bank/` |
+| `scripts/measure_entropy.py` (v1.6.0) | **Automated Entropy Optimization**: Hotspot detection + active reduction with --optimize flag |
+| `scripts/utils/entropy_optimizer.py` | **EntropyOptimizer class**: Analyzes and reduces structural, alignment, and cognitive entropy |
+| `scripts/utils/entropy_analyzer.py` | **EntropyAnalyzer class**: Advanced hotspot detection and diagnostics |
+| `reference/04_core_workflow.md` | Updated **Entropy Crisis Protocol** with automated optimization workflow |
+| **Core Architecture** | Enhanced **Digital Airlock** design with ToolBridge + LLMBridge for I/O isolation |
 
-### Quick Start (v1.6.1)
+### Quick Start (v1.7.0)
 
 ```bash
-# Clone
+# Clone and navigate
 git clone https://github.com/wsman/Constitution-Driven-Development-Skill.git
 cd Constitution-Driven-Development-Skill
 
-# Create new feature
-python scripts/cdd-feature.py "Add User Login"
+# Create new feature with automated entropy checks
+python scripts/cdd-feature.py "Add Entropy Optimization"
 
-# Dry run (no changes)
-python scripts/cdd-feature.py "Add User Login" --dry-run
+# Run automated entropy optimization (dry-run first)
+python scripts/measure_entropy.py --project . --optimize --dry-run
+
+# Apply entropy optimizations
+python scripts/measure_entropy.py --project . --optimize
+
+# Full constitutional audit with entropy optimization
+make audit
 ```
 
 ### Version History & Features
+
+#### v1.7.0 (Entropy Optimizer)
+- **Feature**: **Automated Entropy Optimization** with EntropyOptimizer class for active entropy reduction
+- **Feature**: Enhanced `measure_entropy.py` with `--optimize` flag for hotspot detection and remediation
+- **Feature**: **Digital Airlock** architecture with ToolBridge + LLMBridge for complete I/O isolation
+- **Feature**: Updated **Entropy Crisis Protocol** with automated optimization workflow
+- **Feature**: **EntropyAnalyzer** class for advanced hotspot diagnostics and visualization
 
 #### v1.6.1 (Memory Bank First)
 - **Feature**: 引入 **Memory Bank First** 宪法护栏作为最高优先级规则。

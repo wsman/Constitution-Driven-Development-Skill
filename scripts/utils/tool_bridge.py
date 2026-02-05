@@ -16,6 +16,7 @@ import shutil
 import tempfile
 import uuid
 import logging
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Optional, List, Union, Dict, Any
 
@@ -108,8 +109,7 @@ class ToolBridge:
 
     def _get_timestamp(self) -> str:
         """获取ISO格式时间戳"""
-        from datetime import datetime
-        return datetime.utcnow().isoformat() + "Z"
+        return datetime.now(UTC).isoformat() + "Z"
 
     def _get_caller(self) -> str:
         """获取调用者信息"""

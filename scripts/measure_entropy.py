@@ -2,9 +2,9 @@
 """
 CDD 熵值计算脚本 (Compliance-Based Entropy Model)
 
-v1.5.0 - Automated Entropy Analyzer Integration (Phase 1 MVP)
+v1.6.0 - Automated Entropy Optimizer Integration (Phase 2)
 Implements §300.1 Spore Protocol with self-check allowance.
-Integrates EntropyAnalyzer for hotspot detection.
+Integrates EntropyAnalyzer for hotspot detection and EntropyOptimizer for active reduction.
 """
 
 import argparse
@@ -21,6 +21,7 @@ from scripts.utils.cache_manager import CacheManager
 from scripts.utils.command_utils import run_command
 from scripts.utils.spore_guard import check_spore_isolation, SKILL_ROOT
 from scripts.utils.entropy_analyzer import create_entropy_analyzer
+from scripts.utils.entropy_optimizer import create_entropy_optimizer
 
 @dataclass
 class EntropyMetrics:
@@ -251,7 +252,7 @@ def analyze_entropy_hotspots(project_path: str, args) -> int:
     Returns:
         int: 退出码
     """
-    print("🔍 CDD 熵值热点分析 (v1.5.0)")
+    print("🔍 CDD 熵值热点分析 (v1.6.0)")
     print(f"📁 项目路径: {project_path}")
     
     try:
@@ -297,8 +298,97 @@ def analyze_entropy_hotspots(project_path: str, args) -> int:
         return 1
 
 
+def optimize_entropy(project_path: str, args) -> int:
+    """
+    运行熵值优化（新增功能）
+    
+    Args:
+        project_path: 项目路径
+        args: 命令行参数
+        
+    Returns:
+        int: 退出码
+    """
+    print("⚡ CDD 自动化熵值优化器 (v1.6.0)")
+    print(f"📁 项目路径: {project_path}")
+    
+    try:
+        # 创建熵值优化器
+        optimizer = create_entropy_optimizer(project_path, interactive=not args.force)
+        optimizer.set_dry_run(args.dry_run)
+        
+        # 运行优化
+        result = optimizer.optimize(format=args.format)
+        
+        # 处理结果输出
+        if args.output:
+            output_path = Path(args.output)
+            
+            if args.format == "json" or args.format == "both":
+                # 获取JSON报告
+                if isinstance(result, tuple):
+                    json_report = result[0]  # (json, markdown) 格式
+                elif isinstance(result, dict):
+                    json_report = result  # 纯JSON格式
+                else:
+                    json_report = {"result": str(result)}  # 其他格式
+                
+                json_path = output_path.with_suffix('.json') if output_path.suffix != '.json' else output_path
+                json_path.write_text(json.dumps(json_report, indent=2, ensure_ascii=False), encoding='utf-8')
+                print(f"✅ JSON 优化报告已保存: {json_path}")
+            
+            if args.format == "markdown" or args.format == "both":
+                # 获取Markdown报告
+                if isinstance(result, tuple) and len(result) == 2:
+                    md_report = result[1]  # (json, markdown) 格式
+                elif isinstance(result, str):
+                    md_report = result  # 纯Markdown格式
+                elif isinstance(result, dict):
+                    # 如果只有JSON格式，转换为Markdown格式的字符串
+                    md_report = json.dumps(result, indent=2, ensure_ascii=False)
+                else:
+                    md_report = str(result)
+                
+                md_path = output_path.with_suffix('.md') if output_path.suffix != '.md' else output_path
+                md_path.write_text(md_report, encoding='utf-8')
+                print(f"✅ Markdown 优化报告已保存: {md_path}")
+        else:
+            # 打印到控制台
+            if args.format == "json":
+                if isinstance(result, dict):
+                    print(json.dumps(result, indent=2, ensure_ascii=False))
+                elif isinstance(result, tuple):
+                    print(json.dumps(result[0], indent=2, ensure_ascii=False))
+                else:
+                    print(result)
+            elif args.format == "markdown":
+                if isinstance(result, str):
+                    print(result)
+                elif isinstance(result, tuple):
+                    print(result[1] if len(result) > 1 else result[0])
+                else:
+                    print(str(result))
+            else:  # both
+                if isinstance(result, tuple) and len(result) == 2:
+                    print("\n📊 JSON 优化报告:")
+                    print(json.dumps(result[0], indent=2, ensure_ascii=False))
+                    print("\n📋 Markdown 优化报告:")
+                    print(result[1])
+                else:
+                    # 如果返回的不是元组，说明格式有问题，直接打印
+                    print(result)
+        
+        return 0
+        
+    except Exception as e:
+        print(f"❌ 熵值优化失败: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+
 def main():
-    parser = argparse.ArgumentParser(description="CDD 熵值计算脚本 (v1.5.0 with Entropy Analyzer)")
+    parser = argparse.ArgumentParser(description="CDD 熵值计算脚本 (v1.6.0 with Entropy Analyzer & Optimizer)")
     
     # 原有参数
     parser.add_argument("--project", "-p", default=".", help="项目路径")
@@ -309,7 +399,7 @@ def main():
     parser.add_argument("--cache-info", action="store_true", help="显示缓存信息")
     parser.add_argument("--self-audit", action="store_true", help="允许自检模式（测量CDD技能自身的熵值）")
     
-    # 新增分析参数
+    # 分析参数组
     analysis_group = parser.add_argument_group("熵值热点分析选项")
     analysis_group.add_argument("--analyze", "-a", action="store_true", 
                                help="运行熵值热点分析（新增功能）")
@@ -321,6 +411,15 @@ def main():
                                help="输出文件路径（可选，默认输出到控制台）")
     analysis_group.add_argument("--top-n", type=int, default=10,
                                help="显示前 N 个热点（默认: 10）")
+    
+    # 优化参数组
+    optimization_group = parser.add_argument_group("自动化熵值优化选项")
+    optimization_group.add_argument("--optimize", action="store_true",
+                                   help="运行自动化熵值优化（新增功能）")
+    optimization_group.add_argument("--dry-run", action="store_true",
+                                   help="干运行模式（仅生成计划不执行）")
+    optimization_group.add_argument("--force", action="store_true",
+                                   help="强制优化（非交互式模式）")
     
     args = parser.parse_args()
     
@@ -349,7 +448,10 @@ def main():
         return 0
     
     # 判断运行模式
-    if args.analyze or args.analyze_struct:
+    if args.optimize:
+        # 运行熵值优化
+        return optimize_entropy(str(project_path), args)
+    elif args.analyze or args.analyze_struct:
         # 运行熵值热点分析
         return analyze_entropy_hotspots(str(project_path), args)
     else:
@@ -365,8 +467,15 @@ def main():
         if args.json:
             print(json.dumps(metrics.to_dict(), indent=2))
         else:
-            print(f"\n📊 CDD 熵值报告 (v1.5.0)\nH_sys: {metrics.h_sys:.4f} [{metrics.status}]")
-            print("💡 提示: 使用 --analyze 参数运行熵值热点分析")
+            print(f"\n📊 CDD 熵值报告 (v1.6.0)")
+            print(f"H_sys: {metrics.h_sys:.4f} [{metrics.status}]")
+            print("c_dir: 目录结构合规率: {:.2%}".format(metrics.c_dir))
+            print("c_sig: 接口签名覆盖率: {:.2%}".format(metrics.c_sig))
+            print("c_test: 核心测试通过率: {:.2%}".format(metrics.c_test))
+            print("💡 提示:")
+            print("  - 使用 --analyze 参数运行熵值热点分析")
+            print("  - 使用 --optimize 参数运行自动化熵值优化")
+            print("  - 使用 --optimize --dry-run 查看优化计划而不执行")
         
         return 0 if metrics.h_sys <= calculator.THRESHOLD_WARNING else 1
 

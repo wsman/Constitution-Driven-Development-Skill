@@ -15,7 +15,7 @@ Phase 1 MVP: 结构熵 ($H_{struct}$) 热点分析
 import json
 import re
 from dataclasses import dataclass, asdict
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union, Any
@@ -508,12 +508,17 @@ class EntropyAnalyzer:
         else:
             summary += " 🟢 系统熵值优秀，继续保持。"
         
-        # 限制热点数量
-        limited_hotspots = all_hotspots[:top_n]
+        # 限制热点数量 - 确保 top_n 是整数
+        try:
+            top_n_int = int(top_n) if top_n is not None else 10
+            limited_hotspots = all_hotspots[:top_n_int]
+        except (ValueError, TypeError):
+            # 如果无法转换为整数，使用默认值
+            limited_hotspots = all_hotspots[:10]
         
-        # 创建报告
+        # 创建报告 - 修复 datetime 弃用警告
         report = DiagnosticReport(
-            timestamp=datetime.utcnow().isoformat() + "Z",
+            timestamp=datetime.now(UTC).isoformat() + "Z",
             global_entropy=global_entropy,
             hotspots=limited_hotspots,
             summary=summary
