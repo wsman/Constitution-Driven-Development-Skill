@@ -322,14 +322,25 @@ class TestMainFunction:
     @patch('scripts.measure_entropy.EntropyCalculator')
     def test_main_success_json(self, mock_calculator, mock_args):
         """测试主函数成功（JSON输出）"""
-        # 模拟参数 - 包含所有新的命令行参数
+        # 模拟参数 - 包含所有命令行参数
         mock_args.return_value = Mock(
             project=".",
             verbose=False,
             json=True,
             clear_cache=False,
             force_recalculate=False,
-            cache_info=False
+            cache_info=False,
+            self_audit=False,
+            # 分析参数
+            analyze=False,
+            analyze_struct=False,
+            format="both",
+            output=None,
+            top_n=10,
+            # 优化参数
+            optimize=False,
+            dry_run=False,
+            force=False
         )
         
         # 模拟计算结果
