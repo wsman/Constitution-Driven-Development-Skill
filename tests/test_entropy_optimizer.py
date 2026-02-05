@@ -534,7 +534,7 @@ class TestEntropyOptimizer:
         # 模拟生成计划
         mock_plan1 = Mock()
         mock_plan2 = Mock()
-        mock_generate.side_effect = [mock_plan1, mock_plan2, None]  # 第三个热点返回None
+        mock_generate.side_effect = [mock_plan1, mock_plan2]  # 只对前两个结构熵热点调用
         
         plans = optimizer.generate_optimization_plans(hotspots)
         
@@ -546,9 +546,9 @@ class TestEntropyOptimizer:
         assert plans == [mock_plan1, mock_plan2]
         assert optimizer.optimization_plans == plans
         
-        # 验证排序：按优化价值降序
-        # 计算的价值：[0.72, 0.18, 0.9] -> 排序后：热点3(0.9), 热点1(0.72), 热点2(0.18)
-        # 但热点3是非结构熵，不会生成计划，所以实际是热点1和热点2
+        # 验证排序：热点按优化价值降序排序后生成计划
+        # mock_calculate返回值: [0.72, 0.3, 0.9]
+        # 但热点3是非结构熵，不会生成计划
     
     @patch('scripts.utils.entropy_analyzer.EntropyAnalyzer')
     def test_execute_action_create_directory_success(self, mock_analyzer_class, optimizer):
@@ -774,28 +774,9 @@ class TestEntropyOptimizer:
         assert mock_execute_plan.call_args_list[2][0][0] == plan3
     
     @patch('scripts.utils.entropy_analyzer.EntropyAnalyzer')
-    @patch.object(EntropyOptimizer, 'analyze_hotspots')
-    def test_verify_optimization_effect(self, mock_analyze_hotspots, mock_analyzer_class, optimizer):
+    def test_verify_optimization_effect(self, mock_analyzer_class, optimizer):
         """测试验证优化效果"""
         from scripts.utils.entropy_analyzer import Hotspot, EntropyType
-        
-        # 模拟优化前的热点
-        original_hotspots = [
-            Hotspot(
-                id="hotspot1",
-                path="src/",
-                entropy_score=0.8,
-                entropy_type=EntropyType.STRUCTURAL,
-                reason="目录缺失"
-            ),
-            Hotspot(
-                id="hotspot2",
-                path="tests/",
-                entropy_score=0.6,
-                entropy_type=EntropyType.STRUCTURAL,
-                reason="文件多余"
-            )
-        ]
         
         # 模拟优化后的热点
         new_hotspots = [
@@ -814,17 +795,19 @@ class TestEntropyOptimizer:
         optimizer.optimization_plans = [mock_plan, Mock()]  # 两个计划，一个执行
         optimizer.failed_operations = [{"plan_id": "plan2", "action": {}, "error": "错误"}]
         
-        # 模拟分析结果
-        mock_analyze_hotspots.return_value = new_hotspots
+        # 模拟 analyzer.analyze_structural_entropy() 而不是 analyze_hotspots()
+        mock_analyzer = Mock()
+        mock_analyzer.analyze_structural_entropy.return_value = new_hotspots
+        optimizer.analyzer = mock_analyzer
         
-        original_entropy = 0.7  # (0.8 + 0.6) / 2
+        original_entropy = 0.7
         report = optimizer.verify_optimization_effect(original_entropy)
         
         assert report.original_entropy == original_entropy
-        # 使用我们添加的 Mock 处理逻辑，新熵值应该是安全的 0.5
-        # 因为优化后的热点是 Mock 对象，会被处理为 0.5
-        assert abs(report.new_entropy - 0.5) < 0.001
-        assert abs(report.entropy_reduction - (original_entropy - 0.5)) < 0.001
+        # 优化后的热点熵值是0.3，所以新熵值应该是0.3
+        # 由于Hotspot是真实对象（不是Mock），不会被Mock处理逻辑影响
+        assert abs(report.new_entropy - 0.3) < 0.001
+        assert abs(report.entropy_reduction - (original_entropy - 0.3)) < 0.001
         assert report.hotspots_analyzed == 2
         assert report.hotspots_optimized == 1
         assert report.plans_generated == 2
