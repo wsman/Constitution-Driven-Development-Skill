@@ -1,4 +1,4 @@
-.PHONY: help audit gate1 gate2 gate3 fix-versions clean clean-cache cache-info
+.PHONY: help audit gate1 gate2 gate3 gate4 fix-versions clean clean-cache cache-info
 
 # 默认目标：显示帮助
 help:
@@ -7,17 +7,18 @@ help:
 	@echo "⚠️  NOTE: These commands act on the CDD SKILL repository ITSELF, not external projects."
 	@echo ""
 	@echo "Available commands:"
-	@echo "  make audit         : Run full constitutional audit (Gate 1-3)"
+	@echo "  make audit         : Run full constitutional audit (Gate 1-4)"
 	@echo "  make gate1         : Verify Version Consistency (§102.3)"
 	@echo "  make gate2         : Verify System Behavior (Tier 3)"
 	@echo "  make gate3         : Measure System Entropy (H_sys)"
+	@echo "  make gate4         : Semantic Audit (LLM-Judge) - Requires API key"
 	@echo "  make fix-versions  : Auto-fix version inconsistencies"
 	@echo "  make clean         : Clean up cache and temp files"
 	@echo "  make clean-cache   : Clean entropy cache only"
 	@echo "  make cache-info    : Show entropy cache information"
 
 # 🛡️ 运行完整宪法审计
-audit: gate1 gate2 gate3
+audit: gate1 gate2 gate3 gate4
 	@echo "\n✅ 🏛️  All Constitutional Gates Passed! System is compliant."
 
 # Gate 1: 版本一致性 (§102.3)
@@ -34,6 +35,11 @@ gate2:
 gate3:
 	@echo "\n📉 [Gate 3] Measuring System Entropy..."
 	python scripts/cdd_audit.py --gate 3
+
+# Gate 4: 语义审计 (LLM-Judge)
+gate4:
+	@echo "\n⚖️  [Gate 4] Performing Semantic Audit (LLM-as-a-Judge)..."
+	python scripts/cdd_audit.py --gate 4
 
 # 🔧 工具：自动修复版本
 fix-versions:

@@ -6,7 +6,7 @@ project:
   version: "0.1.0"
   entropy_threshold: 0.3
 
-# 外部审计配置
+# 外部审计配置 (Gate 4 Semantic Audit)
 external_auditor:
   enabled: true
   provider: "deepseek-reasoner"
@@ -14,12 +14,17 @@ external_auditor:
   api:
     base_url: "https://api.deepseek.com"
     api_key: "${DEEPSEEK_API_KEY}"
+    timeout: 60
   trigger_policy:
     on_state_change: ["State E"]
     on_file_change: ["memory_bank/core/active_context.md"]
   reporting:
     format: "markdown"
     output_dir: "research_report"
+  judicial_parameters:
+    temperature: 0.0      # 绝对理性，零创造性
+    max_tokens: 4096      # 给足推理空间
+    strict_mode: true     # 启用严格违宪审查模式
 
 # Spec-Kit 集成配置 (v1.5.0 Updated)
 spec_kit:

@@ -3,7 +3,7 @@
 CDD Auditor CLI (cdd_audit.py)
 ==============================
 Unified interface for Constitution-Driven Development compliance checking.
-Implements Gate 1-3 verification, auto-fixing, and workspace cleaning.
+Implements Gate 1-4 verification, auto-fixing, and workspace cleaning.
 
 Usage:
     python scripts/cdd_audit.py [OPTIONS]
@@ -32,6 +32,7 @@ EC_SUCCESS = 0
 EC_GATE_1_FAIL = 101  # Version Mismatch
 EC_GATE_2_FAIL = 102  # Tests Failed
 EC_GATE_3_FAIL = 103  # Entropy High
+EC_GATE_4_FAIL = 105  # Semantic Audit Failed
 EC_CLEAN_FAIL = 104
 EC_GENERAL_FAIL = 1
 
@@ -40,6 +41,12 @@ GATES = {
     1: {"name": "Version Consistency", "script": "scripts/verify_versions.py", "code": EC_GATE_1_FAIL},
     2: {"name": "Behavior Verification", "module": "pytest", "code": EC_GATE_2_FAIL},
     3: {"name": "Entropy Monitoring", "script": "scripts/measure_entropy.py", "code": EC_GATE_3_FAIL},
+    4: {
+        "name": "Semantic Audit (LLM-Judge)", 
+        "script": "scripts/semantic_audit.py", 
+        "code": EC_GATE_4_FAIL,
+        "description": "Validates semantic alignment between Spec and Code using LLM."
+    },
 }
 
 # -----------------------------------------------------------------------------
@@ -106,6 +113,7 @@ class CDDAuditor:
         elif gate_id == 2:
             if self.args.verbose:
                 cmd.append("-v")
+        # Gate 4 (semantic_audit.py) can use defaults
         
         # Execute
         result = self._run_command(cmd)
@@ -196,6 +204,8 @@ class CDDAuditor:
                             remediation.append("Analyze `pytest` output above. Fix logic errors in code before retrying (Gate 2).")
                         elif gate_id == 3:  # Entropy High
                             remediation.append("System entropy too high. Initiate refactoring workflow and analyze `scripts/measure_entropy.py` output (Gate 3).")
+                        elif gate_id == 4:  # Semantic Audit Failed
+                            remediation.append("Review the semantic audit violations above. Address constitutional, contract, or safety violations in the code (Gate 4).")
                 
                 if remediation:
                     report["ai_remediation_plan"] = remediation
@@ -235,7 +245,7 @@ def main():
     parser = argparse.ArgumentParser(description="CDD Auditor CLI")
     
     # Modes
-    parser.add_argument("--gate", choices=['1', '2', '3', 'all'], default='all', help="Gate to run")
+    parser.add_argument("--gate", choices=['1', '2', '3', '4', 'all'], default='all', help="Gate to run")
     parser.add_argument("--fix", action="store_true", help="Auto-fix Gate 1 violations")
     parser.add_argument("--clean", action="store_true", help="Clean temporary spec directories")
     
@@ -264,7 +274,7 @@ def main():
         # 2. Determine Gates to Run
         gates_to_run = []
         if args.gate == 'all':
-            gates_to_run = [1, 2, 3]
+            gates_to_run = [1, 2, 3, 4]
         else:
             gates_to_run = [int(args.gate)]
 
