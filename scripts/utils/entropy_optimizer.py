@@ -180,7 +180,7 @@ class EntropyOptimizer:
         base_value = hotspot.entropy_score
         
         # 根据热点类型调整价值
-        if hotspot.entropy_type == EntropyType.STRUCTURAL:
+        if hotspot.entropy_type.value == EntropyType.STRUCTURAL.value:
             if "目录缺失" in hotspot.reason:
                 return base_value * self.WEIGHT_MISSING_DIR
             elif "文件缺失" in hotspot.reason:
@@ -336,7 +336,7 @@ class EntropyOptimizer:
         
         # 为前N个热点生成计划
         for value, hotspot in prioritized_hotspots[:self.max_optimizations]:
-            if hotspot.entropy_type == EntropyType.STRUCTURAL:
+            if hotspot.entropy_type.value == EntropyType.STRUCTURAL.value:
                 plan = self._generate_structural_plan(hotspot)
                 if plan:
                     plans.append(plan)
