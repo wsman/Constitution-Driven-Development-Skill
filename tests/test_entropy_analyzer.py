@@ -212,7 +212,7 @@ class TestEntropyAnalyzer:
         project_path = Path(temp_dir)
         
         # 创建基本目录结构
-        (project_path / "templates" / "02_axioms").mkdir(parents=True, exist_ok=True)
+        (project_path / "templates" / "t1_axioms").mkdir(parents=True, exist_ok=True)
         
         # 创建 system_patterns.md 文件
         patterns_content = """# 系统模式定义
@@ -231,7 +231,7 @@ class TestEntropyAnalyzer:
     └── README.md
 ```
 """
-        (project_path / "templates" / "02_axioms" / "system_patterns.md").write_text(patterns_content)
+        (project_path / "templates" / "t1_axioms" / "system_patterns.md").write_text(patterns_content)
         
         yield project_path
         
@@ -248,7 +248,7 @@ class TestEntropyAnalyzer:
         assert analyzer.project_root == temp_project
         assert analyzer.tool_bridge is not None
         assert analyzer.cache is not None
-        assert analyzer.system_patterns_file == temp_project / "templates/02_axioms/system_patterns.md"
+        assert analyzer.system_patterns_file == temp_project / "templates/t1_axioms/system_patterns.md"
         assert analyzer._cached_hotspots is None
         
         # 验证权重配置
@@ -276,7 +276,7 @@ class TestEntropyAnalyzer:
     def test_parse_system_patterns_file_not_found(self, temp_project):
         """测试解析系统模式文件（文件不存在）"""
         # 删除文件
-        (temp_project / "templates" / "02_axioms" / "system_patterns.md").unlink()
+        (temp_project / "templates" / "t1_axioms" / "system_patterns.md").unlink()
         
         analyzer = EntropyAnalyzer(temp_project)
         
@@ -291,7 +291,7 @@ class TestEntropyAnalyzer:
 
 没有tree命令输出
 """
-        (temp_project / "templates" / "02_axioms" / "system_patterns.md").write_text(patterns_content)
+        (temp_project / "templates" / "t1_axioms" / "system_patterns.md").write_text(patterns_content)
         
         analyzer = EntropyAnalyzer(temp_project)
         patterns = analyzer._parse_system_patterns()

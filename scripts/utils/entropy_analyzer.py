@@ -130,7 +130,7 @@ class EntropyAnalyzer:
         self.cache = CacheManager(self.project_root)
         
         # 系统模式文件路径
-        self.system_patterns_file = self.project_root / "templates/02_axioms/system_patterns.md"
+        self.system_patterns_file = self.project_root / "templates/t1_axioms/system_patterns.md"
         
         # 分析结果缓存
         self._cached_hotspots: Optional[List[Hotspot]] = None
@@ -148,7 +148,7 @@ class EntropyAnalyzer:
         if not self.system_patterns_file.exists():
             raise FileNotFoundError(
                 f"系统模式文件不存在: {self.system_patterns_file}\n"
-                "请确保 templates/02_axioms/system_patterns.md 存在。"
+                "请确保 templates/t1_axioms/system_patterns.md 存在。"
             )
         
         content = self.tool_bridge.read_file(
@@ -561,7 +561,7 @@ if __name__ == "__main__":
     try:
         # 创建测试项目结构
         test_root = Path(test_dir)
-        (test_root / "templates/02_axioms").mkdir(parents=True, exist_ok=True)
+        (test_root / "templates/t1_axioms").mkdir(parents=True, exist_ok=True)
         
         # 创建简单的 system_patterns.md
         patterns_content = """# 系统模式定义
@@ -580,7 +580,7 @@ if __name__ == "__main__":
     └── README.md
 ```
 """
-        (test_root / "templates/02_axioms/system_patterns.md").write_text(patterns_content)
+        (test_root / "templates/t1_axioms/system_patterns.md").write_text(patterns_content)
         
         # 创建部分预期目录
         (test_root / "src").mkdir(exist_ok=True)

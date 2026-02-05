@@ -211,7 +211,7 @@ class TestEntropyOptimizer:
         project_path = Path(temp_dir)
         
         # 创建基本目录结构
-        (project_path / "templates" / "02_axioms").mkdir(parents=True, exist_ok=True)
+        (project_path / "templates" / "t1_axioms").mkdir(parents=True, exist_ok=True)
         
         # 创建 system_patterns.md 文件
         patterns_content = """# 系统模式定义
@@ -228,7 +228,7 @@ class TestEntropyOptimizer:
     └── README.md
 ```
 """
-        (project_path / "templates" / "02_axioms" / "system_patterns.md").write_text(patterns_content)
+        (project_path / "templates" / "t1_axioms" / "system_patterns.md").write_text(patterns_content)
         
         # 创建部分目录
         (project_path / "src").mkdir(exist_ok=True)

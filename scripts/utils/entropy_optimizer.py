@@ -629,7 +629,7 @@ if __name__ == "__main__":
     try:
         # 创建测试项目结构
         test_root = Path(test_dir)
-        (test_root / "templates/02_axioms").mkdir(parents=True, exist_ok=True)
+        (test_root / "templates/t1_axioms").mkdir(parents=True, exist_ok=True)
         
         # 创建简单的 system_patterns.md
         patterns_content = """# 系统模式定义
@@ -648,7 +648,7 @@ if __name__ == "__main__":
     └── README.md
 ```
 """
-        (test_root / "templates/02_axioms/system_patterns.md").write_text(patterns_content)
+        (test_root / "templates/t1_axioms/system_patterns.md").write_text(patterns_content)
         
         # 创建部分预期目录（缺失 docs 和 tests/unit）
         (test_root / "src").mkdir(exist_ok=True)

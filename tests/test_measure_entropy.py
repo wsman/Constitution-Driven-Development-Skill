@@ -91,12 +91,12 @@ class TestEntropyCalculator:
         
         # 创建必要的目录结构
         (project_dir / "src").mkdir()
-        (project_dir / "templates" / "02_axioms").mkdir(parents=True)
+        (project_dir / "templates" / "t1_axioms").mkdir(parents=True)
         
         # 创建必要的文件（使用正确的路径）
-        (project_dir / "templates" / "02_axioms" / "system_patterns.md").write_text("# Test")
-        (project_dir / "templates" / "02_axioms" / "tech_context.md").write_text("# Test")
-        (project_dir / "templates" / "02_axioms" / "behavior_context.md").write_text("# Test")
+        (project_dir / "templates" / "t1_axioms" / "system_patterns.md").write_text("# Test")
+        (project_dir / "templates" / "t1_axioms" / "tech_context.md").write_text("# Test")
+        (project_dir / "templates" / "t1_axioms" / "behavior_context.md").write_text("# Test")
         
         return EntropyCalculator(str(project_dir), verbose=False)
     
