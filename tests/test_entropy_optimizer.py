@@ -497,14 +497,13 @@ class TestEntropyOptimizer:
         assert plan is None
     
     @patch('scripts.utils.entropy_analyzer.EntropyAnalyzer')
-    @patch('scripts.utils.entropy_analyzer.Hotspot')
     @patch.object(EntropyOptimizer, '_calculate_optimization_value')
     @patch.object(EntropyOptimizer, '_generate_structural_plan')
-    def test_generate_optimization_plans(self, mock_generate, mock_calculate, mock_hotspot_class, mock_analyzer_class, optimizer):
+    def test_generate_optimization_plans(self, mock_generate, mock_calculate, mock_analyzer_class, optimizer):
         """测试生成优化计划"""
         from scripts.utils.entropy_analyzer import Hotspot, EntropyType
         
-        # 创建模拟热点列表
+        # 创建真实热点实例（不使用模拟的 Hotspot 类）
         hotspot1 = Hotspot(
             id="hotspot1",
             path="src/",
