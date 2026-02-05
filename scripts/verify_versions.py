@@ -53,13 +53,13 @@ VERSION_FILES = {
         ],
         "description": "配置文件"
     },
-    "templates/01_core/active_context.md": {
+    "templates/t0_core/active_context.md": {
         "patterns": [
             r"^\*\*版本\*\*:\s*v?([0-9]+\.[0-9]+\.[0-9]+)",
         ],
         "description": "T0活跃上下文模板"
     },
-    "templates/02_axioms/system_patterns.md": {
+    "templates/t1_axioms/system_patterns.md": {
         "patterns": [
             r"^\*\*版本\*\*:\s*v?([0-9]+\.[0-9]+\.[0-9]+)",
         ],
@@ -258,7 +258,7 @@ class VersionChecker:
                 self.log(f"修复 templates/cdd_config.yaml 失败: {e}")
         
         # 修复 active_context.md
-        active_ctx_path = self.project_root / "templates/01_core/active_context.md"
+        active_ctx_path = self.project_root / "templates/t0_core/active_context.md"
         if active_ctx_path.exists():
             try:
                 content = active_ctx_path.read_text(encoding='utf-8')
@@ -288,14 +288,14 @@ class VersionChecker:
                 )
                 
                 active_ctx_path.write_text(content, encoding='utf-8')
-                self.log(f"已修复 templates/01_core/active_context.md -> v{target_version}")
+                self.log(f"已修复 templates/t0_core/active_context.md -> v{target_version}")
                 fixes_applied += 1
                 
             except Exception as e:
-                self.log(f"修复 templates/01_core/active_context.md 失败: {e}")
+                self.log(f"修复 templates/t0_core/active_context.md 失败: {e}")
         
         # 修复 system_patterns.md
-        system_patterns_path = self.project_root / "templates/02_axioms/system_patterns.md"
+        system_patterns_path = self.project_root / "templates/t1_axioms/system_patterns.md"
         if system_patterns_path.exists():
             try:
                 content = system_patterns_path.read_text(encoding='utf-8')
@@ -309,11 +309,11 @@ class VersionChecker:
                 )
                 
                 system_patterns_path.write_text(content, encoding='utf-8')
-                self.log(f"已修复 templates/02_axioms/system_patterns.md -> v{target_version}")
+                self.log(f"已修复 templates/t1_axioms/system_patterns.md -> v{target_version}")
                 fixes_applied += 1
                 
             except Exception as e:
-                self.log(f"修复 templates/02_axioms/system_patterns.md 失败: {e}")
+                self.log(f"修复 templates/t1_axioms/system_patterns.md 失败: {e}")
         
         return fixes_applied > 0
     

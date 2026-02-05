@@ -9,19 +9,19 @@ CDD organizes knowledge into four tiers to optimize context loading.
 ### T0: Kernel (Consciousness)
 * **Files**: `active_context.md`, `knowledge_graph.md`, `basic_law_index.md`, 
             `procedural_law_index.md`, `technical_law_index.md`
-* **Location**: `templates/01_core/`
+* **Location**: `templates/t0_core/`
 * **Usage**: 5-dimensional truth representation. Must be loaded at the start of every session. Contains the "Now" and the "Self".
 
 **Note**: `SKILL.md` is the project overview (meta-document) and serves as the entry point for AI agents.
 
 ### T1: Axioms (Physics)
 * **Files**: `system_patterns.md`, `tech_context.md`, `behavior_context.md`
-* **Location**: `templates/02_axioms/`
+* **Location**: `templates/t1_axioms/`
 * **Usage**: Defines the invariant rules of the project (directory structure, technology stack, and behavior scenarios). Consult when designing architecture.
 
 ### T2: Standards (Legislation)
 * **Files**: `DS-050_feature_specification.md` (required), `DS-051_implementation_plan.md` (required), `DS-052_atomic_tasks.md`, `DS-053_quality_checklist.md`, `DS-054_environment_hardening.md`, `DS-060_code_review.md`, `DS-007_context_management.md`
-* **Location**: `templates/04_standards/`
+* **Location**: `templates/t2_standards/`
 * **Usage**: The "Bill" that becomes Law. Every feature request MUST generate at least DS-050 and DS-051 documents first.
 
 ### T3: Archives (History)

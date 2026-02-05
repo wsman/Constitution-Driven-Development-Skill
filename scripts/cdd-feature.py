@@ -34,7 +34,7 @@ DEFAULT_ENCODING = "utf-8"
 # 1. 确定 SKILL_ROOT (工具自身的安装位置)
 # 用于定位模板文件，不随运行位置改变
 SKILL_ROOT = Path(__file__).resolve().parent.parent
-TEMPLATES_DIR = SKILL_ROOT / "templates" / "04_standards"
+TEMPLATES_DIR = SKILL_ROOT / "templates" / "t2_standards"
 
 # 默认模板映射 (文件名 -> 目标后缀)
 TEMPLATE_MAPPING = {
@@ -145,12 +145,12 @@ class ContextBuilder:
         file_map = {
             "project": self.target_root / "README.md",
             "active_context": self._resolve_path(
-                "memory_bank/core/active_context.md", 
-                "templates/01_core/active_context.md"
+                "memory_bank/t0_core/active_context.md", 
+                "templates/t0_core/active_context.md"
             ),
             "system_patterns": self._resolve_path(
-                "memory_bank/axioms/system_patterns.md", 
-                "templates/02_axioms/system_patterns.md"
+                "memory_bank/t1_axioms/system_patterns.md", 
+                "templates/t1_axioms/system_patterns.md"
             )
         }
 

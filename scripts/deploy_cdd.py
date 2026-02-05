@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-CDD Spore Deployer (v2.0.1)
+CDD Spore Deployer (v2.1.0)
 ===========================
 "Seed to Sprout" Deployment Protocol.
 Initializes the memory_bank structure for AI cognitive expansion.
 
-Security Enhancement: Spore Isolation Guard (v2.0.1)
+Security Enhancement: Spore Isolation Guard (v2.1.0)
 Implements §300.1 Spore Protocol to prevent self-deployment.
 """
 
@@ -20,42 +20,51 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from scripts.utils.spore_guard import check_spore_isolation
 
-# 核心模板映射 (Source in Skill -> Target in Memory Bank)
+# T层模板映射 (Source in Skill -> Target in Memory Bank)
 CORE_TEMPLATES = {
-    "reference/06_project_readme_template.md": "core/project_readme_template.md",
-    "templates/01_core/active_context.md": "core/active_context.md",
-    "templates/01_core/knowledge_graph.md": "core/knowledge_graph.md",
-    "templates/01_core/basic_law_index.md": "core/basic_law_index.md",
-    "templates/01_core/procedural_law_index.md": "core/procedural_law_index.md",
-    "templates/01_core/technical_law_index.md": "core/technical_law_index.md"
+    "reference/06_project_readme_template.md": "t0_core/project_readme_template.md",
+    "templates/t0_core/active_context.md": "t0_core/active_context.md",
+    "templates/t0_core/knowledge_graph.md": "t0_core/knowledge_graph.md",
+    "templates/t0_core/basic_law_index.md": "t0_core/basic_law_index.md",
+    "templates/t0_core/procedural_law_index.md": "t0_core/procedural_law_index.md",
+    "templates/t0_core/technical_law_index.md": "t0_core/technical_law_index.md"
 }
 
 AXIOMS_TEMPLATES = {
-    "templates/02_axioms/behavior_context.md": "axioms/behavior_context.md",
-    "templates/02_axioms/system_patterns.md": "axioms/system_patterns.md",
-    "templates/02_axioms/tech_context.md": "axioms/tech_context.md"
+    "templates/t1_axioms/behavior_context.md": "t1_axioms/behavior_context.md",
+    "templates/t1_axioms/system_patterns.md": "t1_axioms/system_patterns.md",
+    "templates/t1_axioms/tech_context.md": "t1_axioms/tech_context.md"
 }
 
 # 协议和工作流模板
 PROTOCOL_TEMPLATES = {
-    "templates/03_protocols/WF-001_clarify_workflow.md": "protocols/WF-001_clarify_workflow.md",
-    "templates/03_protocols/WF-201_cdd_workflow.md": "protocols/WF-201_cdd_workflow.md",
-    "templates/03_protocols/WF-amend.md": "protocols/WF-amend.md",
-    "templates/03_protocols/WF-analyze.md": "protocols/WF-analyze.md",
-    "templates/03_protocols/WF-review.md": "protocols/WF-review.md",
-    "templates/03_protocols/WF-sync-issues.md": "protocols/WF-sync-issues.md"
+    "templates/t2_protocols/WF-001_clarify_workflow.md": "t2_protocols/WF-001_clarify_workflow.md",
+    "templates/t2_protocols/WF-201_cdd_workflow.md": "t2_protocols/WF-201_cdd_workflow.md",
+    "templates/t2_protocols/WF-amend.md": "t2_protocols/WF-amend.md",
+    "templates/t2_protocols/WF-analyze.md": "t2_protocols/WF-analyze.md",
+    "templates/t2_protocols/WF-review.md": "t2_protocols/WF-review.md",
+    "templates/t2_protocols/WF-sync-issues.md": "t2_protocols/WF-sync-issues.md"
 }
 
 # DS 标准模板
 STANDARDS_TEMPLATES = {
-    "templates/04_standards/DS-007_context_management.md": "standards/DS-007_context_management.md",
-    "templates/04_standards/DS-050_feature_specification.md": "standards/DS-050_feature_specification.md",
-    "templates/04_standards/DS-051_implementation_plan.md": "standards/DS-051_implementation_plan.md",
-    "templates/04_standards/DS-052_atomic_tasks.md": "standards/DS-052_atomic_tasks.md",
-    "templates/04_standards/DS-053_quality_checklist.md": "standards/DS-053_quality_checklist.md",
-    "templates/04_standards/DS-054_environment_hardening.md": "standards/DS-054_environment_hardening.md",
-    "templates/04_standards/DS-060_code_review.md": "standards/DS-060_code_review.md",
-    "reference/07_feature_readme_template.md": "standards/feature_readme_template.md"
+    "templates/t2_standards/DS-007_context_management.md": "t2_standards/DS-007_context_management.md",
+    "templates/t2_standards/DS-050_feature_specification.md": "t2_standards/DS-050_feature_specification.md",
+    "templates/t2_standards/DS-051_implementation_plan.md": "t2_standards/DS-051_implementation_plan.md",
+    "templates/t2_standards/DS-052_atomic_tasks.md": "t2_standards/DS-052_atomic_tasks.md",
+    "templates/t2_standards/DS-053_quality_checklist.md": "t2_standards/DS-053_quality_checklist.md",
+    "templates/t2_standards/DS-054_environment_hardening.md": "t2_standards/DS-054_environment_hardening.md",
+    "templates/t2_standards/DS-060_code_review.md": "t2_standards/DS-060_code_review.md",
+    "reference/07_feature_readme_template.md": "t2_standards/feature_readme_template.md"
+}
+
+# T3 文档模板
+T3_DOCS_TEMPLATES = {
+    "templates/t3_documentation/index.md": "t3_documentation/index.md",
+    "templates/t3_documentation/quickstart.md": "t3_documentation/quickstart.md",
+    "templates/t3_documentation/getting-started.md": "t3_documentation/getting-started.md",
+    "templates/t3_documentation/overview.md": "t3_documentation/overview.md",
+    "templates/t3_documentation/api-reference.md": "t3_documentation/api-reference.md"
 }
 
 # 配置文件和工具链
@@ -93,19 +102,24 @@ def deploy(target_dir: Path, project_name: str, force: bool = False):
 
     # 1. 创建 Memory Bank 土壤 (目录结构)
     print("\n🛖 Creating Memory Bank soil...")
-    for subdir in ["core", "axioms", "protocols", "standards"]:
+    
+    # T层结构
+    for subdir in ["t0_core", "t1_axioms", "t2_protocols", "t2_standards", "t3_documentation"]:
         (memory_bank / subdir).mkdir(parents=True, exist_ok=True)
-    print("✅ Created Memory Bank structure (core/, axioms/, protocols/, standards/)")
+    print("✅ Created Memory Bank structure (t0_core/, t1_axioms/, t2_protocols/, t2_standards/, t3_documentation/)")
 
     # 2. 植入核心 DNA (种子模板)
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d")
     
     print("\n🧬 Injecting Core DNA (Seed Templates)...")
+    
+    # 模板组
     template_groups = [
         ("Core Templates", CORE_TEMPLATES),
         ("Axioms Templates", AXIOMS_TEMPLATES),
         ("Protocol Templates", PROTOCOL_TEMPLATES),
         ("Standards Templates", STANDARDS_TEMPLATES),
+        ("T3 Documentation", T3_DOCS_TEMPLATES),
     ]
     
     for group_name, templates in template_groups:
@@ -189,26 +203,29 @@ def deploy(target_dir: Path, project_name: str, force: bool = False):
     print("")
     print("2. **ROOTING (下一步 - AI Agent 执行)**")
     print("   - Read project seed (code/text requirements)")
-    print("   - Fill `memory_bank/core/project_readme_template.md`")
+    print("   - Fill `memory_bank/t0_core/project_readme_template.md`")
     print("   - Rename to `project_readme.md` after completion")
     print("")
     print("3. **SPROUTING (自动派生)**")
     print("   - Based on the README, derive 5-dimensional truth:")
-    print("     - `active_context.md` (current focus)")
-    print("     - `knowledge_graph.md` (concept relationships)")
-    print("     - `basic_law_index.md` (core axioms)")
-    print("     - `procedural_law_index.md` (workflows)")
-    print("     - `technical_law_index.md` (tech constraints)")
+    print("     - `t0_core/active_context.md` (current focus)")
+    print("     - `t0_core/knowledge_graph.md` (concept relationships)")
+    print("     - `t0_core/basic_law_index.md` (core axioms)")
+    print("     - `t0_core/procedural_law_index.md` (workflows)")
+    print("     - `t0_core/technical_law_index.md` (tech constraints)")
     print("")
     print("📋 **Next Steps for AI Agent:**")
     print(f"   cd {target_dir}")
     print("   # 1. Analyze project context")
-    print("   # 2. Fill memory_bank/core/project_readme_template.md")
+    print("   # 2. Fill memory_bank/t0_core/project_readme_template.md")
     print("   # 3. Execute growth protocol")
     print("")
     print("🔧 **Available Commands:**")
     print("   make audit           # Run constitutional audit")
     print("   python scripts/cdd_audit.py --format json --ai-hint")
+    print("")
+    print("📚 **T3 Documentation:**")
+    print("   Complete T3 documents in `memory_bank/t3_documentation/`")
     print("="*60)
 
 def main():

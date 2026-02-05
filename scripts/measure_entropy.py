@@ -61,9 +61,9 @@ class EntropyCalculator:
         # 使用重命名后的通用 CacheManager, 但在此脚本中逻辑概念仍是 EntropyCache
         self.cache = CacheManager(self.project_path)
         
-        self.system_patterns_file = self.project_path / "templates/02_axioms/system_patterns.md"
-        self.tech_context_file = self.project_path / "templates/02_axioms/tech_context.md"
-        self.behavior_context_file = self.project_path / "templates/02_axioms/behavior_context.md"
+        self.system_patterns_file = self.project_path / "templates/t1_axioms/system_patterns.md"
+        self.tech_context_file = self.project_path / "templates/t1_axioms/tech_context.md"
+        self.behavior_context_file = self.project_path / "templates/t1_axioms/behavior_context.md"
     
     def log(self, msg: str):
         if self.verbose:
