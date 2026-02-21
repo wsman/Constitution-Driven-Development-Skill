@@ -35,7 +35,6 @@ CORE_FILES = {
     "root": [
         "README.md",
         "SKILL.md",
-        "QUICK_START.md",
         "reference.md",
         "pyproject.toml",
         "requirements.txt",
