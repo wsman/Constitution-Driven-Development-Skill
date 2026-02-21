@@ -277,66 +277,343 @@ def format_json_report(results: List[Tuple[DiagnosticCheck, Dict[str, Any]]]) ->
     return json.dumps(report, indent=2, ensure_ascii=False)
 
 # -----------------------------------------------------------------------------
-# 修复函数
+# 文件操作事务管理器
 # -----------------------------------------------------------------------------
 
-def attempt_auto_fix(check: DiagnosticCheck, result: Dict[str, Any], verbose: bool = False) -> Tuple[bool, str]:
-    """尝试自动修复失败的检查"""
-    if check.name == "environment_check":
-        if verbose:
-            print(f"尝试修复环境依赖...")
-        
-        fix_result = subprocess.run(
-            "python3 scripts/cdd_check_env.py --fix --quiet",
-            shell=True,
-            cwd=SKILL_ROOT,
-            capture_output=True,
-            text=True,
-            timeout=120
-        )
-        
-        if fix_result.returncode == 0:
-            return True, "环境依赖修复成功"
-        else:
-            return False, f"环境依赖修复失败: {fix_result.stderr[:100]}"
+class FileTransactionManager:
+    """文件操作事务管理器"""
     
-    elif check.name == "skill_verification":
-        if verbose:
-            print(f"尝试修复技能完整性...")
-        
-        fix_result = subprocess.run(
-            "python3 scripts/cdd_verify.py --fix --quiet",
-            shell=True,
-            cwd=SKILL_ROOT,
-            capture_output=True,
-            text=True,
-            timeout=120
-        )
-        
-        if fix_result.returncode == 0:
-            return True, "技能完整性修复成功"
-        else:
-            return False, f"技能完整性修复失败: {fix_result.stderr[:100]}"
+    def __init__(self):
+        self.backup_dir: Optional[Path] = None
+        self.backup_files: Dict[str, Tuple[str, str]] = {}
+        self.active = False
     
-    elif check.name == "constitution_audit":
-        # Gate 1版本不一致可以尝试修复
-        if "Version mismatch" in str(result.get("stderr", "")):
+    def begin_transaction(self, transaction_name: str) -> bool:
+        """开始事务"""
+        try:
+            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            self.backup_dir = SKILL_ROOT / ".cdd_backups" / f"{transaction_name}_{timestamp}"
+            self.backup_dir.mkdir(parents=True, exist_ok=True)
+            self.active = True
+            return True
+        except Exception as e:
+            print(f"事务开始失败: {e}")
+            return False
+    
+    def backup_file(self, file_path: Path) -> bool:
+        """备份文件"""
+        if not self.active:
+            return False
+        
+        try:
+            if not file_path.exists():
+                return False
+            
+            backup_path = self.backup_dir / file_path.relative_to(SKILL_ROOT)
+            backup_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            with open(backup_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            
+            self.backup_files[str(file_path)] = (str(backup_path), content)
+            return True
+        except Exception as e:
+            print(f"文件备份失败 {file_path}: {e}")
+            return False
+    
+    def commit_transaction(self) -> bool:
+        """提交事务（清理备份）"""
+        if not self.active:
+            return False
+        
+        try:
+            # 删除备份目录
+            import shutil
+            if self.backup_dir.exists():
+                shutil.rmtree(self.backup_dir)
+            
+            self.backup_dir = None
+            self.backup_files.clear()
+            self.active = False
+            return True
+        except Exception as e:
+            print(f"事务提交失败: {e}")
+            return False
+    
+    def rollback_transaction(self) -> bool:
+        """回滚事务（恢复所有备份）"""
+        if not self.active:
+            return False
+        
+        success = True
+        
+        try:
+            # 恢复所有备份文件
+            for original_path, (backup_path, content) in self.backup_files.items():
+                try:
+                    with open(original_path, 'w', encoding='utf-8') as f:
+                        f.write(content)
+                except Exception as e:
+                    print(f"文件恢复失败 {original_path}: {e}")
+                    success = False
+            
+            # 清理备份目录
+            if self.backup_dir and self.backup_dir.exists():
+                import shutil
+                shutil.rmtree(self.backup_dir)
+            
+            self.backup_dir = None
+            self.backup_files.clear()
+            self.active = False
+            return success
+        except Exception as e:
+            print(f"事务回滚失败: {e}")
+            return False
+
+# -----------------------------------------------------------------------------
+# 修复函数 - 增强版
+# -----------------------------------------------------------------------------
+
+def attempt_auto_fix_with_checkpoint(check: DiagnosticCheck, result: Dict[str, Any], verbose: bool = False) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
+    """尝试自动修复失败的检查（带检查点）"""
+    import shutil
+    
+    # 为安全起见，创建检查点
+    try:
+        from cdd_claude_bridge import get_bridge
+        bridge = get_bridge()
+        checkpoint_result = bridge.create_checkpoint(f"before_fix_{check.name}", {
+            "check": check.name,
+            "result": result,
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        })
+        
+        if not checkpoint_result.get("success", False):
+            print("⚠️  检查点创建失败，继续执行修复")
+    except ImportError:
+        # 如果桥接器不可用，跳过检查点
+        pass
+    
+    # 创建文件事务管理器
+    transaction = FileTransactionManager()
+    transaction_used = False
+    
+    try:
+        if check.name == "environment_check":
             if verbose:
-                print(f"尝试修复版本不一致...")
+                print(f"尝试修复环境依赖...")
+            
+            transaction_used = transaction.begin_transaction("env_check_fix")
             
             fix_result = subprocess.run(
-                "python3 scripts/cdd_auditor.py --gate 1 --fix --quiet",
+                "python3 scripts/cdd_check_env.py --fix --quiet",
                 shell=True,
                 cwd=SKILL_ROOT,
                 capture_output=True,
                 text=True,
-                timeout=60
+                timeout=120
             )
             
             if fix_result.returncode == 0:
-                return True, "版本一致性修复成功"
+                if transaction_used:
+                    transaction.commit_transaction()
+                return True, "环境依赖修复成功", None
+            else:
+                if transaction_used:
+                    transaction.rollback_transaction()
+                return False, f"环境依赖修复失败: {fix_result.stderr[:100]}", None
+        
+        elif check.name == "skill_verification":
+            if verbose:
+                print(f"尝试修复技能完整性...")
+            
+            transaction_used = transaction.begin_transaction("skill_verify_fix")
+            
+            # 首先备份关键文件
+            key_files = [
+                SKILL_ROOT / "SKILL.md",
+                SKILL_ROOT / "README.md",
+                SKILL_ROOT / "pyproject.toml",
+                SKILL_ROOT / "requirements.txt"
+            ]
+            
+            for file_path in key_files:
+                if file_path.exists():
+                    transaction.backup_file(file_path)
+            
+            fix_result = subprocess.run(
+                "python3 scripts/cdd_verify.py --fix --quiet",
+                shell=True,
+                cwd=SKILL_ROOT,
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+            
+            if fix_result.returncode == 0:
+                if transaction_used:
+                    transaction.commit_transaction()
+                return True, "技能完整性修复成功", None
+            else:
+                if transaction_used:
+                    transaction.rollback_transaction()
+                return False, f"技能完整性修复失败: {fix_result.stderr[:100]}", None
+        
+        elif check.name == "constitution_audit":
+            # Gate 1版本不一致可以尝试修复
+            if "Version mismatch" in str(result.get("stderr", "")) or \
+               (result.get("json_output") and "gate_1_failed" in str(result["json_output"])):
+                
+                if verbose:
+                    print(f"尝试修复版本不一致...")
+                
+                transaction_used = transaction.begin_transaction("version_fix")
+                
+                # 备份版本相关文件
+                version_files = [
+                    SKILL_ROOT / "pyproject.toml",
+                    SKILL_ROOT / "scripts" / "cdd_auditor.py",
+                    SKILL_ROOT / "scripts" / "cdd_diagnose.py"
+                ]
+                
+                for file_path in version_files:
+                    if file_path.exists():
+                        transaction.backup_file(file_path)
+                
+                fix_result = subprocess.run(
+                    "python3 scripts/cdd_auditor.py --gate 1 --fix --quiet",
+                    shell=True,
+                    cwd=SKILL_ROOT,
+                    capture_output=True,
+                    text=True,
+                    timeout=60
+                )
+                
+                if fix_result.returncode == 0:
+                    if transaction_used:
+                        transaction.commit_transaction()
+                    return True, "版本一致性修复成功", None
+        
+        elif check.name == "entropy_calculation":
+            # 熵值超标优化
+            if result.get("json_output") and "critical" in str(result["json_output"]):
+                if verbose:
+                    print(f"尝试优化熵值超标...")
+                
+                transaction_used = transaction.begin_transaction("entropy_optimize")
+                
+                fix_result = subprocess.run(
+                    "python3 scripts/cdd_entropy.py optimize --dry-run --json",
+                    shell=True,
+                    cwd=SKILL_ROOT,
+                    capture_output=True,
+                    text=True,
+                    timeout=180
+                )
+                
+                if fix_result.returncode == 0:
+                    # 分析优化建议
+                    optimization_result = None
+                    try:
+                        optimization_result = json.loads(fix_result.stdout)
+                    except:
+                        pass
+                    
+                    if verbose:
+                        print(f"生成优化建议，是否执行？")
+                    
+                    return True, "熵值优化建议已生成", optimization_result
+        
+        return False, "无自动修复方案", None
+        
+    except Exception as e:
+        # 异常时回滚
+        if transaction_used:
+            transaction.rollback_transaction()
+        
+        # 尝试恢复检查点
+        try:
+            from cdd_claude_bridge import get_bridge
+            bridge = get_bridge()
+            restore_result = bridge.restore_checkpoint()
+            if restore_result.get("success", False):
+                return False, f"修复过程中发生异常并恢复检查点: {e}", None
+        except:
+            pass
+        
+        return False, f"修复过程中发生异常: {e}", None
+
+def get_intelligent_suggestions(check: DiagnosticCheck, result: Dict[str, Any]) -> List[str]:
+    """获取智能修复建议"""
+    suggestions = []
     
-    return False, "无自动修复方案"
+    if check.name == "environment_check":
+        suggestions.append("运行: python scripts/cdd_check_env.py --fix")
+        
+        # 检查特定错误
+        error_text = result.get("stderr", "")
+        if "pip not found" in error_text:
+            suggestions.append("请安装python-pip包: sudo apt install python3-pip")
+        elif "pytest not found" in error_text:
+            suggestions.append("请安装pytest: pip install pytest")
+        elif "git not found" in error_text:
+            suggestions.append("请安装git: sudo apt install git")
+    
+    elif check.name == "skill_verification":
+        suggestions.append("运行: python scripts/cdd_verify.py --fix")
+        suggestions.append("检查文件完整性: git status")
+        
+        # 检查可能的问题
+        json_output = result.get("json_output")
+        if json_output:
+            if "missing_files" in str(json_output):
+                suggestions.append("检查缺失的文件，可能需要从模板恢复")
+            elif "version_mismatch" in str(json_output):
+                suggestions.append("更新版本信息: 运行python scripts/cdd_verify.py --sync-versions")
+    
+    elif check.name == "constitution_audit":
+        suggestions.append("运行: python scripts/cdd_auditor.py --gate all --verbose 查看详细信息")
+        
+        error_text = result.get("stderr", "") + result.get("stdout", "")
+        if "Gate 1" in error_text:
+            suggestions.append("版本不一致: 运行python scripts/cdd_auditor.py --gate 1 --fix")
+        if "Gate 2" in error_text:
+            suggestions.append("测试失败: 运行pytest tests/ -v 查看详细错误")
+        if "Gate 3" in error_text:
+            suggestions.append("熵值超标: 运行python scripts/cdd_entropy.py analyze")
+        if "Gate 4" in error_text:
+            suggestions.append("宪法引用不足: 在代码中添加§格式的宪法引用")
+        if "Gate 5" in error_text:
+            suggestions.append("引用格式错误: 确保宪法引用格式正确（如§100.3）")
+    
+    elif check.name == "entropy_calculation":
+        suggestions.append("运行: python scripts/cdd_entropy.py analyze 查看熵值热点")
+        suggestions.append("优化: python scripts/cdd_entropy.py optimize (dry-run模式)")
+        
+        json_output = result.get("json_output")
+        if json_output:
+            if "critical" in str(json_output):
+                suggestions.append("⚠️ 紧急: 立即处理熵值超标问题")
+            elif "warning" in str(json_output):
+                suggestions.append("建议在本周内进行优化")
+    
+    # 通用建议
+    suggestions.append("查看详细日志: 添加 --verbose 参数")
+    suggestions.append("宪法依据: §100.3 (环境要求), §101 (审计), §102 (熵值)")
+    
+    return suggestions
+
+# -----------------------------------------------------------------------------
+# 修复函数 - 兼容旧版本
+# -----------------------------------------------------------------------------
+
+def attempt_auto_fix(check: DiagnosticCheck, result: Dict[str, Any], verbose: bool = False) -> Tuple[bool, str]:
+    """尝试自动修复失败的检查（兼容版本）"""
+    success, message, _ = attempt_auto_fix_with_checkpoint(check, result, verbose)
+    return success, message
 
 # -----------------------------------------------------------------------------
 # 主函数

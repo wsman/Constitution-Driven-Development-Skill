@@ -17,6 +17,7 @@ from .measure_entropy_tool import MeasureEntropyTool
 from .cdd_feature_tool import CDDFeatureTool
 from .cdd_project_init_tool import CDDProjectInitTool
 from .cdd_state_transition_tool import CDDStateTransitionTool
+from .cdd_asset_tool import CDDAssetTool
 
 # 导出工具函数
 from .tool_registry import register_tools, get_tool, list_tools
@@ -28,6 +29,7 @@ __all__ = [
     "CDDFeatureTool",
     "CDDProjectInitTool",
     "CDDStateTransitionTool",
+    "CDDAssetTool",
     "register_tools",
     "get_tool",
     "list_tools",

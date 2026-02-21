@@ -168,3 +168,38 @@ def file_matches_patterns(path: Path, patterns: List[str]) -> bool:
         if pattern in path_str:
             return True
     return False
+
+def safe_read_text(path: Union[str, Path], encoding: str = DEFAULT_ENCODING) -> str:
+    """安全读取文本文件，自动处理编码问题"""
+    try:
+        return Path(path).read_text(encoding=encoding)
+    except UnicodeDecodeError:
+        # 尝试不同的编码
+        encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+        for enc in encodings:
+            try:
+                return Path(path).read_text(encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        # 如果所有编码都失败，尝试二进制读取
+        try:
+            return Path(path).read_bytes().decode('utf-8', errors='ignore')
+        except Exception as e:
+            raise CDDError(f"无法读取文件 {path}: {e}")
+    except Exception as e:
+        raise CDDError(f"无法读取文件 {path}: {e}")
+
+def safe_write_text(path: Union[str, Path], content: str, encoding: str = DEFAULT_ENCODING) -> bool:
+    """安全写入文本文件"""
+    try:
+        Path(path).write_text(content, encoding=encoding)
+        return True
+    except Exception:
+        return False
+
+def find_files(root: Path, pattern: str = "**/*") -> List[Path]:
+    """查找匹配模式的所有文件"""
+    try:
+        return list(root.glob(pattern))
+    except Exception:
+        return []

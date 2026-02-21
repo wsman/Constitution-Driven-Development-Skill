@@ -15,7 +15,7 @@ constitutional_basis:
 # -----------------------------------------------------------------------------
 
 primary_configuration:
-  reference: "claude_integration/config.yaml"
+  reference: "claude/config.yaml"
   section: "mcp_integration"
   description: "完整MCP集成配置，包含服务器、权限、安全等完整配置"
 

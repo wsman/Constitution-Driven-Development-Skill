@@ -15,7 +15,7 @@ def parse_version(version_str: str) -> Tuple[int, int, int, Optional[str]]:
     解析版本字符串
     
     Args:
-        version_str: 版本字符串，如 "2.1.0", "v1.2.3-beta"
+        version_str: 版本字符串，如 "2.0.0", "2.1.0-beta"
         
     Returns:
         Tuple[主要版本, 次要版本, 修订版本, 预发布标签]

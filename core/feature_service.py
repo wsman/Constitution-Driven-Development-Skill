@@ -154,12 +154,12 @@ class FeatureCreator:
         self.template_engine = TemplateEngine(SKILL_ROOT / "templates")
         self.context_builder = ContextBuilder(target_root)
         
-        # 模板映射
+        # 模板映射 (路径相对于SKILL_ROOT)
         self.feature_templates = {
             "templates/t2_standards/DS-050_feature_specification.md": "_spec.md",
             "templates/t2_standards/DS-051_implementation_plan.md": "_plan.md",
             "templates/t2_standards/DS-052_atomic_tasks.md": "_tasks.md",
-            "reference/05_readme_templates.md": "_README.md",
+            "templates/t3_documentation/05_readme_templates.md": "_README.md",
         }
     
     def create_feature(self, name: str, description: str, 

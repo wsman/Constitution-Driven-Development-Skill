@@ -10,6 +10,8 @@ type: governance-framework
 
 > **Role**: 你是CDD架构师。目标是交付软件功能，同时严格最小化系统熵值($H_{sys}$)。你服务于`memory_bank/`作为单一真理源。
 
+**📖 本文档面向AI代理/自动化工具 - 操作指令手册**
+
 ## 1. 工具清单 (Tool Manifest)
 
 ```yaml
@@ -62,11 +64,75 @@ tools:
     trigger: 定期检查, 熵值危机
     articles: [§300.5]
     
+  - name: cdd_asset_manager.py
+    purpose: 技术资产管理
+    commands:
+      - scan: 扫描资产库
+      - report: 生成资产报告
+      - search: 搜索资产
+      - validate: 验证新资产
+      - suggest: 生成复用建议
+      - stats: 查看统计
+    usage: |
+      python scripts/cdd_asset_manager.py scan --verbose
+      python scripts/cdd_asset_manager.py search "button" --type component
+      python scripts/cdd_asset_manager.py suggest ./project --json
+    trigger: State A→B（强制资产搜索），资产审计
+    articles: [§101, §102, §103]
+    
   - name: cdd_diagnose.py
     purpose: 综合诊断工具
     usage: python scripts/cdd_diagnose.py [--fix] [--summary] [--json]
     trigger: 系统异常时
     articles: [§100.3, §101]
+    
+  - name: cdd_deploy_gate.py
+    purpose: §306零停机部署验证
+    commands:
+      - check: 检查部署配置
+      - validate: 验证部署计划
+      - audit: 审计运行环境
+      - generate-template: 生成部署模板
+    usage: |
+      python scripts/cdd_deploy_gate.py check --config deployment.yaml --verbose
+      python scripts/cdd_deploy_gate.py validate k8s/deployment-plan.json
+      python scripts/cdd_deploy_gate.py audit production --verbose
+      python scripts/cdd_deploy_gate.py generate-template --type kubernetes --output zero-downtime.yaml
+    trigger: State D验证阶段，CI/CD流水线集成
+    articles: [§306, §101, §102, §151]
+    
+  - name: cdd_architect.py
+    purpose: 架构决策记录工具
+    commands:
+      - create: 创建新的架构决策
+      - list: 列出架构决策
+      - view: 查看架构决策
+      - update: 更新架构决策
+      - analyze: 分析架构决策
+      - template: 生成决策模板
+    usage: |
+      python scripts/cdd_architect.py create "使用TypeScript" --status proposed
+      python scripts/cdd_architect.py list --status accepted --verbose
+      python scripts/cdd_architect.py view adr-20240221-abc123 --format json
+      python scripts/cdd_architect.py analyze --json
+      python scripts/cdd_architect.py template --output adr-template.md
+    trigger: State B规划阶段，技术设计评审，架构演进追踪
+    articles: [§101, §102, §103, §151]
+    
+  - name: cdd_theme_audit.py
+    purpose: §119主题驱动开发审计
+    commands:
+      - scan: 扫描文件查找硬编码颜色
+      - validate: 验证主题合规性
+      - report: 生成主题审计报告
+      - fix: 自动修复主题问题
+    usage: |
+      python scripts/cdd_theme_audit.py scan --directory ./src --verbose
+      python scripts/cdd_theme_audit.py validate --file ./src/components/Button.jsx
+      python scripts/cdd_theme_audit.py report --output theme-report.json
+      python scripts/cdd_theme_audit.py fix --dry-run
+    trigger: State D验证阶段（Gate 4增强），UI开发合规检查
+    articles: [§119, §101, §102]
 ```
 
 ## 2. 5状态工作流引擎 (State Machine)
@@ -93,7 +159,11 @@ cat memory_bank/t0_core/active_context.md
 # 2. 检查系统熵值
 python /path/to/cdd/scripts/cdd_entropy.py calculate
 
-# 3. 创建特性规格（如果H_sys ≤ 0.7）
+# 3. 强制技术资产搜索（宪法依据：§101§102§103）
+python /path/to/cdd/scripts/cdd_asset_manager.py scan --verbose
+python /path/to/cdd/scripts/cdd_asset_manager.py suggest ./ --json | jq '.suggestions[] | {asset:.asset, type:.type, path:.path}' 2>/dev/null || echo "ℹ️  未找到jq，使用文本输出"
+
+# 4. 创建特性规格（如果H_sys ≤ 0.7）
 python /path/to/cdd/scripts/cdd_feature.py create "新特性名称" --target /path/to/project
 ```
 
@@ -133,17 +203,48 @@ echo "✅ 特性交付完成，系统返回State A (Intake)"
 
 ## 3. 熵值规则 (Entropy Rules)
 
-### 熵值公式
+### 双视角熵值模型
 
-```
-H_sys = 0.4 * H_cog + 0.3 * H_struct + 0.3 * H_align
-```
+CDD使用两种互补的熵值视角来评估系统健康度：
 
-| 指标 | 公式 | 目标值 | 检查命令 |
-|------|------|--------|----------|
-| $H_{cog}$ | $T_{load} / 8000$ | < 0.4 | `cdd_entropy.py analyze --dimension cognitive` |
-| $H_{struct}$ | $1 - N_{linked}/N_{total}$ | < 0.1 | `cdd_entropy.py analyze --dimension structural` |
-| $H_{align}$ | $N_{violation} / N_{constraints}$ | 0.0 | `cdd_auditor.py --gate 4` |
+#### 视角一：合规视角（日常开发监控）
+**用途**：评估系统是否符合宪法约束，用于日常开发监控
+**公式**：
+```
+compliance_score = W_DIR * C_dir + W_SIG * C_sig + W_TEST * C_test
+H_sys = 1.0 - compliance_score
+```
+**指标**：
+- **C_dir**：目录结构合规率（权重W_DIR=0.4）- 检查目录结构是否符合CDD规范
+- **C_sig**：接口签名覆盖率（权重W_SIG=0.3）- 检查接口文档覆盖程度
+- **C_test**：测试通过率（权重W_TEST=0.3）- 检查单元测试通过情况
+
+**检查命令**：`cdd_entropy.py calculate` 使用此视角
+
+#### 视角二：成分视角（系统内部分析）
+**用途**：深入分析系统内部质量，用于架构优化和技术债务评估
+**公式**：
+```
+H_sys_component = 0.4 * H_cog + 0.3 * H_struct + 0.3 * H_align
+```
+**指标**：
+- **H_cog**：认知负载（$T_{load} / 8000$）- 开发者理解系统所需的认知工作量
+- **H_struct**：结构离散（$1 - N_{linked}/N_{total}$）- 文件间连接缺失程度
+- **H_align**：同构偏离（$N_{violation} / N_{constraints}$）- 代码实现与架构约束的偏差
+
+**注意**：成分视角在当前版本中作为理论模型，实际工具主要使用合规视角。
+
+### 两种视角的关系
+
+| 特性 | 合规视角 | 成分视角 |
+|------|----------|----------|
+| **主要用途** | 日常开发监控 | 系统内部分析 |
+| **计算复杂度** | 低（实时计算） | 高（需要深入分析） |
+| **实现状态** | ✅ 已实现 | 🔄 理论模型 |
+| **工具支持** | `cdd_entropy.py calculate` | 计划中 |
+| **使用频率** | 高（每次状态转换） | 低（架构评审时） |
+
+**关系说明**：当系统完全符合宪法时，高合规分数（低H_sys）通常对应低成分熵值。两者结合使用可获得系统健康度的完整视图。
 
 ### 阈值-行动映射
 
@@ -201,7 +302,7 @@ python /path/to/cdd/scripts/cdd_entropy.py calculate
 
 ## 4. 宪法约束 (Constitutional Constraints)
 
-### 核心条款 (62条)
+### 核心条款 (50条)
 
 ```yaml
 core_articles:

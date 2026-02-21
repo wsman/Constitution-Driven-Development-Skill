@@ -78,7 +78,7 @@
 | **§309** | Claude Code自动化原则 | 鼓励使用Claude Code自动化 | 工具集成 |
 | **§310** | 工具调用公理 | 文件操作必须通过工具桥接器 | 文件操作安全 |
 
-**完整宪法条款列表**：请参考 `core/constitution_core.py`，包含62个实际使用的核心条款定义。
+**完整宪法条款列表**：请参考 `core/constitution_core.py`，包含50个实际使用的核心条款定义。
 
 ---
 
@@ -150,7 +150,7 @@ H_sys = 1.0 - compliance_score
 - THRESHOLD_EXCELLENT = 0.3（优秀阈值）
 - THRESHOLD_GOOD = 0.5（良好阈值）
 - THRESHOLD_WARNING = 0.7（警告阈值）
-- THRESHOLD_DANGER = 0.9（危险阈值）
+- THRESHOLD_DANGER = 0.7（危险阈值）
 
 ### 5. 熵值管理工具
 
@@ -698,7 +698,7 @@ cdd/
 │   ├── __init__.py
 │   ├── audit_service.py    # 审计服务（Gate 1-5）
 │   ├── constants.py        # 全局常量（熵值公式等）
-│   ├── constitution_core.py # 宪法核心条款（62条）
+│   ├── constitution_core.py # 宪法核心条款（50条）
 │   ├── entropy_service.py  # 熵值服务
 │   ├── exceptions.py       # 异常定义
 │   ├── feature_service.py  # 特性管理服务
@@ -883,7 +883,7 @@ auditor.run_gate(5)  # 宪法引用完整性检查
 
 **Gate 4增强说明**：
 审查报告中提到Gate 4的外部依赖问题已解决。现在Gate 4：
-1. 动态加载所有宪法核心条款（62条）
+1. 动态加载所有宪法核心条款（50条）
 2. 扫描所有Markdown文档中的引用
 3. 计算覆盖率，要求达到80%
 4. 提供缺失条款列表以便修复
@@ -935,7 +935,7 @@ h_sys_component = 0.4 * h_cog + 0.3 * h_struct + 0.3 * h_align
 **职责**: 定义和维护宪法条款
 
 **内容**：
-- 62个核心宪法条款，分为三类：
+- 50个核心宪法条款，分为三类：
   - 基本法 (§100-§199)：治理框架
   - 技术法 (§200-§299)：实施标准  
   - 程序法 (§300-§399)：工作流程

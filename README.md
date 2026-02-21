@@ -4,6 +4,8 @@
 
 **🎯 让AI辅助开发变得可控、可预测、可持续**
 
+**📖 本文档面向开发者/新用户 - 快速入门指南**
+
 [![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/wsman/Constitution-Driven-Development-Skill)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8+-yellow.svg)](https://www.python.org/)
@@ -42,7 +44,61 @@
 
 ## 🚀 快速开始
 
-### 第一步：安装
+### 📋 5分钟快速检查表
+
+#### ✅ 步骤1：环境检查（1分钟）
+```bash
+# 检查并修复环境依赖
+python scripts/cdd_check_env.py --fix
+
+# 预期输出：
+# ✅ 环境检查完成: 3/3 必需依赖
+```
+
+#### ✅ 步骤2：技能验证（1分钟）
+```bash
+# 验证CDD技能完整性
+python scripts/cdd_verify.py
+
+# 预期输出：
+# ✅ 技能完整性验证通过
+```
+
+#### ✅ 步骤3：创建项目（1分钟）
+```bash
+# 正确做法：在项目目录中执行
+cd /path/to/your/project
+python /path/to/cdd/scripts/cdd_feature.py deploy "项目名称"
+
+# ❌ 错误做法：在CDD目录中执行（孢子隔离违例）
+cd /path/to/cdd
+python scripts/cdd_feature.py deploy "项目名称"  # ❌ 会失败
+```
+
+#### ✅ 步骤4：创建特性（1分钟）
+```bash
+# 检查熵值
+python /path/to/cdd/scripts/cdd_entropy.py calculate
+
+# 如果 H_sys ≤ 0.7，创建特性
+python /path/to/cdd/scripts/cdd_feature.py create "特性名称"
+
+# 查看生成的规格文档
+cat specs/001-特性名称/DS-050_feature_specification.md
+```
+
+#### ✅ 步骤5：运行诊断（1分钟）
+```bash
+# 综合诊断
+python /path/to/cdd/scripts/cdd_diagnose.py
+
+# 如果发现问题，尝试自动修复
+python /path/to/cdd/scripts/cdd_diagnose.py --fix
+```
+
+### 详细安装指南
+
+#### 第一步：安装
 
 ```bash
 # 克隆CDD技能库
@@ -53,7 +109,7 @@ cd Constitution-Driven-Development-Skill
 python scripts/cdd_check_env.py --fix
 ```
 
-### 第二步：初始化你的项目
+#### 第二步：初始化你的项目
 
 ```bash
 # 方式1: 使用绝对路径（推荐）
@@ -69,7 +125,7 @@ python scripts/cdd_feature.py deploy "我的项目" --target /path/to/your/proje
 - **正确做法**：在你的项目目录中调用CDD工具
 - **常见错误**：在CDD技能目录中直接运行工具（违反§106.1）
 
-### 第三步：创建第一个特性
+#### 第三步：创建第一个特性
 
 ```bash
 # 使用绝对路径方式
@@ -81,27 +137,6 @@ cat specs/001-用户登录/DS-050_feature_specification.md
 ```
 
 **🎉 恭喜！你已经完成CDD的首次使用！**
-
----
-
-## 📚 详细安装
-
-### 系统要求
-
-| 依赖 | 最低版本 | 如何检查 | 如何安装 |
-|------|----------|----------|----------|
-| **Python** | 3.8+ | `python3 --version` | 系统包管理器 |
-| **pytest** | 6.0+ | `pytest --version` | `pip install pytest` |
-| **PyYAML** | 6.0+ | `python -c "import yaml"` | `pip install pyyaml` |
-
-### 安装验证
-
-```bash
-# 验证CDD技能完整性
-python scripts/cdd_verify.py
-
-# 如果看到 ✅，安装成功！
-```
 
 ---
 
@@ -117,6 +152,26 @@ python scripts/cdd_verify.py
 | **0.3 - 0.5** | 🟡 良好 | 存在少量技术债务 |
 | **0.5 - 0.7** | 🟠 警告 | 需要关注 |
 | **> 0.7** | 🔴 危险 | 需要立即重构 |
+
+#### 📊 熵值速查表
+
+| H_sys范围 | 状态 | 颜色 | 立即操作 |
+|-----------|------|------|----------|
+| **0.0 - 0.3** | 🟢 优秀 | 绿色 | 正常开发 |
+| **0.3 - 0.5** | 🟡 良好 | 黄色 | 监控技术债务 |
+| **0.5 - 0.7** | 🟠 警告 | 橙色 | `cdd_entropy.py optimize --dry-run` |
+| **> 0.7** | 🔴 危险 | 红色 | `cdd_entropy.py optimize` (立即停止新功能) |
+
+##### 熵值相关命令
+```bash
+# 检查当前熵值
+python /path/to/cdd/scripts/cdd_entropy.py calculate
+
+# 解读结果：
+# ✅ H_sys = 0.25 (优秀 🟢)    # 可以继续
+# ⚠️ H_sys = 0.65 (警告 🟠)    # 需要优化
+# ❌ H_sys = 0.85 (危险 🔴)    # 必须立即优化
+```
 
 ### 5状态工作流
 
@@ -139,6 +194,55 @@ CDD将开发过程分为5个明确的状态：
 - State D **所有Gate通过** 才能提交
 - 熵值 > 0.7 时**必须先重构**
 
+#### 🔄 5状态工作流速查
+
+##### State A (Intake) → State B (Plan)
+```bash
+# 1. 加载上下文
+cat memory_bank/t0_core/active_context.md
+
+# 2. 检查熵值
+python /path/to/cdd/scripts/cdd_entropy.py calculate
+
+# 3. 如果 H_sys ≤ 0.7，创建规格
+python /path/to/cdd/scripts/cdd_feature.py create "特性名"
+```
+
+##### State B (Plan) → State C (Execute)
+```bash
+# 1. 检查规格文档是否已批准
+cat specs/*/DS-050_*.md | grep "批准状态: ✅ 已批准"
+
+# 2. 如果已批准，开始编码
+# 3. 编写测试
+# 4. 运行本地测试
+pytest tests/ -v
+```
+
+##### State C (Execute) → State D (Verify)
+```bash
+# 1. 运行完整宪法审计
+python /path/to/cdd/scripts/cdd_auditor.py --gate all
+
+# 2. 如果Gate失败，根据错误信息修复
+```
+
+##### State D (Verify) → State E (Close)
+```bash
+# 1. 所有Gate通过后，更新文档
+echo "最近宪法事件: [日期] Gate 1-5全部通过" >> memory_bank/t0_core/active_context.md
+
+# 2. 原子性提交
+git add .
+git commit -m "feat: 实现[特性名称] - 宪法依据: §101§102§300.3"
+```
+
+##### State E (Close) → State A (Intake)
+```bash
+# 系统自动返回State A，准备下一个特性
+echo "✅ 特性交付完成，系统返回State A (Intake)"
+```
+
 ### Memory Bank
 
 Memory Bank是项目的"大脑"，存储所有重要信息：
@@ -153,6 +257,132 @@ Memory Bank是项目的"大脑"，存储所有重要信息：
 ---
 
 ## 📋 快速参考
+
+### 🛠️ 工具速查表
+
+#### 所有工具通用参数
+```bash
+# 获取帮助
+python scripts/cdd_feature.py --help
+python scripts/cdd_auditor.py --help
+python scripts/cdd_entropy.py --help
+python scripts/cdd_diagnose.py --help
+```
+
+#### 1. cdd_feature.py - 项目管理
+```bash
+# 🔥 核心用例
+cd /path/to/project && python /path/to/cdd/scripts/cdd_feature.py deploy "项目名"  # 初始化项目
+cd /path/to/project && python /path/to/cdd/scripts/cdd_feature.py create "特性名"  # 创建特性
+cd /path/to/project && python /path/to/cdd/scripts/cdd_feature.py list          # 列出所有特性
+
+# 🎯 进阶用法
+cd /path/to/project && python /path/to/cdd/scripts/cdd_feature.py create "特性名" --dry-run  # 预览不生成
+cd /path/to/project && python /path/to/cdd/scripts/cdd_feature.py create "特性名" --json    # JSON格式输出
+```
+
+#### 2. cdd_auditor.py - 宪法审计
+```bash
+# 🔥 核心用例
+cd /path/to/project && python /path/to/cdd/scripts/cdd_auditor.py --gate all  # 完整审计
+cd /path/to/project && python /path/to/cdd/scripts/cdd_auditor.py --gate 1 --fix  # 自动修复版本问题
+
+# 🎯 进阶用法
+cd /path/to/project && python /path/to/cdd/scripts/cdd_auditor.py --gate all --verbose  # 详细输出
+cd /path/to/project && python /path/to/cdd/scripts/cdd_auditor.py --gate all --format json  # JSON报告
+cd /path/to/project && python /path/to/cdd/scripts/cdd_auditor.py --gate 3  # 仅检查熵值
+```
+
+#### 3. cdd_entropy.py - 熵值管理
+```bash
+# 🔥 核心用例
+cd /path/to/project && python /path/to/cdd/scripts/cdd_entropy.py calculate  # 计算当前熵值
+cd /path/to/project && python /path/to/cdd/scripts/cdd_entropy.py optimize   # 优化熵值
+
+# 🎯 进阶用法
+cd /path/to/project && python /path/to/cdd/scripts/cdd_entropy.py analyze   # 分析熵值热点
+cd /path/to/project && python /path/to/cdd/scripts/cdd_entropy.py optimize --dry-run  # 预览优化建议
+cd /path/to/project && python /path/to/cdd/scripts/cdd_entropy.py calculate --force  # 强制重新计算
+```
+
+#### 4. cdd_diagnose.py - 综合诊断
+```bash
+# 🔥 核心用例
+cd /path/to/project && python /path/to/cdd/scripts/cdd_diagnose.py  # 综合诊断
+cd /path/to/project && python /path/to/cdd/scripts/cdd_diagnose.py --fix  # 诊断并自动修复
+
+# 🎯 进阶用法
+cd /path/to/project && python /path/to/cdd/scripts/cdd_diagnose.py --json  # JSON格式输出
+cd /path/to/project && python /path/to/cdd/scripts/cdd_diagnose.py --summary  # 只显示摘要
+```
+
+### ⚠️ 常见错误与立即解决方案
+
+#### 错误1：❌ 孢子隔离违例 (C003)
+**症状**：`Target directory is CDD Skill Root: /path/to/cdd`
+**原因**：在CDD技能目录中运行工具，违反§106.1
+**解决方案**：
+```bash
+# 错误做法 ❌
+cd /path/to/cdd
+python scripts/cdd_feature.py deploy "项目名"
+
+# 正确做法 ✅
+cd /path/to/your/project
+python /path/to/cdd/scripts/cdd_feature.py deploy "项目名"
+```
+
+#### 错误2：❌ 熵值超标 (C001)
+**症状**：`H_sys = 0.85 (危险 🔴)` 或 `Gate 3 failed`
+**原因**：系统熵值过高，违反§102
+**解决方案**：
+```bash
+# 1. 分析熵值热点
+python /path/to/cdd/scripts/cdd_entropy.py analyze
+
+# 2. 生成优化建议
+python /path/to/cdd/scripts/cdd_entropy.py optimize --dry-run
+
+# 3. 执行优化
+python /path/to/cdd/scripts/cdd_entropy.py optimize
+
+# 4. 重新计算熵值
+python /path/to/cdd/scripts/cdd_entropy.py calculate
+
+# ✅ 只有当 H_sys ≤ 0.5 时才能继续新功能
+```
+
+#### 错误3：❌ Gate 1失败
+**症状**：`Gate 1: 版本一致性检查 ❌ FAILED`
+**原因**：文件版本信息不一致，违反§100.3
+**解决方案**：
+```bash
+# 自动修复版本问题
+python /path/to/cdd/scripts/cdd_auditor.py --gate 1 --fix
+```
+
+#### 错误4：❌ Gate 2失败
+**症状**：`Gate 2: 行为验证检查 ❌ FAILED`
+**原因**：测试未通过，违反§300.3
+**解决方案**：
+```bash
+# 查看详细测试错误
+pytest tests/ -v
+
+# 修复失败的测试后重新运行
+python /path/to/cdd/scripts/cdd_auditor.py --gate 2
+```
+
+#### 错误5：❌ Spec未批准 (C005)
+**症状**：`Spec未批准: 不能在State B编码`
+**原因**：未获得DS-050规格文档批准，违反§103
+**解决方案**：
+```bash
+# 检查规格文档状态
+cat specs/*/DS-050_*.md | grep "批准状态"
+
+# 等待用户明确批准：✅ 已批准
+```
 
 ### 常用命令速查表
 
@@ -174,7 +404,19 @@ Memory Bank是项目的"大脑"，存储所有重要信息：
 | **0.5 - 0.7** | 🟠 警告 | 橙色 | 暂停新功能，优先修复 |
 | **> 0.7** | 🔴 危险 | 红色 | 立即停止所有新功能，重构优先 |
 
-### 状态转换表
+### 状态转换表 (详细版)
+
+| 当前状态 | 触发条件 | 下一状态 | 必需操作 | 禁止操作 |
+|----------|----------|----------|----------|----------|
+| **A (Intake)** | 意图明确，H_sys ≤ 0.7 | B | 加载`active_context.md`，检查系统熵值 | 编码 |
+| **B (Plan)** | DS-050获批准 | C | 生成DS-050/051/052文档，等待用户批准 | 编码 |
+| **B (Plan)** | Spec未批准 | B | 细化规格文档，重新提交批准 | 编码 |
+| **C (Execute)** | 代码完成，本地测试通过 | D | 实现代码，编写并通过单元测试 | 跳过测试 |
+| **D (Verify)** | Gate 1-5全部通过 | E | 运行`cdd_auditor.py --gate all` | 提交代码 |
+| **D (Verify)** | 任意Gate失败 | C | 修复问题，重新运行测试 | 继续新功能 |
+| **E (Close)** | - | A | 更新`active_context.md`，原子性提交代码和文档 | - |
+
+### 快速参考表
 
 | 当前状态 | 触发条件 | 下一状态 | 关键规则 |
 |----------|----------|----------|----------|
@@ -194,6 +436,97 @@ Memory Bank是项目的"大脑"，存储所有重要信息：
 | **C004** | 工作流状态无效 | 检查`active_context.md` |
 | **C005** | Spec未批准 | 等待用户批准DS-050文档 |
 | **C006** | Gate审计失败 | `cdd_auditor.py --gate all --verbose` |
+
+### 🚨 紧急恢复流程
+
+#### 系统异常中断恢复
+```bash
+# 1. 检查当前状态
+cat memory_bank/t0_core/active_context.md
+
+# 2. 运行综合诊断
+python /path/to/cdd/scripts/cdd_diagnose.py --fix
+
+# 3. 根据诊断结果修复
+```
+
+#### 项目结构损坏恢复
+```bash
+# 1. 验证项目结构
+python /path/to/cdd/scripts/cdd_feature.py list
+
+# 2. 重新部署Memory Bank（谨慎使用）
+python /path/to/cdd/scripts/cdd_feature.py deploy "项目名" --force
+
+# 3. 恢复备份（如果有）
+```
+
+#### Git冲突解决流程
+```bash
+# 1. 检查冲突状态
+git status
+
+# 2. 优先保持memory_bank/一致性
+# 3. 解决冲突，确保宪法引用完整
+# 4. 运行审计确保合规
+python /path/to/cdd/scripts/cdd_auditor.py --gate all
+```
+
+### 📞 快速帮助
+
+#### 忘记命令时
+```bash
+# 记住这个万能命令：
+python scripts/cdd_diagnose.py --fix
+
+# 它会：
+# 1. 检查环境
+# 2. 验证技能
+# 3. 运行审计
+# 4. 检查熵值
+# 5. 尝试自动修复
+```
+
+#### 需要更多帮助时
+```bash
+# 查看完整文档
+cat README.md        # 基础指南
+cat SKILL.md         # AI代理指南
+cat reference.md     # 技术参考
+
+# 或者直接搜索
+grep -r "孢子隔离" reference.md
+grep -r "熵值超标" SKILL.md
+```
+
+### 🎯 最佳实践摘要
+
+1. **✅ 总是在项目目录调用工具** - 避免孢子隔离违例
+2. **✅ 先检查熵值再创建特性** - 确保H_sys ≤ 0.7
+3. **✅ State B必须等待批准才能编码** - 遵守文档优先公理
+4. **✅ State D必须通过所有Gate才能提交** - 确保宪法合规
+5. **✅ 熵值 > 0.7时立即停止新功能** - 优先降低熵值
+
+---
+
+## 📚 详细安装
+
+### 系统要求
+
+| 依赖 | 最低版本 | 如何检查 | 如何安装 |
+|------|----------|----------|----------|
+| **Python** | 3.8+ | `python3 --version` | 系统包管理器 |
+| **pytest** | 6.0+ | `pytest --version` | `pip install pytest` |
+| **PyYAML** | 6.0+ | `python -c "import yaml"` | `pip install pyyaml` |
+
+### 安装验证
+
+```bash
+# 验证CDD技能完整性
+python scripts/cdd_verify.py
+
+# 如果看到 ✅，安装成功！
+```
 
 ---
 
@@ -273,6 +606,22 @@ your_project/
 ## 📄 许可证
 
 基于 Apache License 2.0 授权。详见 [LICENSE](LICENSE) 文件。
+
+---
+
+<div align="center">
+
+**🔄 本指南已包含CDD 80%的日常使用场景**
+
+**📚 如需深入了解，请阅读完整文档**
+
+</div>
+
+---
+
+**宪法依据**: §100.3§101§102§103§104§106.1§300.3§300.5  
+**版本**: v2.0.0  
+**更新日期**: 2026-02-21
 
 ---
 

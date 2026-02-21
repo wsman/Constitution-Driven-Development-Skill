@@ -35,6 +35,8 @@ CORE_FILES = {
     "root": [
         "README.md",
         "SKILL.md",
+        "QUICK_START.md",
+        "reference.md",
         "pyproject.toml",
         "requirements.txt",
         "pytest.ini",
@@ -356,6 +358,109 @@ def verify_structure() -> Dict[str, Any]:
     
     return results
 
+
+# -----------------------------------------------------------------------------
+# 模板必需文件
+# -----------------------------------------------------------------------------
+
+REQUIRED_TEMPLATES = {
+    "t0_core": [
+        "templates/t0_core/active_context.md",
+        "templates/t0_core/knowledge_graph.md",
+        "templates/t0_core/basic_law_index.md",
+        "templates/t0_core/operational_law_index.md",
+        "templates/t0_core/tools_law_index.md",
+    ],
+    "t1_axioms": [
+        "templates/t1_axioms/behavior_context.md",
+        "templates/t1_axioms/system_patterns.md",
+        "templates/t1_axioms/tech_context.md",
+    ],
+    "t2_protocols": [
+        "templates/t2_protocols/WF-001_clarify_workflow.md",
+        "templates/t2_protocols/WF-201_cdd_workflow.md",
+        "templates/t2_protocols/WF-206_refactor_protocol.md",
+    ],
+    "t2_standards": [
+        "templates/t2_standards/DS-007_context_management.md",
+        "templates/t2_standards/DS-039_tool_bridge.md",
+        "templates/t2_standards/DS-050_feature_specification.md",
+        "templates/t2_standards/DS-051_implementation_plan.md",
+        "templates/t2_standards/DS-052_atomic_tasks.md",
+        "templates/t2_standards/DS-053_quality_checklist.md",
+    ],
+    "t3_documentation": [
+        "templates/t3_documentation/unified_docs.md",
+    ],
+}
+
+
+def verify_templates(full: bool = False) -> Dict[str, Any]:
+    """验证模板完整性"""
+    results = {
+        "category": "templates",
+        "description": "模板完整性",
+        "status": "passed",
+        "templates_checked": 0,
+        "templates_passed": 0,
+        "issues": [],
+        "details": {}
+    }
+    
+    for group_name, templates in REQUIRED_TEMPLATES.items():
+        group_passed = 0
+        group_total = len(templates)
+        
+        for template_path_str in templates:
+            template_path = SKILL_ROOT / template_path_str
+            results["templates_checked"] += 1
+            
+            if not template_path.exists():
+                results["status"] = "failed"
+                results["issues"].append({
+                    "template": template_path_str,
+                    "group": group_name,
+                    "error": "模板文件不存在"
+                })
+                continue
+            
+            # 检查模板文件是否有内容
+            if full:
+                try:
+                    content = template_path.read_text(encoding='utf-8')
+                    if len(content.strip()) < 50:  # 模板至少要有50字符
+                        results["status"] = "warning"
+                        results["issues"].append({
+                            "template": template_path_str,
+                            "group": group_name,
+                            "error": "模板内容过短，可能是空模板"
+                        })
+                        continue
+                    
+                    # 检查是否包含未解析的模板变量
+                    import re
+                    unresolved_vars = re.findall(r'\{\{[A-Z_]+\}\}', content)
+                    # 注意：模板文件中包含模板变量是正常的
+                    
+                except Exception as e:
+                    results["status"] = "failed"
+                    results["issues"].append({
+                        "template": template_path_str,
+                        "group": group_name,
+                        "error": f"无法读取模板: {e}"
+                    })
+                    continue
+            
+            results["templates_passed"] += 1
+            group_passed += 1
+        
+        results["details"][group_name] = {
+            "total": group_total,
+            "passed": group_passed
+        }
+    
+    return results
+
 # -----------------------------------------------------------------------------
 # 修复函数
 # -----------------------------------------------------------------------------
@@ -491,6 +596,10 @@ def main():
     
     # 4. 验证配置文件
     results.append(verify_config_files())
+    
+    # 5. 验证模板（完整模式下）
+    if args.full:
+        results.append(verify_templates(full=True))
     
     # 尝试修复
     if args.fix:

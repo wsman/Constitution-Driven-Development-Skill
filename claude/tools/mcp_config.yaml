@@ -105,6 +105,41 @@ tools:
           description: "是否使用最小化部署"
           default: false
       required: ["project_name"]
+    
+  - name: "cdd_asset"
+    description: "技术资产库的扫描、搜索、验证和管理"
+    input_schema:
+      type: "object"
+      properties:
+        command:
+          type: "string"
+          description: "命令类型 (scan, search, validate, suggest, stats, report)"
+          default: "scan"
+        query:
+          type: "string"
+          description: "搜索查询词"
+          default: ""
+        asset_type:
+          type: "string"
+          description: "资产类型过滤"
+          default: ""
+        verbose:
+          type: "boolean"
+          description: "详细输出模式"
+          default: false
+        format:
+          type: "string"
+          description: "报告格式 (json/text)"
+          default: "json"
+        file_path:
+          type: "string"
+          description: "资产文件路径"
+          default: ""
+        project_path:
+          type: "string"
+          description: "项目路径"
+          default: "."
+      required: []
 
 # 工具组定义
 tool_groups:
@@ -122,6 +157,11 @@ tool_groups:
     name: "项目初始化"
     tools: ["cdd_project_init"]
     description: "项目部署和初始化工具"
+
+  asset_management:
+    name: "资产管理"
+    tools: ["cdd_asset"]
+    description: "技术资产管理工具"
 
 # 工具权限配置
 permissions:
