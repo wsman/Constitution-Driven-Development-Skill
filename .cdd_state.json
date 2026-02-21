@@ -1,0 +1,14 @@
+{
+  "state": "B",
+  "previous_state": "A",
+  "transition_timestamp": "2026-02-20T18:01:43.294243",
+  "transition_reason": "manual",
+  "history": [
+    {
+      "from_state": "A",
+      "to_state": "B",
+      "timestamp": "2026-02-20T18:01:43.294243",
+      "reason": "manual"
+    }
+  ]
+}

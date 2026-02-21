@@ -1,0 +1,134 @@
+# CDD Configuration v1.8.0
+# Ecosystem & Automation
+
+project:
+  name: "{{PROJECT_NAME}}"
+  version: "0.1.0"
+  entropy_threshold: 0.3
+
+# 外部审计配置 (Gate 4 Semantic Audit)
+external_auditor:
+  enabled: true
+  provider: "deepseek-reasoner"
+  max_tokens: 8192
+  api:
+    base_url: "https://api.deepseek.com"
+    api_key: "${DEEPSEEK_API_KEY}"
+    timeout: 60
+  trigger_policy:
+    on_state_change: ["State E"]
+    on_file_change: ["memory_bank/t0_core/active_context.md"]
+  reporting:
+    format: "markdown"
+    output_dir: "research_report"
+  judicial_parameters:
+    temperature: 0.0      # 绝对理性，零创造性
+    max_tokens: 4096      # 给足推理空间
+    strict_mode: true     # 启用严格违宪审查模式
+
+# Spec-Kit 集成配置 (v1.8.0 Updated)
+spec_kit:
+  templates:
+    spec: "templates/t2_standards/DS-050_feature_specification.md"
+    plan: "templates/t2_standards/DS-051_implementation_plan.md"
+    tasks: "templates/t2_standards/DS-052_atomic_tasks.md"
+    quality_checklist: "templates/t2_standards/DS-053_quality_checklist.md"
+    environment_hardening: "templates/t2_standards/DS-054_environment_hardening.md"
+  output:
+    specs_dir: "specs"
+    plans_dir: "plans"
+    checklists_dir: "memory_bank/checklists"
+
+# 质量门禁配置 (v1.8.0更新)
+quality_gates:
+  analyze:
+    enabled: true
+    mandatory: true
+    trigger: "after DS-052 generation"
+    output: "memory_bank/t2_protocols/analysis_report.md"
+  checklist:
+    enabled: true
+    mandatory: false
+    trigger: "after Analyze pass"
+    output_dir: "memory_bank/t2_standards/checklists"
+  environment_hardening:
+    enabled: true
+    mandatory: true
+    trigger: "before State C execution"
+    skip_patterns:
+      - "*.docs"
+      - "*.refactor"
+
+# GitHub 生态集成 (v1.8.0更新)
+github_integration:
+  enabled: true
+  protocol: "memory_bank/t2_protocols/WF-sync-issues.md"
+  sync_on_state_b: true        # State B完成后自动同步
+  sync_on_demand: true         # 支持手动触发
+  default_labels:
+    - "cdd-task"
+    - "automated"
+  behavior: "create_and_link"  # create | link_only
+  task_prefix: "T"            # 任务ID前缀
+
+# 治理配置 (v1.8.0更新)
+governance:
+  amendment_protocol: "memory_bank/t2_protocols/WF-amend.md"
+  versioning_scheme: "semver"
+  protected_paths:
+    - "memory_bank/t0_core/*"
+    - "memory_bank/t1_axioms/*"
+  require_impact_report: true
+
+# 上下文管理 (DS-007)
+context_strategy:
+  max_tokens: 8000
+  safety_margin: 0.1
+  modes:
+    planning:
+      include: ["memory_bank/t1_axioms/system_patterns.md", "memory_bank/t1_axioms/tech_context.md"]
+      budget_ratio: 0.5
+    coding:
+      include: ["memory_bank/t2_standards/DS-050_feature_specification.md", "memory_bank/t2_standards/DS-051_implementation_plan.md", "memory_bank/t2_standards/DS-052_atomic_tasks.md"]
+      budget_ratio: 0.7
+    verifying:
+      include: ["memory_bank/t1_axioms/behavior_context.md"]
+      budget_ratio: 0.6
+
+# 路径配置 (v1.8.0)
+paths:
+  memory_bank:
+    t0_core: "memory_bank/t0_core"
+    t1_axioms: "memory_bank/t1_axioms"
+    t2_protocols: "memory_bank/t2_protocols"
+    t2_standards: "memory_bank/t2_standards"
+    t3_documentation: "memory_bank/t3_documentation"
+  templates:
+    t0_core: "templates/t0_core"
+    t1_axioms: "templates/t1_axioms"
+    t2_protocols: "templates/t2_protocols"
+    t2_standards: "templates/t2_standards"
+    t3_documentation: "templates/t3_documentation"
+
+# ============================================
+# v1.6.0: 工具集扩展 (Toolkit Expansion)
+# ============================================
+
+# 工具集配置 (v1.8.0更新)
+toolkit:
+  code_review:
+    enabled: true
+    template: "memory_bank/t2_standards/DS-060_code_review.md"
+    protocol: "memory_bank/t2_protocols/WF-review.md"
+    auto_trigger:
+      on_git_push: false
+      on_pr_open: true
+    severity_levels:
+      critical: "🔴 立即修复"
+      major: "🟠 合并前修复"
+      minor: "🟡 建议修复"
+    checklist:
+      - security: "SQL注入、XSS、硬编码Secrets"
+      - architecture: "分层结构、依赖管理"
+      - robustness: "边缘情况、错误处理"
+      - compliance: "CDD工作流、T0/T1/T2规范"

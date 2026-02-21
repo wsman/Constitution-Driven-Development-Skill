@@ -1,0 +1,50 @@
+# CDD Skill Dependencies
+# 宪法依据: §100.3
+
+# ================================
+# 必需依赖 (必须安装，否则CDD无法运行)
+# ================================
+
+pytest>=6.0.0              # Gate 2 行为验证测试框架
+pyyaml>=6.0.0              # 配置文件解析 (导入名: yaml)
+
+# ================================
+# 推荐依赖 (增强功能，建议安装)
+# ================================
+
+# tree 命令 - 目录结构可视化
+# 系统包管理器安装，非 pip 包:
+#   Ubuntu/Debian: apt install tree
+#   macOS: brew install tree
+#   Windows: choco install tree
+
+# jq 命令 - JSON 输出处理 (可选)
+#   Ubuntu/Debian: apt install jq
+#   macOS: brew install jq
+
+# ================================
+# 可选依赖 (特定功能需要)
+# ================================
+
+# DeepSeek API 客户端 (Gate 4 语义审计)
+# 需要配置 DEEPSEEK_API_KEY 环境变量
+# openai>=1.0.0
+
+# ================================
+# 开发依赖 (仅用于开发CDD技能本身)
+# ================================
+
+# 无特殊要求
+
+# ================================
+# 安装说明
+# ================================
+
+# 一键安装必需依赖:
+#   pip install pytest pyyaml
+
+# 完整安装 (包含可选依赖):
+#   pip install pytest pyyaml openai
+
+# 环境检查 (验证依赖):
+#   python scripts/cdd_check_env.py --fix

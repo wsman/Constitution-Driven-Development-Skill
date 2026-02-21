@@ -1,0 +1,377 @@
+---
+name: cdd-unified-workflow
+description: CDD统一工作流技能 - 5状态参数化版本 (A→B→C→D→E)
+model: zai/glm-4.7
+version: v2.0.0
+type: unified-state-skill
+priority: critical
+activation_triggers: ["cdd", "宪法", "entropy", "审计", "开发", "workflow"]
+constitutional_basis:
+  - "§101: 单一真理源原则"
+  - "§102: 熵减原则"
+  - "§141: 状态机公理"
+  - "§151: 持久化原则"
+  - "§152: 规格驱动原则"
+  - "§201.3: 四门宪法审计"
+  - "§300.1: 孢子协议"
+  - "§313: Claude Code自动化原则"
+  - "§320: L2+项目强制使用原则"
+---
+
+# CDD统一工作流技能 v2.0.0
+
+> **角色定义**: 你是**CDD统一工作流引擎**。根据当前状态参数执行对应的5状态工作流阶段，确保所有操作符合宪法约束。
+
+## 🎯 核心使命
+
+### 状态参数化架构
+本技能通过`state`参数动态加载对应阶段的行为模式：
+
+| 状态 | 名称 | 核心任务 | 宪法依据 |
+|:----:|:----:|:---------|:---------|
+| **A** | Intake | 接收任务、检查点恢复、熵值验证 | §101, §102, §313 |
+| **B** | Plan | 生成DS-050/051/052规格文档 | §141, §152, §313 |
+| **C** | Execute | 基于批准规格编码实现 | §119, §152, §306, §320 |
+| **D** | Verify | 执行四门宪法审计验证 | §201.3, §102, §141 |
+| **E** | Close | 更新上下文、创建检查点、归档 | §151, §101, §141 |
+
+---
+
+## 🔄 状态机工作流
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CDD 5-STATE WORKFLOW                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│   ┌───────┐    ┌───────┐    ┌───────┐    ┌───────┐    ┌───────┐ │
+│   │   A   │───▶│   B   │───▶│   C   │───▶│   D   │───▶│   E   │ │
+│   │Intake │    │ Plan  │    │Execute│    │Verify │    │ Close │ │
+│   └───────┘    └───────┘    └───────┘    └───────┘    └───────┘ │
+│       ▲                                    │              │     │
+│       └────────────────────────────────────┴──────────────┘     │
+│                         (循环继续)                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📋 STATE A: INTAKE (接收阶段)
+
+### 阶段使命
+- **检查点智能检测**: 自动检测并加载上次中断的检查点
+- **熵值危机识别**: 实时监测系统熵值，识别危机状态
+- **宪法上下文加载**: 加载状态特定的宪法约束
+- **任务接收验证**: 验证任务是否符合宪法授权范围
+
+### 标准工作流程
+```python
+def state_a_intake():
+    """State A: 接收阶段主流程"""
+    
+    # 1. 检查点检测与恢复
+    checkpoint = detect_and_recover_checkpoint()
+    
+    # 2. 熵值状态验证
+    entropy_status = verify_entropy_state()
+    if entropy_status["h_sys"] > 0.7:
+        activate_entropy_crisis_protocol()
+        return {"state": "crisis", "action": "重构"}
+    
+    # 3. 宪法约束加载
+    constraints = load_state_constraints("A")
+    
+    # 4. 准备接收任务
+    return {
+        "state": "A",
+        "ready": True,
+        "entropy": entropy_status["h_sys"],
+        "checkpoint": checkpoint
+    }
+```
+
+### 状态转换条件 (A→B)
+- [ ] 检查点状态正常（无熵值危机）
+- [ ] 系统熵值 $H_{sys} \le 0.7$
+- [ ] 任务已通过宪法验证
+- [ ] Memory Bank初始化完成
+
+---
+
+## 📋 STATE B: PLAN (规划阶段)
+
+### ⚠️ 宪法警告: 绝对禁令
+**§141 开发阶段分离公理**: 严禁在State B编写任何代码或进行技术实现。
+
+### 阶段使命
+- **特性规格生成**: 基于需求生成完整的DS-050/051/052文档
+- **宪法合规预检**: 确保规格设计符合所有宪法约束
+- **技术架构规划**: 设计符合系统模式的技术架构
+- **等待批准**: 在Claude Code界面等待规格批准
+
+### 标准工作流程
+```python
+def state_b_plan(feature_name, requirements, complexity="L2"):
+    """State B: 规划阶段主流程"""
+    
+    # 宪法检查: 确保从State A正常转换
+    validate_state_transition("A", "B")
+    
+    # 1. 生成特性规格
+    spec_result = cdd_feature_tool.execute(
+        feature_name=feature_name,
+        description=requirements,
+        complexity=complexity
+    )
+    
+    # 2. 宪法设计审查
+    review_result = constitutional_design_review(spec_result)
+    
+    # 3. 等待批准
+    if spec_result["success"]:
+        display_specifications(spec_result["spec_docs"])
+        request_approval()  # §152要求
+        
+    return spec_result
+```
+
+### 状态转换条件 (B→C)
+- [ ] DS-050文档已生成并通过宪法审查
+- [ ] **必须等待用户明确批准** (§152)
+- [ ] 技术架构设计完成并合规
+- [ ] 熵值影响评估完成
+
+---
+
+## 📋 STATE C: EXECUTE (执行阶段)
+
+### 阶段使命
+- **宪法合规编码**: 所有代码符合宪法约束
+- **主题系统集成**: 使用北欧主题系统变量 (§119)
+- **零停机支持**: 代码支持§306零停机部署
+- **实时审计**: 编码过程中实时验证宪法合规性
+
+### 标准工作流程
+```python
+@constitutional_coding_guard
+def state_c_execute(spec_docs):
+    """State C: 执行阶段主流程"""
+    
+    # 宪法检查: 必须基于批准的DS-050
+    if not spec_docs.get("ds050_approved", False):
+        raise ConstitutionalViolation("§152", "DS-050未批准")
+    
+    # 1. 准备编码环境
+    prepare_coding_environment(spec_docs)
+    
+    # 2. 实时宪法检查装饰器自动执行
+    #    - §119 主题合规检查
+    #    - §306 零停机检查
+    #    - §101 单一真理源检查
+    
+    # 3. 执行编码操作
+    write_code(file_path, content)
+    
+    # 4. 运行自动化测试
+    run_automated_tests()
+```
+
+### 主题驱动开发 (§119)
+```python
+# 硬编码颜色检测与自动修复
+theme_variables = {
+    "#3b82f6": "var(--primary-color)",
+    "#10b981": "var(--success-color)",
+    "#f59e0b": "var(--warning-color)",
+    "#ef4444": "var(--error-color)"
+}
+```
+
+### 状态转换条件 (C→D)
+- [ ] 所有代码实现完成并通过测试
+- [ ] §119主题合规检查100%通过
+- [ ] §306零停机部署验证通过
+- [ ] 测试覆盖率 > 80%
+
+---
+
+## 📋 STATE D: VERIFY (验证阶段)
+
+### 阶段使命
+- **四门宪法审计**: 执行Gate 1-4完整审计
+- **熵值变化验证**: 计算并验证 $\Delta H_{sys} \le 0$
+- **测试完整性验证**: 确保测试覆盖率 > 80%
+- **宪法合规认证**: 生成最终合规报告
+
+### 四门审计详情
+| Gate | 名称 | 宪法依据 | 检查内容 |
+|:----:|:----:|:---------|:---------|
+| **1** | 版本一致性 | §101, §102.3 | 代码与文档版本同步 |
+| **2** | 行为验证 | §141 | 运行自动化测试验证功能 |
+| **3** | 熵值监控 | §102 | 测量和验证系统熵值变化 |
+| **4** | 语义审计 | §201.3 | LLM-Judge语义合规验证 |
+
+### 标准工作流程
+```python
+def state_d_verify():
+    """State D: 验证阶段主流程"""
+    
+    # 1. 执行四门宪法审计
+    audit_result = cdd_audit_tool.execute(gate="all", format="detailed")
+    
+    # 2. 验证熵值变化
+    entropy_result = verify_entropy_change()
+    
+    # 3. 验证测试完整性
+    test_result = verify_test_completeness()
+    
+    # 4. 生成合规报告
+    report = generate_constitutional_compliance_report(
+        audit_result, entropy_result, test_result
+    )
+    
+    return {
+        "all_passed": audit_result["all_gates_passed"] and entropy_result["entropy_compliant"],
+        "report": report
+    }
+```
+
+### 状态转换条件 (D→E)
+- [ ] **Gate 1-4全部通过** (§201.3)
+- [ ] **熵值变化合规** $\Delta H_{sys} \le 0$ (§102)
+- [ ] **测试覆盖率 > 80%** (Gate 2要求)
+- [ ] **宪法合规报告生成**
+
+---
+
+## 📋 STATE E: CLOSE (关闭阶段)
+
+### 阶段使命
+- **活动上下文更新**: 智能更新memory_bank/t0_core/active_context.md
+- **恢复检查点创建**: 为下次开发创建完整恢复检查点
+- **宪法事件记录**: 记录完整的开发审计轨迹
+- **工作流闭环**: 完成A→E完整工作流，准备新任务
+
+### 标准工作流程
+```python
+def state_e_close():
+    """State E: 关闭阶段主流程"""
+    
+    # 1. 智能更新活动上下文
+    update_active_context_intelligently()
+    
+    # 2. 创建恢复检查点
+    create_recovery_checkpoint()
+    
+    # 3. 归档宪法事件
+    archive_constitutional_events()
+    
+    # 4. 生成办公厅主任汇报
+    generate_chief_of_staff_report()
+    
+    # 5. 返回State A准备新任务
+    return {
+        "state": "A",  # 闭环后回到接收状态
+        "ready_for_next_task": True
+    }
+```
+
+### 状态转换条件 (E→A)
+- [ ] **活动上下文成功更新** (§151)
+- [ ] **恢复检查点完整创建**
+- [ ] **宪法事件完整归档**
+- [ ] **汇报材料准备就绪**
+
+---
+
+## 🛠️ 核心工具接入
+
+| 工具名称 | 命令 | 宪法依据 | 使用场景 |
+|----------|------|----------|----------|
+| **cdd_audit** | `cdd_audit.execute(gate='all')` | §201.3 | 宪法审计验证 |
+| **measure_entropy** | `measure_entropy.execute()` | §102 | 熵值监控和优化 |
+| **cdd_feature** | `cdd_feature.execute(feature_name='xx')` | §101, §313 | 特性规格生成 |
+| **cdd_project_init** | `cdd_project_init.execute(project_name='xx')` | §101, §151 | 项目初始化 |
+| **cdd_state_transition** | `cdd_state_transition.execute(target_state='B')` | §141, §152 | 工作流状态转换 |
+
+---
+
+## 📊 熵值监控 ($H_{sys}$)
+
+### 权威熵值公式
+$$H_{sys} = 0.4 \cdot H_{cog} + 0.3 \cdot H_{struct} + 0.3 \cdot H_{align}$$
+
+### 熵值阈值标准
+
+| 范围 | 状态 | 行动建议 |
+|------|------|----------|
+| **0.0 - 0.3** | 🟢 优秀 | 正常开发 |
+| **0.3 - 0.5** | 🟡 良好 | 正常开发，监控技术债务 |
+| **0.5 - 0.7** | 🟠 警告 | 建议暂停新功能，启动优化 |
+| **0.7 - 1.0** | 🔴 危险 | **强制执行**熵值危机协议 |
+
+### 熵值危机协议
+当 $H_{sys} > 0.7$ 时触发：
+1. **立即停止**: 停止所有新功能开发
+2. **强制重构**: 执行 `scripts/entropy.py --optimize`
+3. **优先级调整**: 技术债务修复优先
+4. **恢复标准**: $H_{sys} \le 0.5$ 后才能继续
+
+---
+
+## 🔧 故障排除
+
+### 常见问题
+
+#### Q1: 状态转换失败
+```
+症状: 无法从State B转换到State C
+原因: DS-050未批准
+解决: 等待用户明确批准规格文档 (§152)
+```
+
+#### Q2: 熵值超标
+```
+症状: H_sys > 0.7
+原因: 系统熵值累积过高
+解决: 执行熵值危机协议，优先重构技术债务
+```
+
+#### Q3: 主题违规
+```
+症状: 检测到硬编码颜色
+原因: 违反§119主题驱动开发原则
+解决: 使用var(--primary-color)等CSS变量替换
+```
+
+---
+
+## 📚 参考资源
+
+### 核心文档
+1. **操作指南**: `reference/01_operational_guide.md`
+2. **模板指南**: `reference/02_templates_guide.md`
+3. **Claude Code集成**: `reference/03_claude_code_integration.md`
+
+### 宪法文件
+1. **基本法**: `templates/t0_core/basic_law_index.md`
+2. **技术法**: `templates/t0_core/technical_law_index.md`
+3. **程序法**: `templates/t0_core/procedural_law_index.md`
+
+---
+
+## 📝 版本记录
+
+- **2026-02-19 v2.0.0**: 统一参数化版本
+  - 合并6个状态技能为1个统一技能
+  - 保持完整的5状态工作流支持
+  - 宪法依据完整保留
+  - 符合激进简化计划要求
+
+**文件状态**: 🟢 活跃  
+**宪法层级**: T0 核心层 (统一工作流技能)  
+**加载策略**: 优先加载，通过state参数动态切换行为
+
+---
+
+> **宪法宣言**: 本技能作为CDD框架的统一工作流实现，确保所有开发活动严格遵守宪法约束，实现熵值最优的自动化开发流程。

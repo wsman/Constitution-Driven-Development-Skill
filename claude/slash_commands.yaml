@@ -1,0 +1,269 @@
+# CDD Claude Code 斜杠命令配置
+# 宪法依据: §101单一真理源原则、§102状态机公理、§309自动化任务原则
+
+name: unified-cdd-slash-commands
+version: v2.0.0
+description: CDD统一斜杠命令配置
+type: slash-command-configuration
+maintainer: 科技部Claude Code集成团队
+constitutional_basis:
+  - "§101: 单一真理源原则 - 斜杠命令定义统一配置"
+  - "§102: 状态机公理 - 命令支持5状态工作流"
+  - "§309: Claude Code自动化任务原则 - 优化自动化命令交互"
+  - "§304: L2+项目强制使用原则 - 确保命令使用合规"
+
+# -----------------------------------------------------------------------------
+# 核心工作流命令
+# -----------------------------------------------------------------------------
+
+# 工作流命令
+cdd-workflow:
+  name: /cdd-workflow
+  syntax: "/cdd-workflow <task_description>"
+  description: 启动完整的CDD 5状态工作流
+  constitutional_basis: ["§102", "§309", "§304"]
+  examples:
+    - command: "/cdd-workflow implement-user-authentication"
+      description: "实现用户认证功能（自动执行A→E状态）"
+    - command: "/cdd-workflow add-password-reset-feature"
+      description: "添加密码重置功能"
+  workflow_trigger:
+    state: "A"
+    auto_transition: true
+    tools_invoked:
+      - "cdd_feature"
+      - "cdd_state_transition"
+      - "cdd_audit"
+
+# 宪法检查命令
+constitution-check:
+  name: /constitution-check
+  syntax: "/constitution-check [--gate=1-4|all] [--format=json|text]"
+  description: 执行宪法合规检查
+  constitutional_basis: ["§101", "§102", "§300.3"]
+  options:
+    gate:
+      description: "指定审计门（1-4或all）"
+      default: "all"
+      values: ["1", "2", "3", "4", "all"]
+    format:
+      description: "输出格式"
+      default: "text"
+      values: ["json", "text", "detailed"]
+  examples:
+    - command: "/constitution-check"
+      description: "执行全部4门宪法审计"
+    - command: "/constitution-check --gate=1"
+      description: "仅执行Gate 1版本一致性检查"
+    - command: "/constitution-check --gate=all --format=json"
+      description: "JSON格式输出完整审计结果"
+  tools_invoked:
+    - "cdd_audit"
+    - "cdd_constitution_check"
+
+# 熵值监控命令
+entropy-monitor:
+  name: /entropy-monitor
+  syntax: "/entropy-monitor [--optimize] [--threshold=0.7]"
+  description: 监控和优化系统熵值
+  constitutional_basis: ["§102"]
+  options:
+    optimize:
+      description: "自动执行熵值优化"
+      type: "flag"
+    threshold:
+      description: "熵值警告阈值"
+      default: "0.7"
+      type: "float"
+  examples:
+    - command: "/entropy-monitor"
+      description: "显示当前系统熵值"
+    - command: "/entropy-monitor --optimize"
+      description: "监控并自动优化熵值"
+    - command: "/entropy-monitor --threshold=0.5"
+      description: "使用0.5作为警告阈值"
+  tools_invoked:
+    - "measure_entropy"
+
+# 代码审查命令
+code-review:
+  name: /code-review
+  syntax: "/code-review <path> [--standard=ds-060]"
+  description: 执行代码审查
+  constitutional_basis: ["§101", "§102", "§300.3"]
+  options:
+    standard:
+      description: "审查标准"
+      default: "ds-060"
+      values: ["ds-060", "constitution", "all"]
+  examples:
+    - command: "/code-review src/auth/"
+      description: "审查auth目录下的代码"
+    - command: "/code-review src/components/Button.tsx --standard=constitution"
+      description: "按宪法标准审查Button组件"
+  tools_invoked:
+    - "cdd_audit"
+
+# 检查点保存命令
+checkpoint-save:
+  name: /checkpoint-save
+  syntax: "/checkpoint-save [--note=<description>]"
+  description: 保存当前工作流检查点
+  constitutional_basis: ["§104"]
+  options:
+    note:
+      description: "检查点备注"
+      type: "string"
+  examples:
+    - command: "/checkpoint-save"
+      description: "保存当前状态为检查点"
+    - command: "/checkpoint-save --note='完成用户认证核心逻辑'"
+      description: "带备注保存检查点"
+  tools_invoked:
+    - "claude_code_bridge.create_checkpoint"
+
+# 检查点恢复命令
+checkpoint-restore:
+  name: /checkpoint-restore
+  syntax: "/checkpoint-restore [--latest|<checkpoint_id>]"
+  description: 恢复到指定检查点
+  constitutional_basis: ["§104"]
+  options:
+    latest:
+      description: "恢复到最新检查点"
+      type: "flag"
+  examples:
+    - command: "/checkpoint-restore --latest"
+      description: "恢复到最新检查点"
+    - command: "/checkpoint-restore 20260219_120000"
+      description: "恢复到指定ID的检查点"
+  tools_invoked:
+    - "claude_code_bridge.restore_checkpoint"
+
+# 特性生成命令
+feature-spec:
+  name: /feature-spec
+  syntax: "/feature-spec <feature_name> [--complexity=L1-L4]"
+  description: 生成特性规格文档
+  constitutional_basis: ["§101", "§309"]
+  options:
+    complexity:
+      description: "功能复杂度等级"
+      default: "L2"
+      values: ["L1", "L2", "L3", "L4"]
+  examples:
+    - command: "/feature-spec user-authentication --complexity=L3"
+      description: "生成L3复杂度的用户认证规格"
+  tools_invoked:
+    - "cdd_feature"
+
+# 状态转换命令
+state-transition:
+  name: /state-transition
+  syntax: "/state-transition <target_state>"
+  description: 手动触发工作流状态转换
+  constitutional_basis: ["§102", "§103"]
+  valid_transitions:
+    - from: "A"
+      to: ["B"]
+    - from: "B"
+      to: ["C"]
+    - from: "C"
+      to: ["D"]
+    - from: "D"
+      to: ["E", "C"]
+    - from: "E"
+      to: ["A"]
+  examples:
+    - command: "/state-transition B"
+      description: "从State A转换到State B"
+    - command: "/state-transition C"
+      description: "从State B转换到State C"
+  tools_invoked:
+    - "cdd_state_transition"
+
+# 主题检查命令
+theme-check:
+  name: /theme-check
+  syntax: "/theme-check <path> [--fix]"
+  description: 检查§119 Nordic主题合规性
+  constitutional_basis: ["§119"]
+  options:
+    fix:
+      description: "自动修复硬编码颜色"
+      type: "flag"
+  examples:
+    - command: "/theme-check src/"
+      description: "检查src目录下的主题合规"
+    - command: "/theme-check src/components/ --fix"
+      description: "检查并自动修复主题违规"
+  detection_patterns:
+    - "#[0-9a-fA-F]{3,6}"
+    - "rgb\\([0-9, ]+\\)"
+    - "rgba\\([0-9, ]+\\)"
+
+# 零停机检查命令
+zero-downtime-check:
+  name: /zero-downtime-check
+  syntax: "/zero-downtime-check [--pre-deploy|--post-deploy]"
+  description: 验证§310零停机部署合规
+  constitutional_basis: ["§310"]
+  options:
+    pre-deploy:
+      description: "部署前检查"
+      type: "flag"
+    post-deploy:
+      description: "部署后检查"
+      type: "flag"
+  examples:
+    - command: "/zero-downtime-check --pre-deploy"
+      description: "部署前验证零停机条件"
+    - command: "/zero-downtime-check --post-deploy"
+      description: "部署后验证服务健康"
+
+# -----------------------------------------------------------------------------
+# 命令分组
+# -----------------------------------------------------------------------------
+
+command_groups:
+  workflow:
+    name: "工作流控制"
+    commands: ["cdd-workflow", "state-transition", "checkpoint-save", "checkpoint-restore"]
+  
+  verification:
+    name: "验证检查"
+    commands: ["constitution-check", "entropy-monitor", "code-review", "theme-check", "zero-downtime-check"]
+  
+  generation:
+    name: "文档生成"
+    commands: ["feature-spec"]
+
+# -----------------------------------------------------------------------------
+# 快捷别名
+# -----------------------------------------------------------------------------
+
+aliases:
+  "/cc": "/constitution-check"
+  "/em": "/entropy-monitor"
+  "/cr": "/code-review"
+  "/cs": "/checkpoint-save"
+  "/cw": "/cdd-workflow"
+
+# -----------------------------------------------------------------------------
+# 宪法合规声明
+# -----------------------------------------------------------------------------
+
+constitutional_compliance:
+  compliance_statement: |
+    本斜杠命令配置严格遵循OpenDoge宪法约束，确保：
+    1. 命令定义清晰一致（§101）
+    2. 支持完整工作流状态转换（§102）
+    3. 优化Claude Code自动化交互（§309）
+    4. 确保L2+项目使用合规（§304）
+
+# 文件状态
+file_status:
+  status: "活跃"
+  constitutional_level: "T2 标准层 (命令配置)"
+  maintenance_policy: "持续维护，随CDD版本同步更新"
+  source_config: "基于unified-cdd-integration-config v2.0.0"

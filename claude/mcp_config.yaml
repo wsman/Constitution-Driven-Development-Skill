@@ -1,0 +1,212 @@
+# CDD Claude Code MCP服务器配置
+# 宪法依据: §309 Claude Code自动化任务原则、§304 L2+项目强制使用原则
+
+name: unified-cdd-mcp-config
+version: v2.0.0
+description: CDD统一MCP服务器配置
+type: mcp-server-configuration
+maintainer: 科技部Claude Code集成团队
+constitutional_basis:
+  - "§309: Claude Code自动化任务原则 - 优化自动化MCP工具"
+  - "§304: L2+项目强制使用原则 - 确保L2+项目MCP集成合规"
+
+# -----------------------------------------------------------------------------
+# 主配置引用
+# -----------------------------------------------------------------------------
+
+primary_configuration:
+  reference: "claude_integration/config.yaml"
+  section: "mcp_integration"
+  description: "完整MCP集成配置，包含服务器、权限、安全等完整配置"
+
+# -----------------------------------------------------------------------------
+# MCP服务器配置 (简化为常用服务器)
+# -----------------------------------------------------------------------------
+
+mcp_servers:
+  # CDD工具MCP
+  cdd_tools:
+    command: "python3"
+    args:
+      - "-m"
+      - "claude_tools.tool_registry"
+    env:
+      PYTHONPATH: "/home/wsman/OpenDoge/departments/technology/skills/cdd"
+      CDD_ROOT: "/home/wsman/OpenDoge/departments/technology/skills/cdd"
+    description: "CDD工具MCP - 提供CDD宪法审计、熵值计算、特性生成等工具"
+    constitutional_basis: ["§309", "§304"]
+    permissions:
+      allow:
+        - "cdd_audit:*"
+        - "measure_entropy:*"
+        - "cdd_feature:*"
+        - "cdd_project_init:*"
+        - "cdd_state_transition:*"
+      deny:
+        - "system:*"
+        - "file_write:*"
+
+  # Git MCP
+  git:
+    package: "@modelcontextprotocol/server-git"
+    description: "Git版本控制集成"
+    installation: "claude mcp add git -- npx -y @modelcontextprotocol/server-git"
+    constitutional_basis: ["§101", "§104"]
+    capabilities:
+      - "读取提交历史"
+      - "查看文件差异"
+      - "管理分支"
+    permissions:
+      allow:
+        - "mcp__git__status"
+        - "mcp__git__log"
+        - "mcp__git__diff"
+        - "mcp__git__branch_list"
+      deny:
+        - "mcp__git__push"  # 需要人工确认
+        - "mcp__git__reset"
+
+  # GitHub MCP
+  github:
+    package: "@modelcontextprotocol/server-github"
+    description: "GitHub API集成"
+    installation: "claude mcp add github -- npx -y @modelcontextprotocol/server-github"
+    constitutional_basis: ["§101", "§309"]
+    capabilities:
+      - "读取仓库信息"
+      - "管理Issues"
+      - "创建Pull Requests"
+      - "查看Actions状态"
+    permissions:
+      allow:
+        - "mcp__github__read_repo:OpenDoge/OpenDoge"
+        - "mcp__github__list_issues"
+        - "mcp__github__list_prs"
+      deny:
+        - "mcp__github__write_repo"  # 需要人工确认
+
+  # Sentry MCP
+  sentry:
+    package: "@modelcontextprotocol/server-sentry"
+    description: "错误监控集成"
+    installation: "claude mcp add sentry -- npx -y @modelcontextprotocol/server-sentry"
+    constitutional_basis: ["§102", "§310"]
+    capabilities:
+      - "读取错误报告"
+      - "分析性能问题"
+      - "监控部署健康"
+    permissions:
+      allow:
+        - "mcp__sentry__read_issues"
+        - "mcp__sentry__read_events"
+      deny:
+        - "mcp__sentry__write_settings"
+
+# -----------------------------------------------------------------------------
+# 权限配置模板
+# -----------------------------------------------------------------------------
+
+permission_templates:
+  developer:
+    description: "开发者默认权限"
+    allow:
+      - "Read(departments/technology/**)"
+      - "Read(memory_bank/**)"
+      - "Write(library/**)"
+      - "mcp__git__status"
+      - "mcp__git__log"
+      - "mcp__github__read_repo:*"
+    deny:
+      - "Write(memory_bank/t0_core/**)"
+      - "Write(cabinet/**)"
+      - "mcp__postgres__write:*"
+
+  auditor:
+    description: "审计者权限"
+    allow:
+      - "Read(**)"
+      - "mcp__git__*"
+      - "mcp__github__read_*"
+      - "mcp__sentry__read_*"
+    deny:
+      - "Write(**)"
+
+  admin:
+    description: "管理员权限 (办公厅主任)"
+    allow:
+      - "Read(**)"
+      - "Write(**)"
+      - "mcp__**"
+    deny: []
+
+# -----------------------------------------------------------------------------
+# 安全配置
+# -----------------------------------------------------------------------------
+
+security:
+  sensitive_operations:
+    - "git push"
+    - "github create_pr"
+    - "postgres write"
+    - "file delete"
+  
+  audit_logging:
+    enabled: true
+    log_path: "~/.claude/audit.log"
+    retention_days: 30
+  
+  rate_limits:
+    mcp_calls_per_minute: 60
+    file_operations_per_minute: 100
+
+# -----------------------------------------------------------------------------
+# 宪法合规声明
+# -----------------------------------------------------------------------------
+
+constitutional_compliance:
+  compliance_statement: |
+    本MCP服务器配置严格遵循OpenDoge宪法约束，确保：
+    1. 所有MCP操作通过Claude Code自动化（§309）
+    2. 确保L2+项目强制使用MCP工具（§304）
+    3. 权限配置保护宪法核心文件（§101）
+    4. 实时监控和审计所有MCP操作（§102）
+
+# -----------------------------------------------------------------------------
+# 部署指南
+# -----------------------------------------------------------------------------
+
+deployment_guidance:
+  recommended_servers:
+    - name: "cdd_tools"
+      priority: "high"
+      description: "CDD核心工具，必须部署"
+    
+    - name: "git"
+      priority: "high"
+      description: "版本控制，推荐部署"
+    
+    - name: "github"
+      priority: "medium"
+      description: "GitHub集成，根据项目需求"
+    
+    - name: "sentry"
+      priority: "low"
+      description: "错误监控，可选"
+
+  installation_commands:
+    cdd_tools: |
+      # CDD工具MCP已集成在系统中
+      echo "CDD工具MCP已预配置"
+    
+    git: "claude mcp add git -- npx -y @modelcontextprotocol/server-git"
+    
+    github: "claude mcp add github -- npx -y @modelcontextprotocol/server-github"
+    
+    sentry: "claude mcp add sentry -- npx -y @modelcontextprotocol/server-sentry"
+
+# 文件状态
+file_status:
+  status: "活跃"
+  constitutional_level: "T2 标准层 (MCP配置)"
+  maintenance_policy: "持续维护，随CDD版本同步更新"
+  source_config: "基于unified-cdd-integration-config v2.0.0"

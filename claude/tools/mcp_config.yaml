@@ -1,0 +1,241 @@
+# CDD Tools MCP Configuration
+# 为Claude Code提供CDD工具的MCP服务器配置
+
+mcp_servers:
+  # CDD工具MCP服务器
+  cdd_tools:
+    command: "python3"
+    args:
+      - "-m"
+      - "claude_tools.tool_registry"
+    env:
+      CDD_ROOT: "/home/wsman/OpenDoge/departments/technology/skills/cdd"
+      PYTHONPATH: "/home/wsman/OpenDoge/departments/technology/skills/cdd"
+    timeout: 30
+    capabilities:
+      - "tools"
+
+# 可用工具定义
+tools:
+  - name: "cdd_audit"
+    description: "执行CDD宪法审计（Gate 1-4）"
+    input_schema:
+      type: "object"
+      properties:
+        gates:
+          type: "string"
+          description: "审计门禁（1-4或all）"
+          default: "all"
+        fix:
+          type: "boolean"
+          description: "是否自动修复版本漂移"
+          default: false
+        target:
+          type: "string"
+          description: "目标项目路径"
+      required: []
+    
+  - name: "measure_entropy"
+    description: "测量和分析系统熵值 (H_sys)"
+    input_schema:
+      type: "object"
+      properties:
+        project_path:
+          type: "string"
+          description: "项目路径"
+          default: "."
+        analyze:
+          type: "boolean"
+          description: "是否进行熵值热点分析"
+          default: false
+        optimize:
+          type: "boolean"
+          description: "是否生成优化建议"
+          default: false
+        top_n:
+          type: "integer"
+          description: "显示前N个热点"
+          default: 10
+      required: []
+    
+  - name: "cdd_feature"
+    description: "创建CDD特性规格脚手架"
+    input_schema:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          description: "特性名称"
+        description:
+          type: "string"
+          description: "特性描述"
+          default: ""
+        target:
+          type: "string"
+          description: "目标项目路径"
+          default: "."
+        create_branch:
+          type: "boolean"
+          description: "是否创建Git分支"
+          default: true
+        dry_run:
+          type: "boolean"
+          description: "模拟运行，不实际创建文件"
+          default: false
+      required: ["name"]
+    
+  - name: "cdd_project_init"
+    description: "部署CDD Memory Bank结构和配置"
+    input_schema:
+      type: "object"
+      properties:
+        project_name:
+          type: "string"
+          description: "项目名称"
+        target:
+          type: "string"
+          description: "目标项目路径"
+          default: "."
+        force:
+          type: "boolean"
+          description: "是否覆盖现有文件"
+          default: false
+        minimal:
+          type: "boolean"
+          description: "是否使用最小化部署"
+          default: false
+      required: ["project_name"]
+
+# 工具组定义
+tool_groups:
+  audit_verification:
+    name: "审计验证"
+    tools: ["cdd_audit", "measure_entropy"]
+    description: "宪法审计和熵值验证工具"
+  
+  feature_management:
+    name: "特性管理"
+    tools: ["cdd_feature"]
+    description: "特性创建和管理工具"
+  
+  project_initialization:
+    name: "项目初始化"
+    tools: ["cdd_project_init"]
+    description: "项目部署和初始化工具"
+
+# 工具权限配置
+permissions:
+  # 默认权限
+  default:
+    allow:
+      - "tools/cdd_audit"
+      - "tools/measure_entropy"
+      - "tools/cdd_feature"
+      - "tools/cdd_project_init"
+    deny: []
+  
+  # 只读权限
+  read_only:
+    allow:
+      - "tools/measure_entropy"
+    deny:
+      - "tools/cdd_feature"
+      - "tools/cdd_project_init"
+  
+  # 完全控制权限
+  full_control:
+    allow:
+      - "tools/*"
+    deny: []
+
+# 安全性配置
+security:
+  # 危险命令检查
+  dangerous_command_check: true
+  
+  # 路径白名单（限制可操作的目标路径）
+  allowed_paths:
+    - "~/*"
+    - "/tmp/*"
+    - "*/projects/*"
+  
+  # 禁止操作的目标路径
+  blocked_paths:
+    - "/"
+    - "/etc/*"
+    - "/home/*/.ssh"
+  
+  # 孢子隔离强制执行
+  spore_isolation:
+    enabled: true
+    strict_mode: true
+    allow_deployment_mode: true
+
+# MCP服务器配置
+server_config:
+  # 连接设置
+  host: "127.0.0.1"
+  port: 3000
+  
+  # 性能设置
+  max_connections: 10
+  request_timeout: 30
+  heartbeat_interval: 10
+  
+  # 日志设置
+  log_level: "info"
+  log_file: "/tmp/cdd_tools_mcp.log"
+  
+  # 缓存设置
+  cache_enabled: true
+  cache_ttl: 300
+
+# 宪法合规配置
+constitutional_compliance:
+  # 宪法依据
+  constitutional_basis:
+    - "§101: 单一真理源原则"
+    - "§102: 熵减原则"
+    - "§200: 孢子隔离原则"
+    - "§310: 安全原则"
+    - "§309: 自动化任务原则"
+    - "§310: 工具调用公理"
+  
+  # 宪法验证要求
+  verification_requirements:
+    - "每次工具调用前验证孢子隔离"
+    - "实时监控宪法合规状态"
+    - "记录所有工具调用事件"
+  
+  # 宪法违规处理
+  violation_handling:
+    - "宪法违规操作自动阻止"
+    - "违规事件立即记录审计日志"
+    - "系统管理员实时通知"
+
+# 工具调用统计
+metrics:
+  enabled: true
+  collection:
+    - "tool_execution_count"
+    - "tool_execution_time"
+    - "tool_success_rate"
+    - "constitutional_violations"
+  
+  reporting:
+    interval: 300  # 5分钟
+    retention_days: 30
+
+# 版本信息
+version:
+  mcp_version: "1.0.0"
+  cdd_version: "2.0.0"
+  compatibility:
+    claude_code: ">= 2.0.0"
+    mcp_protocol: ">= 1.0.0"
+
+# 配置验证
+validation:
+  schema_version: "1.0"
+  last_validated: "2026-02-20"
+  status: "active"
