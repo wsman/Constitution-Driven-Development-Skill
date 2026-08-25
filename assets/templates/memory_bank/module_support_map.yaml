@@ -1,0 +1,31 @@
+schemaVersion: "3.0"
+coreThesis: "Replace this sentence with the project's stable governing thesis."
+moduleOrder:
+  - example-module
+modules:
+  example-module:
+    t0Refs:
+      landscape: memory_bank/t0_core/knowledge_graph.md
+      status: memory_bank/t0_core/active_context.md
+      baseline: memory_bank/t0_core/basic_law_index.md
+    t1Refs:
+      systemPatterns: memory_bank/t1_axioms/system_patterns.md
+      behaviorContext: memory_bank/t1_axioms/behavior_context.md
+      techContext: memory_bank/t1_axioms/tech_context.md
+    t2Refs:
+      - path: memory_bank/t2_standards/DS-000_module_standard.md
+        kind: standard
+        coverage:
+          - constraint
+          - t1-support
+        t1Anchors:
+          - memory_bank/t1_axioms/system_patterns.md
+          - memory_bank/t1_axioms/behavior_context.md
+          - memory_bank/t1_axioms/tech_context.md
+      - path: memory_bank/t2_protocols/WF-000_module_protocol.md
+        kind: protocol
+        coverage:
+          - execution
+          - validation
+          - evidence
+    archiveRoot: memory_bank/t3_archives/example-module/
