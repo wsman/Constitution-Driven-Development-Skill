@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_only_governance_surface_remains() -> None:
     expected = {
+        "README.md",
         "SKILL.md",
         "assets",
         "references",
