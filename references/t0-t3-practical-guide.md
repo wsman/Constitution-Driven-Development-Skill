@@ -34,6 +34,15 @@ Standards state reusable constraints. Protocols state an executable sequence,
 inputs, outputs, stop conditions, and evidence destination. Do not combine
 these responsibilities merely to reduce file count.
 
+This is the `canonical-v1` scaffold, not the only valid representation. An
+existing project may declare an `established-schema3` layout through
+`memory_bank/README.md` and `memory_bank/t1_axioms/module_support_map.yaml`.
+That layout may retain `t2_execution`, `t3_archive`, module Story protocols,
+and module-owned archive roots outside `memory_bank`. Validation follows the
+declared safe relative paths and their semantic roles; it does not require a
+directory migration. Canonical text remains UTF-8/LF. Established text may use
+UTF-8 LF or CRLF, while BOM, NUL, invalid UTF-8, and bare CR remain invalid.
+
 ## Support contract
 
 Each module must have:

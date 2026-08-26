@@ -36,11 +36,17 @@ python scripts/validate_t0_t3.py --project <path> [--json]
 ```
 
 - `scaffold_t0_t3.py` is the only write entry. It creates missing managed
-  templates and overwrites them only with `--force`.
+  templates and overwrites them only with `--force`. It never rewrites an
+  established schema-3 project into the canonical scaffold, including with
+  `--force`.
 - `diagnose_t0_t3.py` is read-only and reports T0, T1, Support, T2, T3, and
   Gate 1-7 health with impact-scoped blockers.
 - `validate_t0_t3.py` is read-only and checks structure, support closure, T2
   separation, coverage, T3 authority leakage, and UTF-8 text rules.
+- Diagnosis and validation auto-detect `canonical-v1` and declared
+  `established-schema3` layouts. Established projects may retain their existing
+  T2, Story-protocol, archive-root, and CRLF conventions when their schema-3
+  support map closes those paths.
 - Exit codes are `0` for success, `1` for governance/validation failure, and
   `2` for CLI usage errors.
 - With `--json`, stdout contains exactly one versioned JSON object. Human

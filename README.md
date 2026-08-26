@@ -13,6 +13,7 @@ session persistence, analytics, or product implementation.
 - T1 explanatory-context templates
 - A module support-map contract
 - Separate T2 standards and protocols
+- Automatic validation of canonical and established schema-3 layouts
 - A non-authoritative T3 archive boundary
 - Read-only diagnosis and validation
 - Impact-proportional Gate decisions
@@ -45,11 +46,13 @@ python scripts/validate_t0_t3.py --project <path> [--json]
 ```
 
 - `scaffold_t0_t3.py` is the only write entry. It creates missing managed
-  files and overwrites them only when `--force` is supplied.
+  files and overwrites them only when `--force` is supplied. It refuses to
+  overwrite or reorganize an established schema-3 project.
 - `diagnose_t0_t3.py` is read-only and reports T0, T1, Support, T2, T3, and
   Gate 1-7 status.
 - `validate_t0_t3.py` is read-only and checks structure, support closure, T2
   separation, coverage, T3 authority leakage, and UTF-8/LF rules.
+  Established schema-3 projects may retain safe support-map routes and CRLF.
 
 Exit codes are `0` for success, `1` for governance or validation failure, and
 `2` for command-line usage errors. With `--json`, stdout contains exactly one

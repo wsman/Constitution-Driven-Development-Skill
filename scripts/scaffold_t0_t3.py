@@ -19,7 +19,7 @@ def main() -> int:
     template_root = Path(__file__).resolve().parents[1] / "assets" / "templates"
     payload = scaffold_project(project, template_root, args.force)
     emit(payload, args.json)
-    return 0
+    return 0 if payload["status"] == "PASS" else 1
 
 
 if __name__ == "__main__":
